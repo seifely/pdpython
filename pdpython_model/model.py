@@ -1,6 +1,6 @@
 from mesa import Model
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
-from mesa.space import SingleGrid # doesn't need to be multigrid as agent's aren't moving atop one another
+from mesa.space import SingleGrid  # doesn't need to be multigrid as agent's aren't moving atop one another
 from mesa.datacollection import DataCollector
 
 from .agents import PDAgent
