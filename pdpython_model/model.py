@@ -19,9 +19,9 @@ class PDGrid(Model):
 
     def __init__(self,
                  nagents,
-                 height,
-                 width,
                  payoffs,
+                 height=1,
+                 width=2,
                  schedule_type="Sequential",
                  spatialty=False):
         # super().__init__()  # This could be wrong - look at how you've structured it in boxworld. no super init
@@ -32,21 +32,16 @@ class PDGrid(Model):
         self.nagents = nagents
 
         self.spatiality = spatialty  # This isn't functioning properly right now
-        # Actual spatial placement of agents (basically iterating through free grid cells) isn't happening
-        # Below, but if we want it to we need to fix this/rewrite it ***
+        # Spatial placement of agents would basically include scaling up the world depending on how many agents you want
+        # Basically, increase agents by some fixed multiple, then scale up world to fit.
+        # e.g. 40 agents, 20 x 20 world, 50 agents, 25 x 25 world etc.
 
-        if not self.spatiality:
-            self.height = 50
-            self.width = 50
-        elif self.spatiality:
-            self.height = nagents
-            self.width = nagents
 
         # Create the agents
         for i in range(self.nagents):
             x, y = self.grid.find_empty()  # Find an empty spot - this is used for the non-spatial version
             agent = PDAgent((x, y), self)  # Create the agent itself
-            self.grid.place_agent(agent, (x, y))
+            self.grid.place_agent(agent, (x, y))  # Place it in the world
             self.schedule.add(agent)
 
         self.datacollector = DataCollector({
