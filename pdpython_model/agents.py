@@ -25,15 +25,16 @@ class PDAgent(Agent):
         self.move = None
         self.previous_moves = []
         self.payoffs = self.model.payoffs
+        self.stepcount = 0
         # pull in the payoff matrix (same for all agents IF WE ASSUME ALL AGENTS HAVE EQUAL PAYOFFS)
 
-
-        # pick a strategy - either by force, or by a decision mechanism
-    def pick_strategy(self, strategy):
-        if strategy is None:
+    # pick a strategy - either by force, or by a decision mechanism
+    def pick_strategy(self):
+        """ This will later need more information coming into it - on what should I base my
+        strategy selection? """
+        if self.strategy is None:
             # decision mechanism goes here
             return
-
 
     # given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
     # calculate the expected utility of each move, and then pick the highest
@@ -68,82 +69,36 @@ class PDAgent(Agent):
                 return "D"
 
     # increment the agent's score - for iterated games
-    def increment_score(self, my_move, opponents_move, current_score):
+    def increment_score(self, current_score, payoffs):
         # get payoff matrix
         # ------- FIND THE OPPONENTS MOVE --------
         neighbors = self.model.grid.get_neighbors(self.pos, True,
                                                       include_center=False)
-        
+        for i in neighbors:
+            partner_move = neighbors[i].move
+            my_move = self.move
+            outcome = [my_move, partner_move]  # what was the actual outcome
+            outcome_payoff = payoffs[outcome]  # this might break # find out how much utility we got
 
-        # what was the actual outcome
-        # find out how much utility we got
-        # return the value to increment our current score by
+            return outcome_payoff  # return the value to increment our current score by
+        """ This will only work for one neighbour - when we have multiple neighbours,
+        we will want to store them in a new list - where neighbour 0 has outcome-with-me 0
+        in terms of indices. """
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # if starting_move:
-        #     self.move = starting_move
-        # else:
-        #     #  self.move = self.random.choice(["C", "D"])  # random behaviours - we don't want this
-        #     return
-        #
-        # def pick_strategy(self, payoff):
-        #     new_strategy = ""
-        #     # bloo bloo pick strategy based on something
-        #     return new_strategy
-        #     # then need to set self.strategy to the new strategy
-        #
-        #
-        # def pick_move(self, strategy, payoff):
-        #     move = []
-        #     if strategy == None:
-        #         # pick_strategy(self, 1)
-        #         return
-        #     elif strategy == "ANGEL":
-        #         return move == "C"
-        #     elif strategy == "DEVIL":
-        #         return move == "D"
-
-
-        # @property # I AM NOT USED TO THIS SYNTAX BUT HEY LET'S TRY IT
-        # def isCooperating(self):
-        #     return self.move == "C"
+    # @property # I AM NOT USED TO THIS SYNTAX BUT HEY LET'S TRY IT
+    # def isCooperating(self):
+    #     return self.move == "C"
 
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
-        # if we were doing a spatial model, where agents looked at neighbours' choices, we would do:
-        # neighbours = self.model.grid.get_neighbours(self.pos, True,
-        #                                             include_center=True)
-        # then whatever computation we want (finding out the best utility score out of all the neighbours and picking their strategy)
+        if self.stepcount == 0:
+            if self.strategy is None or 0 or []:
+                self.strategy = self.pick_strategy()
+                self.pick_move(self.strategy, self.payoffs)
+                self.increment_score(self.score, self.payoffs)
+            else:
+                self.pick_move(self.strategy, self.payoffs)
 
-        #if stepcount = 0, pick a strategy (this is for simulation type 1)?
 
-        # self.move = pick_move(self, self.strategy, self.model.payoff)?
-        # self.increment_score
 
 
