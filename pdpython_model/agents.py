@@ -23,43 +23,61 @@ class PDAgent(Agent):
         self.score = 0  # starting utility at zero
         self.strategy = strategy
         self.move = None
-
-
-        # pull in the payoff matrix (same for all agents IF WE ASSUME ALL AGENTS HAVE EQUAL PAYOFFS)
+        self.previous_moves = []
         self.payoffs = self.model.payoffs
+        # pull in the payoff matrix (same for all agents IF WE ASSUME ALL AGENTS HAVE EQUAL PAYOFFS)
+
 
         # pick a strategy - either by force, or by a decision mechanism
-        def pick_strategy(self, strategy):
-            if strategy is None:
-                # decision mechanism goes here
-                return
+    def pick_strategy(self, strategy):
+        if strategy is None:
+            # decision mechanism goes here
+            return
 
 
-        # given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
-        # calculate the expected utility of each move, and then pick the highest
-        def pick_move(self, strategy, payoffs):
+    # given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
+    # calculate the expected utility of each move, and then pick the highest
+    def pick_move(self, strategy, payoffs):
 
-            if strategy is None or [] or 0:
-                print("I don't know what to do!")
-            elif strategy == "ANGEL":
+        if strategy is None or [] or 0:
+            print("I don't know what to do!")
+        elif strategy == "ANGEL":
+            return "C"
+        elif strategy == "DEVIL":
+            return "D"
+
+        elif strategy == "FP":  # this is under assumption of heterogeneity of agents
+            """ FP is designed as a strategy not based on 'trust' (though it can reflect that), but instead on 
+            the logic; 'I know they know defect is the best strategy usually, just as they know I know that'. """
+            # Current set-up: We assume partner will defect
+
+            ppD = 0.8  # probability of partner's defection
+            ppC = 0.2  # probability of partner's cooperation
+
+            euCD = (payoffs["C", "D"] * ppD)
+            euCC = (payoffs["C", "C"] * ppC)
+            euDD = (payoffs["C", "D"] * ppD)
+            euDC = (payoffs["D", "C"] * ppC)
+
+            exp_util = (euCC, euCD, euDC, euDD)
+            highest_eu = exp_util.index(max(exp_util))
+
+            if exp_util[highest_eu] == euCD or euCC:
                 return "C"
-            elif strategy == "DEVIL":
+            elif exp_util[highest_eu] == euDD or euDC:
                 return "D"
 
-            elif strategy = "FP":  # this is under assumption of heterogeneity of agents
-                """ FP is designed as a strategy not based on 'trust' (though it can reflect that), but instead on 
-                the logic; 'I know they know defect is the best strategy usually, just as they know I know that'. """
+    # increment the agent's score - for iterated games
+    def increment_score(self, my_move, opponents_move, current_score):
+        # get payoff matrix
+        # ------- FIND THE OPPONENTS MOVE --------
+        neighbors = self.model.grid.get_neighbors(self.pos, True,
+                                                      include_center=False)
+        
 
-                ppD = 0.8  # probability of partner's defection
-                ppC = 0.2  # probability of partner's cooperation
-
-                euCD = (payoffs["C, D"]
-
-
-
-
-        # increment the agent's score - for iterated games
-        def increment_score(self, current_score):
+        # what was the actual outcome
+        # find out how much utility we got
+        # return the value to increment our current score by
 
 
 
@@ -116,18 +134,16 @@ class PDAgent(Agent):
         # def isCooperating(self):
         #     return self.move == "C"
 
-        def increment_score
+    def step(self):
+        """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
+        # if we were doing a spatial model, where agents looked at neighbours' choices, we would do:
+        # neighbours = self.model.grid.get_neighbours(self.pos, True,
+        #                                             include_center=True)
+        # then whatever computation we want (finding out the best utility score out of all the neighbours and picking their strategy)
 
-        def step(self):
-            """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
-            # if we were doing a spatial model, where agents looked at neighbours' choices, we would do:
-            # neighbours = self.model.grid.get_neighbours(self.pos, True,
-            #                                             include_center=True)
-            # then whatever computation we want (finding out the best utility score out of all the neighbours and picking their strategy)
+        #if stepcount = 0, pick a strategy (this is for simulation type 1)?
 
-            #if stepcount = 0, pick a strategy (this is for simulation type 1)?
-
-            # self.move = pick_move(self, self.strategy, self.model.payoff)?
-            # self.increment_score
+        # self.move = pick_move(self, self.strategy, self.model.payoff)?
+        # self.increment_score
 
 
