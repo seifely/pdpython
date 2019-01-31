@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.space import MultiGrid
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
-from pdpython_model.base_model.agents import Gagent
+from pdpython_model.generic_model.agents import Gagent
 
 from mesa.datacollection import DataCollector
 

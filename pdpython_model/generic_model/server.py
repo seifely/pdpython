@@ -2,8 +2,8 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
-from pdpython_model.base_model.agents import Gagent
-from pdpython_model.base_model.model import GenericModel
+from pdpython_model.generic_model.agents import Gagent
+from pdpython_model.generic_model.model import GenericModel
 
 def gen_Model_Portrayal(agent):
     if agent is None:
