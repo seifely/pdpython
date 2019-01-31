@@ -18,12 +18,12 @@ def portrayPDAgent(agent):
     portrayal = {}
 
     if type(agent) is PDAgent:
-        if agent.strategy == None:
-            portrayal["Color"] = ["#00FF00", "#00CC00", "#009900"]
-            portrayal["text"] = "I'm an Agent!"
-        elif agent.strategy == "ANGEL":
-            portrayal["Color"] = ["#84e184", "#adebad", "#d6f5d6"]
-            portrayal["text"] = "I'm an Agent!"
+        if agent.strategy == "ANGEL":
+            portrayal["Color"] = "yellow"
+            portrayal["text"] = agent.move, agent.score
+        elif agent.strategy == "DEVIL":
+            portrayal["Color"] = ["red", "black"]
+            portrayal["text"] = agent.move, agent.score
 
         if agent.move == None:
             return

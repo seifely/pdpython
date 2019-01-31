@@ -24,9 +24,12 @@ class PDGrid(Model):
     rounds = 1
 
     def __init__(self,
-                 nagents,
-                 payoffs,
-                 rounds,
+                 nagents=2,
+                 payoffs={("C", "C"): 3,
+              ("C", "D"): 0,
+              ("D", "C"): 5,
+              ("D", "D"): 2},
+                 rounds=1,
                  height=1,
                  width=2,
                  schedule_type="Sequential",
@@ -34,9 +37,11 @@ class PDGrid(Model):
 
         self.grid = SingleGrid(width, height, torus=True)
         self.schedule_type = schedule_type
+        self.schedule = self.schedule_types[self.schedule_type](self)
         self.payoffs = payoffs
         self.nagents = nagents
         self.rounds = rounds
+
 
         # Create the agents
         for i in range(self.nagents):
@@ -47,6 +52,9 @@ class PDGrid(Model):
 
         # Collect Data
         # on agent utilities? (or on utility per strategy?)
+        """ We could collect data on: 
+            Number of Agents in Each Strat
+            Total Utility Achieved """
 
         self.running = True
         # self.datacollector.collect(self)

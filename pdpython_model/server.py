@@ -14,7 +14,7 @@ model_params ={
     "width": 50,
     "schedule_type": UserSettableParameter("choice", "Scheduler Type", value="Sequential",
                                            choices=list(PDGrid.schedule_types.keys())),
-    "number_agents": UserSettableParameter("slider", "Number of Agents", 2, 2, 2, 1)
+    # "number_agents": UserSettableParameter("slider", "Number of Agents", 2, 2, 2, 1)
     # "strategy_style"
     # "strategy_diversity"
 }
