@@ -24,7 +24,7 @@ class PDGrid(Model):
     rounds = 1
 
     def __init__(self,
-                 nagents=2,
+                 nagents=4,
                  payoffs={("C", "C"): 3,
               ("C", "D"): 0,
               ("D", "C"): 5,
@@ -42,13 +42,13 @@ class PDGrid(Model):
         self.nagents = nagents
         self.rounds = rounds
 
-
         # Create the agents
         for i in range(self.nagents):
             x, y = self.grid.find_empty()  # Find an empty spot - this is used for the non-spatial version
             agent = PDAgent((x, y), self)  # Create the agent itself
             self.grid.place_agent(agent, (x, y))  # Place it in the world
             self.schedule.add(agent)
+            print("Agent Spawned")
 
         # Collect Data
         # on agent utilities? (or on utility per strategy?)

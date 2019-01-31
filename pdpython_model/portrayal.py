@@ -18,6 +18,8 @@ def portrayPDAgent(agent):
     portrayal = {}
 
     if type(agent) is PDAgent:
+        portrayal["Color"] = "green"
+
         if agent.strategy == "ANGEL":
             portrayal["Color"] = "yellow"
             portrayal["text"] = agent.move, agent.score
@@ -25,8 +27,8 @@ def portrayPDAgent(agent):
             portrayal["Color"] = ["red", "black"]
             portrayal["text"] = agent.move, agent.score
 
-        if agent.move == None:
-            return
+        # if agent.move == None:
+        #     return
         # THIS NEEDS TO GO ON AND SO ON FOR EACH STRATEGY
         portrayal["Shape"] = "rect"
         portrayal["Filled"] = "true"
