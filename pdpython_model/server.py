@@ -2,8 +2,8 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.UserParam import UserSettableParameter
 
-from pdpython_model.agents import PDAgent
-from .model import PDGrid
+# from pdpython_model.fixed_model.agents import PDAgent
+# from pdpython_model.fixed_model.model import PDGrid
 
 def portrayPDAgent(agent):
     if agent is None:
