@@ -1,32 +1,28 @@
 from mesa import Agent
-
-# Stratgey Key:
-    # ANGEL - Always Cooperate
-    # DEVIL - Always Defect
-    # FP - Fixed Probabilities, multiplying the payoff matrix by the likelihood of each outcome (dependant on other)
-
+import random
 
 class PDAgent(Agent):
-    """ Agent member of the iterated prisoner's dilemma model """
-
-    def __init__(self, pos, model, starting_move=None, strategy='ANGEL'):
-        """ Args:
-                pos: (x, y), tuple of the agent's position.
-                model: model instance
-                starting_move: If provided, determines agent starting state: C or D.
-                                Otherwise, random.
-
-        """
-
+    def __init__(self, pos, model, stepcount=0, strategy="ANGEL",starting_move=None):
         super().__init__(pos, model)
+
         self.pos = pos
-        self.score = 0  # starting utility at zero
+        self.stepCount = stepcount
+        self.score = 0
         self.strategy = strategy
         self.move = None
-        self.previous_moves = []
+        self.next_move = None
+        if starting_move:
+            self.move = starting_move
+        else:
+            self.move = self.random.choice(["C", "D"])
+
         self.payoffs = self.model.payoffs
-        self.stepcount = 0
         # pull in the payoff matrix (same for all agents IF WE ASSUME ALL AGENTS HAVE EQUAL PAYOFFS)
+
+        # ------------------------ LOCAL MEMORY --------------------------
+        # partner's moves (by position, read in order)
+        # partner's scores
+        self.previous_moves = []
 
     # pick a strategy - either by force, or by a decision mechanism
     def pick_strategy(self):
@@ -43,10 +39,10 @@ class PDAgent(Agent):
         if strategy is None or [] or 0:
             print("I don't know what to do!")
         elif strategy == "ANGEL":
-            print("I'm an angel, so I'll cooperate")
+            # print("I'm an angel, so I'll cooperate")
             return "C"
         elif strategy == "DEVIL":
-            print("I'm a devil, so I'll defect")
+            # print("I'm a devil, so I'll defect")
             return "D"
 
         elif strategy == "FP":  # this is under assumption of heterogeneity of agents
@@ -72,54 +68,86 @@ class PDAgent(Agent):
 
     # increment the agent's score - for iterated games
     def increment_score(self, payoffs):
-        # get payoff matrix
-        # ------- FIND THE OPPONENTS MOVE --------
-        neighbors = self.model.grid.get_neighbors(self.pos, False,
-                                                      include_center=False)
-        print("fellow cool kids:", neighbors)
-        print(len(neighbors))
-        for i in neighbors:
-            partner_move = max(neighbors, key=lambda a: a.score)
+        # Get Neighbours
+        x, y = self.pos
+        neighbouring_cells = [(x, y+1), (x+1, y), (x, y-1), (x-1, y)]  # N, E, S, W
+        # --------------- THERE NEEDS TO BE AN IF X,Y IS IN RANGE ---------------------
+        for i in neighbouring_cells:
+            bound_checker = self.model.grid.out_of_bounds(i)
+            if not bound_checker:
+                this_cell = self.model.grid.get_cell_list_contents([i])
 
-            # partner_move = neighbors[i].move
-            # print("fellow cool kids' move:", partner_move)
-            my_move = self.move
-            outcome = [my_move, partner_move]  # what was the actual outcome
-            outcome_payoff = payoffs[outcome]  # this might break # find out how much utility we got
-            print("The outcome payoff is ", outcome_payoff)
-            return outcome_payoff  # return the value to increment our current score by
-        """ This will only work for one neighbour - when we have multiple neighbours,
-        we will want to store them in a new list - where neighbour 0 has outcome-with-me 0
-        in terms of indices. """
+                if len(this_cell) > 0:
+                    partner = [obj for obj in this_cell
+                                   if isinstance(obj, PDAgent)][0]
+                    partner_score = partner.score
+                    partner.strategy = partner.strategy
+                    partner_move = partner.move
 
-    # @property # I AM NOT USED TO THIS SYNTAX BUT HEY LET'S TRY IT
-    # def isCooperating(self):
-    #     return self.move == "C"
+                    my_move = self.move
+                    outcome = [my_move, partner_move]  # what was the actual outcome
+                    print("Outcome: ", outcome)
+                    outcome_payoff = payoffs[self.move, partner_move]  # this might break # find out how much utility we got
+                    print("The outcome payoff is ", outcome_payoff)
+                    return outcome_payoff  # return the value to increment our current score by
+                """ This will only work for one neighbour - when we have multiple neighbours,
+                we will want to store them in a new list - where neighbour 0 has outcome-with-me 0
+                in terms of indices. """
+            else:
+                return
+
 
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
-        if self.stepcount == 0:
+        if self.stepCount == 0:
             print(self.strategy)
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
-                self.move = self.pick_move(self.strategy, self.payoffs)
+                self.next_move = self.pick_move(self.strategy, self.payoffs)
                 print("My move is ", self.move)
 
                 self.previous_moves.append(self.move)
 
-                to_increment = self.increment_score(self.payoffs)
-                print("My utility this round is ", to_increment)
-                self.score += to_increment
+                # to_increment = self.increment_score(self.payoffs)
+                # print("My utility this round is ", to_increment)
+                # self.score += to_increment
+
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
+
+                self.stepCount += 1
             else:
-                self.move = self.pick_move(self.strategy, self.payoffs)
+                self.next_move = self.pick_move(self.strategy, self.payoffs)
                 print("My move is ", self.move)
 
                 self.previous_moves.append(self.move)
 
-                to_increment = self.increment_score(self.payoffs)
-                print("My utility this round is ", to_increment)
-                self.score += to_increment
+                # to_increment = self.increment_score(self.payoffs)
+                # print("My utility this round is ", to_increment)
+                # self.score += to_increment
 
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
 
+                self.stepCount += 1
+        else:
+            self.next_move = self.pick_move(self.strategy, self.payoffs)
+            print("My move is ", self.move)
 
+            self.previous_moves.append(self.move)
 
+            # to_increment = self.increment_score(self.payoffs)
+            # print("My utility this round is ", to_increment)
+            # self.score += to_increment
+
+            if self.model.schedule_type != "Simultaneous":
+                self.advance()
+
+            self.stepCount += 1
+
+    def advance(self):
+        self.move = self.next_move
+        round_payoff = self.increment_score(self.payoffs)
+        if round_payoff is not None:
+            self.score += round_payoff
+            return
