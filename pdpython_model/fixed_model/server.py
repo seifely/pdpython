@@ -49,7 +49,7 @@ def gen_Model_Portrayal(agent):
 
     return portrayal
 
-canvas_element = CanvasGrid(gen_Model_Portrayal, 1, 2, 500, 500)
+canvas_element = CanvasGrid(gen_Model_Portrayal, 5, 5, 500, 500)
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 

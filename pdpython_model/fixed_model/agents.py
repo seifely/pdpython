@@ -14,12 +14,9 @@ class PDAgent(Agent):
         self.payoffs = self.model.payoffs
         # pull in the payoff matrix (same for all agents IF WE ASSUME ALL AGENTS HAVE EQUAL PAYOFFS)
 
-    # def some_function(self):
-    #     a = 2 + 2
-    #     return a
-    #
-    # def step(self):
-    #     print(self.some_function())
+        # ------------------------ LOCAL MEMORY --------------------------
+        # partner's moves (by position, read in order)
+        # partner's scores
 
     # pick a strategy - either by force, or by a decision mechanism
     def pick_strategy(self):
@@ -65,22 +62,43 @@ class PDAgent(Agent):
 
     # increment the agent's score - for iterated games
     def increment_score(self, payoffs):
-        # get payoff matrix
-        # ------- FIND THE OPPONENTS MOVE --------
-        neighbors = self.model.grid.get_neighbors(self.pos, True,
-                                                    include_center=False)
-        print("fellow cool kids:", neighbors)
-        for i in neighbors:
-            partner_move = neighbors[i].move
-            print("fellow cool kids' move:", partner_move)
-            my_move = self.move
-            outcome = [my_move, partner_move]  # what was the actual outcome
-            outcome_payoff = payoffs[outcome]  # this might break # find out how much utility we got
-            print("The outcome payoff is ", outcome_payoff)
-            return outcome_payoff  # return the value to increment our current score by
-        """ This will only work for one neighbour - when we have multiple neighbours,
-        we will want to store them in a new list - where neighbour 0 has outcome-with-me 0
-        in terms of indices. """
+        # Get Neighbours
+        x, y = self.pos
+        neighbouring_cells = [(x, y+1), (x+1, y), (x, y-1), (x-1, y)]  # N, E, S, W
+        # --------------- THERE NEEDS TO BE AN IF X,Y IS IN RANGE ---------------------
+        for i in neighbouring_cells:
+            bound_checker = self.model.grid.out_of_bounds(i)
+            if not bound_checker:
+                this_cell = self.model.grid.get_cell_list_contents([i])
+
+                if len(this_cell) > 0:
+                    partner = [obj for obj in this_cell
+                                   if isinstance(obj, PDAgent)][0]
+                    partner_score = partner.score
+                    partner.strategy = partner.strategy
+                    partner_move = partner.move
+
+                    my_move = self.move
+                    outcome = [my_move, partner_move]  # what was the actual outcome
+                    print("Outcome: ", outcome)
+                    outcome_payoff = payoffs[outcome[0]]  # this might break # find out how much utility we got
+                    print("The outcome payoff is ", outcome_payoff)
+                    return outcome_payoff  # return the value to increment our current score by
+                """ This will only work for one neighbour - when we have multiple neighbours,
+                we will want to store them in a new list - where neighbour 0 has outcome-with-me 0
+                in terms of indices. """
+            else:
+                return
+
+
+        # neighbors = self.model.grid.get_neighbors(self.pos, True,
+        #                                             include_center=False)
+        # print("fellow cool kids:", neighbors)
+        # for i in neighbors:
+        #     # partner_move = neighbors[i].move
+        #     # print("fellow cool kids' move:", partner_move)
+        #     partner_move = max(neighbors, key=lambda a: a.score)
+
 
     # @property # I AM NOT USED TO THIS SYNTAX BUT HEY LET'S TRY IT
     # def isCooperating(self):
@@ -101,6 +119,9 @@ class PDAgent(Agent):
                 print("My utility this round is ", to_increment)
                 self.score += to_increment
 
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
+
                 self.stepCount += 1
             else:
                 self.move = self.pick_move(self.strategy, self.payoffs)
@@ -111,6 +132,10 @@ class PDAgent(Agent):
                 to_increment = self.increment_score(self.payoffs)
                 print("My utility this round is ", to_increment)
                 self.score += to_increment
+
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
+
                 self.stepCount += 1
         else:
             self.move = self.pick_move(self.strategy, self.payoffs)
@@ -121,4 +146,8 @@ class PDAgent(Agent):
             to_increment = self.increment_score(self.payoffs)
             print("My utility this round is ", to_increment)
             self.score += to_increment
+
+            if self.model.schedule_type != "Simultaneous":
+                self.advance()
+
             self.stepCount += 1

@@ -74,12 +74,15 @@ class PDAgent(Agent):
     def increment_score(self, payoffs):
         # get payoff matrix
         # ------- FIND THE OPPONENTS MOVE --------
-        neighbors = self.model.grid.get_neighbors(self.pos, True,
+        neighbors = self.model.grid.get_neighbors(self.pos, False,
                                                       include_center=False)
         print("fellow cool kids:", neighbors)
+        print(len(neighbors))
         for i in neighbors:
-            partner_move = neighbors[i].move
-            print("fellow cool kids' move:", partner_move)
+            partner_move = max(neighbors, key=lambda a: a.score)
+
+            # partner_move = neighbors[i].move
+            # print("fellow cool kids' move:", partner_move)
             my_move = self.move
             outcome = [my_move, partner_move]  # what was the actual outcome
             outcome_payoff = payoffs[outcome]  # this might break # find out how much utility we got
