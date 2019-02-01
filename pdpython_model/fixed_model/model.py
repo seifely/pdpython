@@ -46,7 +46,7 @@ class PDModel(Model):
         self.schedule.step()
         self.step_count += 1
 
-    def run_model(self, rounds=10):
+    def run_model(self, rounds=200):
         for i in range(rounds):
             self.step()
 
