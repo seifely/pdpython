@@ -46,6 +46,17 @@ def gen_Model_Portrayal(agent):
                          "text_color": "white",
                          "scale": 1
                          }
+        if agent.strategy == "FP":
+            portrayal = {"Shape": "circle",
+                         "scale": 1,
+                         "Color": "green",
+                         "Filled": "true",
+                         "Layer": 1,
+                         "r": 0.5,
+                         "text": [agent.move, " ", agent.score],
+                         "text_color": "white",
+                         "scale": 1
+                         }
 
     return portrayal
 

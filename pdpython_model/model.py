@@ -11,7 +11,7 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=5, width=5,
+    def __init__(self, height=1, width=2,
                  number_of_agents=2,
                  schedule_type="Simultaneous",
                  rounds=1,):

@@ -2,7 +2,7 @@ from mesa import Agent
 import random
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, strategy="ANGEL",starting_move=None):
+    def __init__(self, pos, model, stepcount=0, strategy="FP",starting_move=None):
         super().__init__(pos, model)
 
         self.pos = pos
@@ -53,17 +53,26 @@ class PDAgent(Agent):
             ppD = 0.8  # probability of partner's defection
             ppC = 0.2  # probability of partner's cooperation
 
-            euCD = (payoffs["C", "D"] * ppD)
             euCC = (payoffs["C", "C"] * ppC)
-            euDD = (payoffs["C", "D"] * ppD)
+            euCD = (payoffs["C", "D"] * ppD)
             euDC = (payoffs["D", "C"] * ppC)
+            euDD = (payoffs["C", "D"] * ppD)
 
             exp_util = (euCC, euCD, euDC, euDD)
+            print("EXPUTIL: ", exp_util)
             highest_eu = exp_util.index(max(exp_util))
-
-            if exp_util[highest_eu] == euCD or euCC:
+            print("Highest EU: ", highest_eu)
+            if highest_eu == 0:
+                print("Cooperate is best")
                 return "C"
-            elif exp_util[highest_eu] == euDD or euDC:
+            elif highest_eu == 1:
+                print("Cooperate is best")
+                return "C"
+            elif highest_eu == 2:
+                print("Defect is best")
+                return "D"
+            elif highest_eu == 3:
+                print("Defect is best")
                 return "D"
 
     # increment the agent's score - for iterated games
