@@ -26,6 +26,7 @@ class PDAgent(Agent):
         self.partner_moves = {}
         self.partner_latest_move = {}  # this is a popped list
         self.partner_scores = {}
+        self.per_partner_utility = {}
 
     # pick a strategy - either by force, or by a decision mechanism
     def pick_strategy(self):
@@ -63,20 +64,20 @@ class PDAgent(Agent):
             euDD = (payoffs["C", "D"] * ppD)
 
             exp_util = (euCC, euCD, euDC, euDD)
-            print("EXPUTIL: ", exp_util)
+            # print("EXPUTIL: ", exp_util)
             highest_eu = exp_util.index(max(exp_util))
-            print("Highest EU: ", highest_eu)
+            # print("Highest EU: ", highest_eu)
             if highest_eu == 0:
-                print("Cooperate is best")
+                # print("Cooperate is best")
                 return "C"
             elif highest_eu == 1:
-                print("Cooperate is best")
+                # print("Cooperate is best")
                 return "C"
             elif highest_eu == 2:
-                print("Defect is best")
+                # print("Defect is best")
                 return "D"
             elif highest_eu == 3:
-                print("Defect is best")
+                # print("Defect is best")
                 return "D"
 
     def check_partner(self):
@@ -105,7 +106,10 @@ class PDAgent(Agent):
                     if self.partner_latest_move.get(partner_ID) is None:
                         self.partner_latest_move[partner_ID] = partner_move
                     else:
-                        self.partner_latest_move[partner_ID] = [partner_move]  # this is stupidly redundant but I don't have the current brain energy to fix it
+                        self.partner_latest_move[partner_ID] = partner_move  # this is stupidly redundant but I don't have the current brain energy to fix it
+
+                    if self.per_partner_utility.get(partner_ID) is None:
+                        self.per_partner_utility[partner_ID] = 0
 
                     """Below needs uncommenting when I want to do multi-round memory"""
                     # First, check if we have a casefile on them in each memory slot
@@ -118,16 +122,31 @@ class PDAgent(Agent):
                     #     print("My partner's moves have been:", self.partner_moves[partner_ID])
                     #     """ We should repeat the above process for the other memory fields too, like partner's gathered utility """
 
-                    self.partner_IDs.append(partner_ID)
+                    if partner_ID not in self.partner_IDs:
+                        self.partner_IDs.append(partner_ID)
 
+        print("Partner IDs: ", self.partner_IDs)
+        print("Partner Latest Moves:", self.partner_latest_move)
 
     # increment the agent's score - for iterated games
-    def increment_score(self, pmoves, payoffs):
+    def increment_score(self, payoffs):
         my_move = self.move
+        total_utility = 0
 
         for i in self.partner_IDs:
-            this_partner_outcome = self.partner_latest_move[i]
-            
+            this_partner_move = self.partner_latest_move[i]
+            outcome = [my_move, this_partner_move]
+            print("Outcome with partner %i was:" % i, outcome)
+
+            outcome_payoff = payoffs[self.move, this_partner_move]
+            current_partner_payoff = self.per_partner_utility[i]
+            new_partner_payoff = current_partner_payoff + outcome_payoff
+            self.per_partner_utility[i] = new_partner_payoff
+            total_utility += outcome_payoff
+
+        # self.score = self.score + total_utility
+        print("My total overall score is:", self.score)
+        return total_utility
 
         # Get Neighbours
         #             my_move = self.move
@@ -151,8 +170,6 @@ class PDAgent(Agent):
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
-                print("My move is ", self.move)
-
                 self.previous_moves.append(self.move)
 
                 # to_increment = self.increment_score(self.payoffs)
@@ -194,6 +211,7 @@ class PDAgent(Agent):
 
     def advance(self):
         self.move = self.next_move
+        self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
         round_payoff = self.increment_score(self.payoffs)
         if round_payoff is not None:
             self.score += round_payoff

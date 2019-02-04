@@ -5,13 +5,14 @@ from pdpython_model.agents import PDAgent
 
 from mesa.datacollection import DataCollector
 
+
 class PDModel(Model):
 
     schedule_types = {"Sequential": BaseScheduler,
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=1, width=2,
+    def __init__(self, height=5, width=5,
                  number_of_agents=2,
                  schedule_type="Simultaneous",
                  rounds=1,):
@@ -28,9 +29,13 @@ class PDModel(Model):
                         ("D", "C"): 5,
                         ("D", "D"): 2}
 
+
         # Model Functions
         self.schedule = self.schedule_types[self.schedule_type](self)
         self.grid = SingleGrid(self.height, self.width, torus=True)
+
+        # Find list of empty cells
+        self.coordinates = [(x, y) for x in range(self.width) for y in range(self.height)]
 
         self.agentIDs = list(range(1, (number_of_agents + 1)))
 
@@ -39,7 +44,9 @@ class PDModel(Model):
 
     def make_agents(self):
         for i in range(self.number_of_agents):
-            x, y = self.grid.find_empty()
+            x, y = self.coordinates.pop(0)
+            print("x, y:", x, y)
+            # x, y = self.grid.find_empty()
             pdagent = PDAgent((x, y), self, True)
             self.grid.place_agent(pdagent, (x, y))
             self.schedule.add(pdagent)
