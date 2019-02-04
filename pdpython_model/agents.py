@@ -7,8 +7,10 @@ class PDAgent(Agent):
 
         self.pos = pos
         self.stepCount = stepcount
+        self.ID = self.model.agentIDs.pop(0)
         self.score = 0
         self.strategy = strategy
+        self.previous_moves = []
         self.move = None
         self.next_move = None
         if starting_move:
@@ -20,9 +22,10 @@ class PDAgent(Agent):
         # pull in the payoff matrix (same for all agents IF WE ASSUME ALL AGENTS HAVE EQUAL PAYOFFS)
 
         # ------------------------ LOCAL MEMORY --------------------------
-        # partner's moves (by position, read in order)
-        # partner's scores
-        self.previous_moves = []
+        self.partner_IDs = []
+        self.partner_moves = {}
+        self.partner_latest_move = {}  # this is a popped list
+        self.partner_scores = {}
 
     # pick a strategy - either by force, or by a decision mechanism
     def pick_strategy(self):
@@ -32,9 +35,10 @@ class PDAgent(Agent):
             # decision mechanism goes here
             return
 
-    # given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
-    # calculate the expected utility of each move, and then pick the highest
     def pick_move(self, strategy, payoffs):
+        """ given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
+            calculate the expected utility of each move, and then pick the highest"""
+        """AT THE MOMENT, THIS IS A GENERAL ONCE-A-ROUND FUNCTION, AND ISN'T PER PARTNER - THIS NEEDS TO CHANGE """
 
         if strategy is None or [] or 0:
             print("I don't know what to do!")
@@ -75,35 +79,69 @@ class PDAgent(Agent):
                 print("Defect is best")
                 return "D"
 
-    # increment the agent's score - for iterated games
-    def increment_score(self, payoffs):
-        # Get Neighbours
+    def check_partner(self):
+        """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
         x, y = self.pos
-        neighbouring_cells = [(x, y+1), (x+1, y), (x, y-1), (x-1, y)]  # N, E, S, W
-        # --------------- THERE NEEDS TO BE AN IF X,Y IS IN RANGE ---------------------
+        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+
+        # First, get the neighbours
         for i in neighbouring_cells:
-            bound_checker = self.model.grid.out_of_bounds(i)
+            bound_checker = self.model.grid.out_of_bounds(i)  # Is the cell not off the map?
             if not bound_checker:
                 this_cell = self.model.grid.get_cell_list_contents([i])
-
+                # print("This cell", this_cell)
+                #
                 if len(this_cell) > 0:
                     partner = [obj for obj in this_cell
-                                   if isinstance(obj, PDAgent)][0]
-                    partner_score = partner.score
-                    partner.strategy = partner.strategy
-                    partner_move = partner.move
+                               if isinstance(obj, PDAgent)][0]
 
-                    my_move = self.move
-                    outcome = [my_move, partner_move]  # what was the actual outcome
-                    print("Outcome: ", outcome)
-                    outcome_payoff = payoffs[self.move, partner_move]  # this might break # find out how much utility we got
-                    print("The outcome payoff is ", outcome_payoff)
-                    return outcome_payoff  # return the value to increment our current score by
-                """ This will only work for one neighbour - when we have multiple neighbours,
-                we will want to store them in a new list - where neighbour 0 has outcome-with-me 0
-                in terms of indices. """
-            else:
-                return
+                    partner_ID = partner.ID
+                    partner_score = partner.score
+                    partner_strategy = partner.strategy
+                    partner_move = partner.move
+                    partner_moves = partner.previous_moves # ******** this could either be redundant or MORE EFFICIENT than the current way of doing things - this is accessing the other agent's own record of its moves
+
+                    # Wanna add each neighbour's move, score etc. to the respective memory banks
+                    if self.partner_latest_move.get(partner_ID) is None:
+                        self.partner_latest_move[partner_ID] = partner_move
+                    else:
+                        self.partner_latest_move[partner_ID] = [partner_move]  # this is stupidly redundant but I don't have the current brain energy to fix it
+
+                    """Below needs uncommenting when I want to do multi-round memory"""
+                    # First, check if we have a casefile on them in each memory slot
+                    # if self.partner_moves.get(partner_ID) is None:  # if we don't have a casefile for this partner
+                    #     self.partner_moves[partner_ID] = []
+                    #     self.partner_moves[partner_ID][0] = partner_move
+                    # else:
+                    #     sublist_len = len(self.partner_moves[partner_ID])
+                    #     self.partner_moves[partner_ID][sublist_len+1] = partner_move   # ****** I don't know if this needs to be len+1, just len might be more appropriate
+                    #     print("My partner's moves have been:", self.partner_moves[partner_ID])
+                    #     """ We should repeat the above process for the other memory fields too, like partner's gathered utility """
+
+                    self.partner_IDs.append(partner_ID)
+
+
+    # increment the agent's score - for iterated games
+    def increment_score(self, pmoves, payoffs):
+        my_move = self.move
+
+        for i in self.partner_IDs:
+            this_partner_outcome = self.partner_latest_move[i]
+            
+
+        # Get Neighbours
+        #             my_move = self.move
+        #             outcome = [my_move, partner_move]  # what was the actual outcome
+
+        #             print("Outcome: ", outcome)
+        #             outcome_payoff = payoffs[self.move, partner_move]  # this might break # find out how much utility we got
+        #             print("The outcome payoff is ", outcome_payoff)
+        #             return outcome_payoff  # return the value to increment our current score by
+        #         """ This will only work for one neighbour - when we have multiple neighbours,
+        #         we will want to store them in a new list - where neighbour 0 has outcome-with-me 0
+        #         in terms of indices. """
+        #     else:
+        #         return
 
 
     def step(self):

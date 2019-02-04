@@ -32,6 +32,8 @@ class PDModel(Model):
         self.schedule = self.schedule_types[self.schedule_type](self)
         self.grid = SingleGrid(self.height, self.width, torus=True)
 
+        self.agentIDs = list(range(1, (number_of_agents + 1)))
+
         self.make_agents()
         self.running = True
 
