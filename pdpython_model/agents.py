@@ -114,11 +114,12 @@ class PDAgent(Agent):
                     if self.per_partner_utility.get(partner_ID) is None:
                         self.per_partner_utility[partner_ID] = 0
 
-                    """Below needs uncommenting when I want to do multi-round memory"""
-                    # First, check if we have a casefile on them in each memory slot
+                    # """Below needs uncommenting when I want to do multi-round memory"""
+                    # # First, check if we have a casefile on them in each memory slot
                     # if self.partner_moves.get(partner_ID) is None:  # if we don't have a casefile for this partner
                     #     self.partner_moves[partner_ID] = []
-                    #     self.partner_moves[partner_ID][0] = partner_move
+                    #     print("partner moves dict:", self.partner_moves)
+                    #     self.partner_moves[partner_ID] = partner_move
                     # else:
                     #     sublist_len = len(self.partner_moves[partner_ID])
                     #     self.partner_moves[partner_ID][sublist_len+1] = partner_move   # ****** I don't know if this needs to be len+1, just len might be more appropriate
