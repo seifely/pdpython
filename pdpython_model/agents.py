@@ -150,20 +150,6 @@ class PDAgent(Agent):
         # self.score = self.score + total_utility
         return total_utility
 
-        # Get Neighbours
-        #             my_move = self.move
-        #             outcome = [my_move, partner_move]  # what was the actual outcome
-
-        #             print("Outcome: ", outcome)
-        #             outcome_payoff = payoffs[self.move, partner_move]  # this might break # find out how much utility we got
-        #             print("The outcome payoff is ", outcome_payoff)
-        #             return outcome_payoff  # return the value to increment our current score by
-        #         """ This will only work for one neighbour - when we have multiple neighbours,
-        #         we will want to store them in a new list - where neighbour 0 has outcome-with-me 0
-        #         in terms of indices. """
-        #     else:
-        #         return
-
 
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
@@ -173,10 +159,6 @@ class PDAgent(Agent):
                 self.strategy = self.pick_strategy()
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-
-                # to_increment = self.increment_score(self.payoffs)
-                # print("My utility this round is ", to_increment)
-                # self.score += to_increment
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -188,10 +170,6 @@ class PDAgent(Agent):
 
                 self.previous_moves.append(self.move)
 
-                # to_increment = self.increment_score(self.payoffs)
-                # print("My utility this round is ", to_increment)
-                # self.score += to_increment
-
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
@@ -201,10 +179,6 @@ class PDAgent(Agent):
             print("My move is ", self.move)
 
             self.previous_moves.append(self.move)
-
-            # to_increment = self.increment_score(self.payoffs)
-            # print("My utility this round is ", to_increment)
-            # self.score += to_increment
 
             if self.model.schedule_type != "Simultaneous":
                 self.advance()
@@ -217,5 +191,5 @@ class PDAgent(Agent):
         round_payoff = self.increment_score(self.payoffs)
         if round_payoff is not None:
             self.score += round_payoff
-            print("My total overall score is:", self.score)
+            # print("My total overall score is:", self.score)
             return
