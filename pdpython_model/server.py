@@ -60,11 +60,12 @@ def gen_Model_Portrayal(agent):
 
     return portrayal
 
-canvas_element = CanvasGrid(gen_Model_Portrayal, 5, 5, 500, 500)
+
+canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
-model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 2, 2, 25, 1),
+model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 2, 2, 64, 1),
                 }
 
 server = ModularServer(PDModel, [canvas_element], "Generic Model", model_params)
