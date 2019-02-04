@@ -35,7 +35,7 @@ def gen_Model_Portrayal(agent):
                          "text_color": "black",
                          "scale": 1
                          }
-        if agent.strategy == "DEVIL":
+        elif agent.strategy == "DEVIL":
             portrayal = {"Shape": "circle",
                          "scale": 1,
                          "Color": "red",
@@ -46,10 +46,21 @@ def gen_Model_Portrayal(agent):
                          "text_color": "white",
                          "scale": 1
                          }
-        if agent.strategy == "FP":
+        elif agent.strategy == "FP":
             portrayal = {"Shape": "circle",
                          "scale": 1,
                          "Color": "green",
+                         "Filled": "true",
+                         "Layer": 1,
+                         "r": 0.5,
+                         "text": [agent.move, " ", agent.score],
+                         "text_color": "white",
+                         "scale": 1
+                         }
+        elif agent.strategy == "RANDOM":
+            portrayal = {"Shape": "circle",
+                         "scale": 1,
+                         "Color": "grey",
                          "Filled": "true",
                          "Layer": 1,
                          "r": 0.5,

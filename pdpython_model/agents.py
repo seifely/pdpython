@@ -2,7 +2,7 @@ from mesa import Agent
 import random
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, strategy="FP",starting_move=None):
+    def __init__(self, pos, model, stepcount=0, strategy="RANDOM",starting_move=None):
         super().__init__(pos, model)
 
         self.pos = pos
@@ -80,6 +80,9 @@ class PDAgent(Agent):
                 # print("Defect is best")
                 return "D"
 
+        elif strategy == "RANDOM":
+            return self.random.choice(["C", "D"])
+
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
         x, y = self.pos
@@ -145,7 +148,6 @@ class PDAgent(Agent):
             total_utility += outcome_payoff
 
         # self.score = self.score + total_utility
-        print("My total overall score is:", self.score)
         return total_utility
 
         # Get Neighbours
@@ -215,4 +217,5 @@ class PDAgent(Agent):
         round_payoff = self.increment_score(self.payoffs)
         if round_payoff is not None:
             self.score += round_payoff
+            print("My total overall score is:", self.score)
             return
