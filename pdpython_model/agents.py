@@ -29,12 +29,39 @@ class PDAgent(Agent):
         self.per_partner_utility = {}
 
     # pick a strategy - either by force, or by a decision mechanism
+    # *** FOR FUTURE: *** Should agents pick strategies for each of their partners, or for all of their
+    # interactions?
     def pick_strategy(self):
         """ This will later need more information coming into it - on what should I base my
         strategy selection? """
         if self.strategy is None:
             # decision mechanism goes here
             return
+
+    def iter_pick_move(self, strategy, payoffs):
+        versus_moves = {}
+        x, y = self.pos
+        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+
+        # First, get the neighbours
+        for i in neighbouring_cells:
+            bound_checker = self.model.grid.out_of_bounds(i)
+            if not bound_checker:
+                this_cell = self.model.grid.get_cell_list_contents([i])
+                # print("This cell", this_cell)
+
+                if len(this_cell) > 0:
+                    partner = [obj for obj in this_cell
+                               if isinstance(obj, PDAgent)][0]
+
+                    partner_ID = partner.ID
+
+                    # pick a move
+                    move = self.pick_move(strategy, payoffs)
+                    # add that move, with partner ID, to the versus choice dictionary
+                    versus_moves[partner_ID] = move
+
+        return versus_moves
 
     def pick_move(self, strategy, payoffs):
         """ given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
@@ -90,11 +117,11 @@ class PDAgent(Agent):
 
         # First, get the neighbours
         for i in neighbouring_cells:
-            bound_checker = self.model.grid.out_of_bounds(i)  # Is the cell not off the map?
+            bound_checker = self.model.grid.out_of_bounds(i)
             if not bound_checker:
                 this_cell = self.model.grid.get_cell_list_contents([i])
                 # print("This cell", this_cell)
-                #
+
                 if len(this_cell) > 0:
                     partner = [obj for obj in this_cell
                                if isinstance(obj, PDAgent)][0]
@@ -103,29 +130,31 @@ class PDAgent(Agent):
                     partner_score = partner.score
                     partner_strategy = partner.strategy
                     partner_move = partner.move
-                    partner_moves = partner.previous_moves # ******** this could either be redundant or MORE EFFICIENT than the current way of doing things - this is accessing the other agent's own record of its moves
+                    partner_moves = partner.previous_moves
+                    # ******** this could either be redundant or MORE EFFICIENT than the current way of doing things -
+                    # this is accessing the other agent's own record of its moves
 
                     # Wanna add each neighbour's move, score etc. to the respective memory banks
                     if self.partner_latest_move.get(partner_ID) is None:
                         self.partner_latest_move[partner_ID] = partner_move
                     else:
-                        self.partner_latest_move[partner_ID] = partner_move  # this is stupidly redundant but I don't have the current brain energy to fix it
+                        self.partner_latest_move[partner_ID] = partner_move
+                        # this is stupidly redundant but I don't have the current brain energy to fix it
 
                     if self.per_partner_utility.get(partner_ID) is None:
                         self.per_partner_utility[partner_ID] = 0
 
-                    """Below needs uncommenting when I want to do multi-round memory"""
                     # First, check if we have a casefile on them in each memory slot
-                    if self.partner_moves.get(partner_ID) is None:  # if we don't have a casefile for this partner
+                    if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
                         self.partner_moves[partner_ID] = []
                         # print("partner moves dict:", self.partner_moves)
                         self.partner_moves[partner_ID].append(partner_move)
                         # print("partner moves dict2:", self.partner_moves)
                     else:
-                        # sublist_len = len(self.partner_moves[partner_ID])
-                        self.partner_moves[partner_ID].append(partner_move)   # ****** I don't know if this needs to be len+1, just len might be more appropriate
+                        self.partner_moves[partner_ID].append(partner_move)
                         # print("My partner's moves have been:", self.partner_moves)
-                        """ We should repeat the above process for the other memory fields too, like partner's gathered utility """
+                        """ We should repeat the above process for the other memory fields too, like 
+                        partner's gathered utility """
 
                     if partner_ID not in self.partner_IDs:
                         self.partner_IDs.append(partner_ID)
@@ -134,7 +163,7 @@ class PDAgent(Agent):
         # print("Partner Latest Moves:", self.partner_latest_move)
 
     # increment the agent's score - for iterated games
-    def increment_score(self, payoffs):
+    def increment_score(self, payoffs, my_moves):
         my_move = self.move
         total_utility = 0
 
@@ -158,10 +187,10 @@ class PDAgent(Agent):
         if self.stepCount == 0:
             print(self.strategy)
             if self.strategy is None or 0 or []:
-                self.strategy = self.pick_strategy()
+                self.strategy = self.pick_strategy()  # this will eventually do something
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-
+                print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
@@ -169,7 +198,7 @@ class PDAgent(Agent):
             else:
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
                 # print("My move is ", self.move)
-
+                print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
                 self.previous_moves.append(self.move)
 
                 if self.model.schedule_type != "Simultaneous":
@@ -179,7 +208,7 @@ class PDAgent(Agent):
         else:
             self.next_move = self.pick_move(self.strategy, self.payoffs)
             # print("My move is ", self.move)
-
+            print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
             self.previous_moves.append(self.move)
 
             if self.model.schedule_type != "Simultaneous":
@@ -190,7 +219,8 @@ class PDAgent(Agent):
     def advance(self):
         self.move = self.next_move
         self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
-        round_payoff = self.increment_score(self.payoffs)
+        round_payoff = self.increment_score(self.payoffs, 0)  # ----- THIS 0 NEEDS TO BE THE ITERMOVES RESULT
+        """ Can't bring in itermoves as a variable to advance because it's a static function """
         if round_payoff is not None:
             self.score += round_payoff
             # print("My total overall score is:", self.score)

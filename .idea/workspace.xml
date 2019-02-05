@@ -13,8 +13,14 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="332">
-              <caret line="121" column="51" lean-forward="true" selection-start-line="121" selection-start-column="51" selection-end-line="121" selection-end-column="51" />
+            <state relative-caret-position="113">
+              <caret line="192" column="94" selection-start-line="192" selection-start-column="94" selection-end-line="192" selection-end-column="94" />
+              <folding>
+                <element signature="e#1087#1298#0" />
+                <element signature="e#1481#2410#0" />
+                <element signature="e#1476#4071#0" />
+                <element signature="e#6439#7085#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -371,8 +377,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
-          <caret line="121" column="51" lean-forward="true" selection-start-line="121" selection-start-column="51" selection-end-line="121" selection-end-column="51" />
+        <state relative-caret-position="113">
+          <caret line="192" column="94" selection-start-line="192" selection-start-column="94" selection-end-line="192" selection-end-column="94" />
+          <folding>
+            <element signature="e#1087#1298#0" />
+            <element signature="e#1481#2410#0" />
+            <element signature="e#1476#4071#0" />
+            <element signature="e#6439#7085#0" />
+          </folding>
         </state>
       </provider>
     </entry>
