@@ -114,23 +114,24 @@ class PDAgent(Agent):
                     if self.per_partner_utility.get(partner_ID) is None:
                         self.per_partner_utility[partner_ID] = 0
 
-                    # """Below needs uncommenting when I want to do multi-round memory"""
-                    # # First, check if we have a casefile on them in each memory slot
-                    # if self.partner_moves.get(partner_ID) is None:  # if we don't have a casefile for this partner
-                    #     self.partner_moves[partner_ID] = []
-                    #     print("partner moves dict:", self.partner_moves)
-                    #     self.partner_moves[partner_ID] = partner_move
-                    # else:
-                    #     sublist_len = len(self.partner_moves[partner_ID])
-                    #     self.partner_moves[partner_ID][sublist_len+1] = partner_move   # ****** I don't know if this needs to be len+1, just len might be more appropriate
-                    #     print("My partner's moves have been:", self.partner_moves[partner_ID])
-                    #     """ We should repeat the above process for the other memory fields too, like partner's gathered utility """
+                    """Below needs uncommenting when I want to do multi-round memory"""
+                    # First, check if we have a casefile on them in each memory slot
+                    if self.partner_moves.get(partner_ID) is None:  # if we don't have a casefile for this partner
+                        self.partner_moves[partner_ID] = []
+                        # print("partner moves dict:", self.partner_moves)
+                        self.partner_moves[partner_ID].append(partner_move)
+                        # print("partner moves dict2:", self.partner_moves)
+                    else:
+                        # sublist_len = len(self.partner_moves[partner_ID])
+                        self.partner_moves[partner_ID].append(partner_move)   # ****** I don't know if this needs to be len+1, just len might be more appropriate
+                        # print("My partner's moves have been:", self.partner_moves)
+                        """ We should repeat the above process for the other memory fields too, like partner's gathered utility """
 
                     if partner_ID not in self.partner_IDs:
                         self.partner_IDs.append(partner_ID)
 
-        print("Partner IDs: ", self.partner_IDs)
-        print("Partner Latest Moves:", self.partner_latest_move)
+        # print("Partner IDs: ", self.partner_IDs)
+        # print("Partner Latest Moves:", self.partner_latest_move)
 
     # increment the agent's score - for iterated games
     def increment_score(self, payoffs):
@@ -140,7 +141,7 @@ class PDAgent(Agent):
         for i in self.partner_IDs:
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
-            print("Outcome with partner %i was:" % i, outcome)
+            # print("Outcome with partner %i was:" % i, outcome)
 
             outcome_payoff = payoffs[self.move, this_partner_move]
             current_partner_payoff = self.per_partner_utility[i]
@@ -167,7 +168,7 @@ class PDAgent(Agent):
                 self.stepCount += 1
             else:
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
-                print("My move is ", self.move)
+                # print("My move is ", self.move)
 
                 self.previous_moves.append(self.move)
 
@@ -177,7 +178,7 @@ class PDAgent(Agent):
                 self.stepCount += 1
         else:
             self.next_move = self.pick_move(self.strategy, self.payoffs)
-            print("My move is ", self.move)
+            # print("My move is ", self.move)
 
             self.previous_moves.append(self.move)
 

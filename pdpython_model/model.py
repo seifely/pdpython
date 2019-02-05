@@ -45,7 +45,7 @@ class PDModel(Model):
     def make_agents(self):
         for i in range(self.number_of_agents):
             x, y = self.coordinates.pop(0)
-            print("x, y:", x, y)
+            # print("x, y:", x, y)
             # x, y = self.grid.find_empty()
             pdagent = PDAgent((x, y), self, True)
             self.grid.place_agent(pdagent, (x, y))
