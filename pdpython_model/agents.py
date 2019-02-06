@@ -27,6 +27,7 @@ class PDAgent(Agent):
         self.partner_latest_move = {}  # this is a popped list
         self.partner_scores = {}
         self.per_partner_utility = {}
+        self.itermove_result = {}
 
     # pick a strategy - either by force, or by a decision mechanism
     # *** FOR FUTURE: *** Should agents pick strategies for each of their partners, or for all of their
@@ -39,6 +40,8 @@ class PDAgent(Agent):
             return
 
     def iter_pick_move(self, strategy, payoffs):
+        """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
+        keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
         versus_moves = {}
         x, y = self.pos
         neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
@@ -190,7 +193,9 @@ class PDAgent(Agent):
                 self.strategy = self.pick_strategy()  # this will eventually do something
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-                print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
+                # print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
+                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
@@ -198,7 +203,8 @@ class PDAgent(Agent):
             else:
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
                 # print("My move is ", self.move)
-                print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
+                # print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
+                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
 
                 if self.model.schedule_type != "Simultaneous":
@@ -208,7 +214,8 @@ class PDAgent(Agent):
         else:
             self.next_move = self.pick_move(self.strategy, self.payoffs)
             # print("My move is ", self.move)
-            print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
+            # print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
+            self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
             self.previous_moves.append(self.move)
 
             if self.model.schedule_type != "Simultaneous":
@@ -219,9 +226,13 @@ class PDAgent(Agent):
     def advance(self):
         self.move = self.next_move
         self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
-        round_payoff = self.increment_score(self.payoffs, 0)  # ----- THIS 0 NEEDS TO BE THE ITERMOVES RESULT
-        """ Can't bring in itermoves as a variable to advance because it's a static function """
-        if round_payoff is not None:
-            self.score += round_payoff
+        # round_payoff = self.increment_score(self.payoffs, 0)  # ----- THIS 0 NEEDS TO BE THE ITERMOVES RESULT
+        round_payoffs = 0
+
+        for i in self.itermove_result:
+            iter_payoff = self.increment_score(self.payoffs, self.itermove_result[i])
+
+        if round_payoffs is not None:
+            self.score += round_payoffs
             # print("My total overall score is:", self.score)
             return

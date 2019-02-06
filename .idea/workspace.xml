@@ -13,13 +13,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="113">
-              <caret line="192" column="94" selection-start-line="192" selection-start-column="94" selection-end-line="192" selection-end-column="94" />
+            <state relative-caret-position="399">
+              <caret line="232" column="12" lean-forward="true" selection-start-line="232" selection-start-column="12" selection-end-line="232" selection-end-column="12" />
               <folding>
-                <element signature="e#1087#1298#0" />
-                <element signature="e#1481#2410#0" />
-                <element signature="e#1476#4071#0" />
-                <element signature="e#6439#7085#0" />
+                <element signature="e#0#22#0" expanded="true" />
+                <element signature="e#1490#2379#0" />
+                <element signature="e#2424#4409#0" />
+                <element signature="e#4448#7249#0" />
               </folding>
             </state>
           </provider>
@@ -28,8 +28,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="48" column="24" selection-start-line="48" selection-start-column="24" selection-end-line="48" selection-end-column="24" />
+            <state relative-caret-position="153">
+              <caret line="14" column="40" selection-start-line="14" selection-start-column="40" selection-end-line="14" selection-end-column="40" />
+              <folding>
+                <element signature="e#0#22#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -46,8 +49,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="799">
-              <caret line="83" selection-start-line="83" selection-end-line="83" />
+            <state relative-caret-position="969">
+              <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
               <folding>
                 <element signature="e#0#65#0" expanded="true" />
               </folding>
@@ -106,7 +109,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -123,6 +125,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -242,7 +245,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33152762" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.33152762" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -250,7 +253,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.33152762" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="10" visible="true" weight="0.33152762" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -360,8 +363,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="799">
-          <caret line="83" selection-start-line="83" selection-end-line="83" />
+        <state relative-caret-position="969">
+          <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
           <folding>
             <element signature="e#0#65#0" expanded="true" />
           </folding>
@@ -370,20 +373,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="48" column="24" selection-start-line="48" selection-start-column="24" selection-end-line="48" selection-end-column="24" />
+        <state relative-caret-position="153">
+          <caret line="14" column="40" selection-start-line="14" selection-start-column="40" selection-end-line="14" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="113">
-          <caret line="192" column="94" selection-start-line="192" selection-start-column="94" selection-end-line="192" selection-end-column="94" />
+        <state relative-caret-position="399">
+          <caret line="232" column="12" lean-forward="true" selection-start-line="232" selection-start-column="12" selection-end-line="232" selection-end-column="12" />
           <folding>
-            <element signature="e#1087#1298#0" />
-            <element signature="e#1481#2410#0" />
-            <element signature="e#1476#4071#0" />
-            <element signature="e#6439#7085#0" />
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#1490#2379#0" />
+            <element signature="e#2424#4409#0" />
+            <element signature="e#4448#7249#0" />
           </folding>
         </state>
       </provider>
