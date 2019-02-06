@@ -185,6 +185,24 @@ class PDAgent(Agent):
         # self.score = self.score + total_utility
         return total_utility
 
+    # def iter_increment_score(self, payoffs, iterated_move):
+    #     my_move = iterated_move
+    #     total_utility = 0
+    #
+    #     for i in self.partner_IDs:
+    #         this_partner_move = self.partner_latest_move[i]
+    #         outcome = [my_move, this_partner_move]
+    #         # print("Outcome with partner %i was:" % i, outcome)
+    #
+    #         outcome_payoff = payoffs[self.move, this_partner_move]
+    #         current_partner_payoff = self.per_partner_utility[i]
+    #         new_partner_payoff = current_partner_payoff + outcome_payoff
+    #         self.per_partner_utility[i] = new_partner_payoff
+    #         total_utility += outcome_payoff
+    #
+    #     # self.score = self.score + total_utility
+    #     return total_utility
+
 
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
@@ -194,7 +212,6 @@ class PDAgent(Agent):
                 self.strategy = self.pick_strategy()  # this will eventually do something
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-                # print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 if self.model.schedule_type != "Simultaneous":
@@ -204,7 +221,6 @@ class PDAgent(Agent):
             else:
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
                 # print("My move is ", self.move)
-                # print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
 
@@ -215,7 +231,6 @@ class PDAgent(Agent):
         else:
             self.next_move = self.pick_move(self.strategy, self.payoffs)
             # print("My move is ", self.move)
-            # print("TEST OF ITER MOVE: ", self.iter_pick_move(self.strategy, self.payoffs))
             self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
             self.previous_moves.append(self.move)
 
@@ -232,10 +247,12 @@ class PDAgent(Agent):
 
         for i in self.itermove_result:
             iter_payoff = self.increment_score(self.payoffs, self.itermove_result[i])
-            print("My score for that partner was: ", iter_payoff)
+            print("I am agent", self.ID, ", I chose", self.move, ", my partner is:", i, ", they picked ", self.itermove_result[i], ", so my payoff is ", iter_payoff)
             round_payoffs += iter_payoff
+            print("per partner utility:", self.per_partner_utility)
 
         if round_payoffs is not None:
+            print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
             self.score += round_payoffs
             # print("My total overall score is:", self.score)
             return
