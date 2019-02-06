@@ -166,12 +166,13 @@ class PDAgent(Agent):
         # print("Partner Latest Moves:", self.partner_latest_move)
 
     # increment the agent's score - for iterated games
-    def increment_score(self, payoffs, iterated_move):
-        # my_move = self.move
-        my_move = iterated_move
+    def increment_score(self, payoffs):
+        # my_move = self.move=
         total_utility = 0
 
         for i in self.partner_IDs:
+            my_move = self.itermove_result[i]
+
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
             # print("Outcome with partner %i was:" % i, outcome)
@@ -181,33 +182,16 @@ class PDAgent(Agent):
             new_partner_payoff = current_partner_payoff + outcome_payoff
             self.per_partner_utility[i] = new_partner_payoff
             total_utility += outcome_payoff
+            print("I am agent", self.ID, ", I chose", self.move, ", my partner is:", i, ", they picked ",
+                  this_partner_move, ", so my payoff is ", outcome_payoff)
 
         # self.score = self.score + total_utility
         return total_utility
 
-    # def iter_increment_score(self, payoffs, iterated_move):
-    #     my_move = iterated_move
-    #     total_utility = 0
-    #
-    #     for i in self.partner_IDs:
-    #         this_partner_move = self.partner_latest_move[i]
-    #         outcome = [my_move, this_partner_move]
-    #         # print("Outcome with partner %i was:" % i, outcome)
-    #
-    #         outcome_payoff = payoffs[self.move, this_partner_move]
-    #         current_partner_payoff = self.per_partner_utility[i]
-    #         new_partner_payoff = current_partner_payoff + outcome_payoff
-    #         self.per_partner_utility[i] = new_partner_payoff
-    #         total_utility += outcome_payoff
-    #
-    #     # self.score = self.score + total_utility
-    #     return total_utility
-
-
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
         if self.stepCount == 0:
-            print(self.strategy)
+            # print(self.strategy)
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()  # this will eventually do something
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
@@ -242,14 +226,7 @@ class PDAgent(Agent):
     def advance(self):
         self.move = self.next_move
         self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
-        # round_payoff = self.increment_score(self.payoffs, 0)  # ----- THIS 0 NEEDS TO BE THE ITERMOVES RESULT
-        round_payoffs = 0
-
-        for i in self.itermove_result:
-            iter_payoff = self.increment_score(self.payoffs, self.itermove_result[i])
-            print("I am agent", self.ID, ", I chose", self.move, ", my partner is:", i, ", they picked ", self.itermove_result[i], ", so my payoff is ", iter_payoff)
-            round_payoffs += iter_payoff
-            print("per partner utility:", self.per_partner_utility)
+        round_payoffs = self.increment_score(self.payoffs)
 
         if round_payoffs is not None:
             print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
