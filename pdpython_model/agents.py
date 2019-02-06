@@ -166,8 +166,9 @@ class PDAgent(Agent):
         # print("Partner Latest Moves:", self.partner_latest_move)
 
     # increment the agent's score - for iterated games
-    def increment_score(self, payoffs, my_moves):
-        my_move = self.move
+    def increment_score(self, payoffs, iterated_move):
+        # my_move = self.move
+        my_move = iterated_move
         total_utility = 0
 
         for i in self.partner_IDs:
@@ -231,6 +232,8 @@ class PDAgent(Agent):
 
         for i in self.itermove_result:
             iter_payoff = self.increment_score(self.payoffs, self.itermove_result[i])
+            print("My score for that partner was: ", iter_payoff)
+            round_payoffs += iter_payoff
 
         if round_payoffs is not None:
             self.score += round_payoffs
