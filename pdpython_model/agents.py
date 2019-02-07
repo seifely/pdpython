@@ -2,7 +2,7 @@ from mesa import Agent
 import random
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, strategy="RANDOM",starting_move="C"):
+    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="RANDOM", starting_move="C"):
         super().__init__(pos, model)
 
         self.pos = pos
@@ -11,6 +11,7 @@ class PDAgent(Agent):
         self.score = 0
         self.strategy = strategy
         self.previous_moves = []
+        self.pickstrat = pick_strat
         self.move = None
         self.next_move = None
         if starting_move:
@@ -36,9 +37,17 @@ class PDAgent(Agent):
     def pick_strategy(self):
         """ This will later need more information coming into it - on what should I base my
         strategy selection? """
-        if self.strategy is None:
+        # if self.strategy is None:
             # decision mechanism goes here
+            # return
+        if self.pickstrat == "HET":
+            # all agents must use the same strategy
             return
+        elif self.pickstrat == "RANDOM":
+            choices = ["FP", "ANGEL", "RANDOM", "DEVIL"]
+            strat = random.choice(choices)
+            # print("strat is", strat)
+            return str(strat)
 
     def iter_pick_move(self, strategy, payoffs):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
@@ -64,7 +73,7 @@ class PDAgent(Agent):
                     move = self.pick_move(strategy, payoffs)
                     # add that move, with partner ID, to the versus choice dictionary
                     versus_moves[partner_ID] = move
-        print("agent", self.ID,"versus moves:", versus_moves)
+        # print("agent", self.ID,"versus moves:", versus_moves)
         return versus_moves
 
     def pick_move(self, strategy, payoffs):
@@ -73,7 +82,7 @@ class PDAgent(Agent):
         """AT THE MOMENT, THIS IS A GENERAL ONCE-A-ROUND FUNCTION, AND ISN'T PER PARTNER - THIS NEEDS TO CHANGE """
 
         if strategy is None or [] or 0:
-            print("I don't know what to do!")
+            self.pick_strategy()
         elif strategy == "ANGEL":
             # print("I'm an angel, so I'll cooperate")
             return "C"
@@ -192,7 +201,9 @@ class PDAgent(Agent):
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
         if self.stepCount == 0:
+            self.strategy = self.pick_strategy()  # this will eventually do something
             # print(self.strategy)
+
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()  # this will eventually do something
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
@@ -236,8 +247,10 @@ class PDAgent(Agent):
                 move_counter[move] = 1
 
         commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
-        self.common_move = commonest_move[:1]
-        print("My most chosen move is:", self.common_move)
+        self.common_move = commonest_move[:1]   # This isn't perfect as it doesn't display ties -----------------------
+        # print("My most chosen move is:", self.common_move)
+        for n in range(1):
+            print("----------------------------------------------------------")
 
     def advance(self):
         self.move = self.next_move
