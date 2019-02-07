@@ -95,8 +95,8 @@ class PDAgent(Agent):
             the logic; 'I know they know defect is the best strategy usually, just as they know I know that'. """
             # Current set-up: We assume partner will defect
 
-            ppD = 0.8  # probability of partner's defection
-            ppC = 0.2  # probability of partner's cooperation
+            ppD = 0.2  # probability of partner's defection
+            ppC = 0.8  # probability of partner's cooperation
 
             euCC = (payoffs["C", "C"] * ppC)
             euCD = (payoffs["C", "D"] * ppD)
