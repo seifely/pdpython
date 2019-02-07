@@ -9,43 +9,34 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_model/agents.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="162">
-                  <caret line="202" column="24" selection-start-line="202" selection-start-column="24" selection-end-line="202" selection-end-column="24" />
-                  <folding>
-                    <element signature="e#0#22#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="745">
-                  <caret line="230" column="37" lean-forward="true" selection-start-line="230" selection-start-column="37" selection-end-line="230" selection-end-column="37" />
-                  <folding>
-                    <element signature="e#0#22#0" expanded="true" />
-                    <element signature="e#1515#2633#0" />
-                    <element signature="e#2687#4672#0" />
-                    <element signature="e#4711#7512#0" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="263">
+              <caret line="221" column="34" lean-forward="true" selection-start-line="221" selection-start-column="34" selection-end-line="221" selection-end-column="34" />
+              <folding>
+                <element signature="e#0#22#0" expanded="true" />
+                <element signature="e#1515#2680#0" />
+                <element signature="e#2687#4672#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="518">
+              <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
+              <folding>
+                <element signature="e#0#65#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -59,7 +50,10 @@
       <find>PDgrid</find>
       <find>highest eu</find>
       <find>my tot</find>
+      <find>partners itermov</find>
       <find>self.move</find>
+      <find>itermove</find>
+      <find>my_mo</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -79,18 +73,20 @@
         <option value="$PROJECT_DIR$/pdpython_model/run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/model.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/fixed_model/model.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_model/run.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/fixed_model/server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_model/agents.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/fixed_model/agents2.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/fixed_model/model.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/fixed_model/server.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="744" />
-    <option name="width" value="1183" />
-    <option name="height" value="1047" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1040" />
+    <option name="height" value="784" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -108,12 +104,6 @@
               <item name="pdpython" type="b2602c69:ProjectViewProjectNode" />
               <item name="pdpython" type="462c0819:PsiDirectoryNode" />
               <item name="pdpython_model" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pdpython" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pdpython" type="462c0819:PsiDirectoryNode" />
-              <item name="pdpython_model" type="462c0819:PsiDirectoryNode" />
-              <item name="fixed_model" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -146,7 +136,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.run (2)">
+  <component name="RunManager" selected="Python.run">
     <configuration name="run (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="pdpython" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -212,8 +202,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.run (2)" />
         <item itemvalue="Python.run" />
+        <item itemvalue="Python.run (2)" />
         <item itemvalue="Python.run (1)" />
       </list>
     </recent_temporary>
@@ -327,13 +317,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="518">
-          <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
+        <state relative-caret-position="68">
+          <caret line="4" column="33" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
           <folding>
-            <element signature="e#0#65#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#1501#1547#0" />
+            <element signature="e#2687#4672#0" />
+            <element signature="e#9729#10163#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_model/broken_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="12" selection-start-line="4" selection-start-column="12" selection-end-line="4" selection-end-column="12" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#1059#1262#0" />
+            <element signature="e#1780#2500#0" />
+            <element signature="e#2506#2552#0" />
+            <element signature="e#3815#5931#0" />
+            <element signature="e#9729#10166#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_model/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="38" lean-forward="true" selection-start-line="3" selection-start-column="38" selection-end-line="3" selection-end-column="38" />
         </state>
       </provider>
     </entry>
@@ -344,39 +359,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_model/model.py">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_model/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="17" selection-start-line="3" selection-start-column="17" selection-end-line="3" selection-end-column="17" />
+        <state relative-caret-position="68">
+          <caret line="4" column="38" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_model/server.py">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="39" lean-forward="true" selection-start-line="2" selection-start-column="39" selection-end-line="2" selection-end-column="39" />
+        <state relative-caret-position="518">
+          <caret line="62" column="39" selection-start-line="62" selection-start-column="39" selection-end-line="62" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#65#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="745">
-          <caret line="230" column="37" lean-forward="true" selection-start-line="230" selection-start-column="37" selection-end-line="230" selection-end-column="37" />
+        <state relative-caret-position="263">
+          <caret line="221" column="34" lean-forward="true" selection-start-line="221" selection-start-column="34" selection-end-line="221" selection-end-column="34" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#1515#2633#0" />
+            <element signature="e#1515#2680#0" />
             <element signature="e#2687#4672#0" />
-            <element signature="e#4711#7512#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_model/agents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="202" column="24" selection-start-line="202" selection-start-column="24" selection-end-line="202" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
           </folding>
         </state>
       </provider>

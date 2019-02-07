@@ -20,7 +20,7 @@ def gen_Model_Portrayal(agent):
                          "Filled": "true",
                          "Layer": 1,
                          "r": 0.5,
-                         "text": [agent.move, " ", agent.score],
+                         "text": [agent.common_move, " ", agent.score],
                          "text_color": "white",
                          "scale": 1
                          }
@@ -31,7 +31,7 @@ def gen_Model_Portrayal(agent):
                          "Filled": "true",
                          "Layer": 1,
                          "r": 0.5,
-                         "text": [agent.move, " ", agent.score],
+                         "text": [agent.common_move, " ", agent.score],
                          "text_color": "black",
                          "scale": 1
                          }
@@ -42,7 +42,7 @@ def gen_Model_Portrayal(agent):
                          "Filled": "true",
                          "Layer": 1,
                          "r": 0.5,
-                         "text": [agent.move, " ", agent.score],
+                         "text": [agent.common_move, " ", agent.score],
                          "text_color": "white",
                          "scale": 1
                          }
@@ -64,7 +64,7 @@ def gen_Model_Portrayal(agent):
                          "Filled": "true",
                          "Layer": 1,
                          "r": 0.5,
-                         "text": [agent.move, " ", agent.score],
+                         "text": [agent.common_move, " ", agent.score],
                          "text_color": "white",
                          "scale": 1
                          }

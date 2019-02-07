@@ -223,10 +223,12 @@ class PDAgent(Agent):
 
         for i in self.partner_IDs:
             move = self.pick_move(strategy, payoffs)
+            # print("For partner ", i, "I picked move ", move)
             versus_moves[i] = move
 
         self.itermove_result = versus_moves  # this is effectively self.next_move = pick move
         self.previous_moves.append([self.itermove_result])  # this might break
+        # return versus_moves
 
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
@@ -257,14 +259,16 @@ class PDAgent(Agent):
 
 
     def advance(self):
-        round_utility = 0
+        comparison = self.itermove_result
         self.itermove_result = self.next_itermove_result
+        round_utility = 0
 
         self.check_partner()
         for n in self.partner_IDs:
-            partner_payoff = self.increment_score(self.payoffs, self.itermove_result, n)
+            partner_payoff = self.increment_score(self.payoffs, comparison, n)
             round_utility += partner_payoff
 
         print("I am agent", self.ID, ", and I have earned", round_utility, "this round")
         self.score += round_utility
+
         return

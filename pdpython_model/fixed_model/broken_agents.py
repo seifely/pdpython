@@ -2,7 +2,7 @@ from mesa import Agent
 import random
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, strategy="RANDOM",starting_move="C"):
+    def __init__(self, pos, model, stepcount=0, strategy="RANDOM",starting_move=None):
         super().__init__(pos, model)
 
         self.pos = pos
@@ -10,29 +10,31 @@ class PDAgent(Agent):
         self.ID = self.model.agentIDs.pop(0)
         self.score = 0
         self.strategy = strategy
-        self.previous_moves = []
-        self.move = None
-        self.next_move = None
-        if starting_move:
-            self.move = starting_move
-        else:
-            self.move = self.random.choice(["C", "D"])
+        self.move = {}
+        self.next_move = {}
 
         self.payoffs = self.model.payoffs
         # pull in the payoff matrix (same for all agents IF WE ASSUME ALL AGENTS HAVE EQUAL PAYOFFS)
 
         # ------------------------ LOCAL MEMORY --------------------------
         self.partner_IDs = []
-        self.partner_moves = {}
+        self.partner_moves = {}  # problematic with itermove
         self.partner_latest_move = {}  # this is a popped list
         self.partner_scores = {}
         self.per_partner_utility = {}
-        self.itermove_result = {}
-        self.common_move = ""
+
+        self.get_partner_ID()
+        self.set_starting_move(starting_move)
+
+    def set_starting_move(self, starting_move):
+        for i in self.partner_IDs:
+            if starting_move:
+                self.move[i] = starting_move
+            else:
+                self.move[i] = self.random.choice(["C", "D"])
 
     # pick a strategy - either by force, or by a decision mechanism
-    # *** FOR FUTURE: *** Should agents pick strategies for each of their partners, or for all of their
-    # interactions?
+    # *** FOR FUTURE: *** Should agents pick strategies for each of their partners?
     def pick_strategy(self):
         """ This will later need more information coming into it - on what should I base my
         strategy selection? """
@@ -40,10 +42,7 @@ class PDAgent(Agent):
             # decision mechanism goes here
             return
 
-    def iter_pick_move(self, strategy, payoffs):
-        """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
-        keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
-        versus_moves = {}
+    def get_partner_ID(self):
         x, y = self.pos
         neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
 
@@ -60,17 +59,43 @@ class PDAgent(Agent):
 
                     partner_ID = partner.ID
 
-                    # pick a move
-                    move = self.pick_move(strategy, payoffs)
-                    # add that move, with partner ID, to the versus choice dictionary
-                    versus_moves[partner_ID] = move
-        print("agent", self.ID,"versus moves:", versus_moves)
-        return versus_moves
+                    if partner_ID not in self.partner_IDs:
+                        self.partner_IDs.append(partner_ID)
+
+    # def iter_pick_move(self, strategy, payoffs):
+    #     """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
+    #     keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
+    #     versus_moves = {}
+    #     x, y = self.pos
+    #     neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+    #
+    #     # First, get the neighbours
+    #     for i in neighbouring_cells:
+    #         bound_checker = self.model.grid.out_of_bounds(i)
+    #         if not bound_checker:
+    #             this_cell = self.model.grid.get_cell_list_contents([i])
+    #             # print("This cell", this_cell)
+    #
+    #             if len(this_cell) > 0:
+    #                 partner = [obj for obj in this_cell
+    #                            if isinstance(obj, PDAgent)][0]
+    #
+    #                 partner_ID = partner.ID
+    #
+    #                 # pick a move
+    #                 move = self.pick_move(strategy, payoffs)
+    #                 # add that move, with partner ID, to the versus choice dictionary
+    #                 versus_moves[partner_ID] = move
+    #
+    #     return versus_moves
+    # destroy me
 
     def pick_move(self, strategy, payoffs):
         """ given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
             calculate the expected utility of each move, and then pick the highest"""
-        """AT THE MOMENT, THIS IS A GENERAL ONCE-A-ROUND FUNCTION, AND ISN'T PER PARTNER - THIS NEEDS TO CHANGE """
+        """AT THE MOMENT, THIS IS A GENERAL ONCE-A-ROUND FUNCTION, AND ISN'T PER PARTNER - THIS NEEDS TO CHANGE.
+         It also needs to take in more INFORMATION in order to make move choices (such as trustworthiness of partner
+         etc."""
 
         if strategy is None or [] or 0:
             print("I don't know what to do!")
@@ -131,10 +156,15 @@ class PDAgent(Agent):
                                if isinstance(obj, PDAgent)][0]
 
                     partner_ID = partner.ID
+                    partner_pos = partner.pos
                     partner_score = partner.score
                     partner_strategy = partner.strategy
-                    partner_move = partner.itermove_result[self.ID]
-                    partner_moves = partner.previous_moves
+
+                    print("partners moves", partner.move)
+                    partner_move = partner.move[self.ID]  # ---------- SORT THIS MESS OUT ---------
+                    # print("My partner's move to me was ", partner_move)
+
+                    # partner_moves = partner.previous_moves
                     # ******** this could either be redundant or MORE EFFICIENT than the current way of doing things -
                     # this is accessing the other agent's own record of its moves
 
@@ -163,89 +193,77 @@ class PDAgent(Agent):
                     if partner_ID not in self.partner_IDs:
                         self.partner_IDs.append(partner_ID)
 
-        # print("Partner IDs: ", self.partner_IDs)
-        # print("Partner Latest Moves:", self.partner_latest_move)
+    def increment_score(self, payoffs, my_moves, i):
+        # total_utility = 0
+        print("my_moves:", my_moves)
+        my_move = my_moves[i]
 
-    # increment the agent's score - for iterated games
-    def increment_score(self, payoffs):
-        # my_move = self.move=
-        total_utility = 0
+        this_partner_move = self.partner_latest_move[i]
+        outcome = [my_move, this_partner_move]
+        # print("Outcome with partner %i was:" % i, outcome)
+
+        outcome_payoff = payoffs[my_move, this_partner_move]
+        current_partner_payoff = self.per_partner_utility[i]
+        new_partner_payoff = current_partner_payoff + outcome_payoff
+        self.per_partner_utility[i] = new_partner_payoff
+        # total_utility += outcome_payoff
+        print("I am agent", self.ID, ", I chose", my_move, ", my partner is:", i, ", they picked ",
+              this_partner_move, ", so my payoff is ", outcome_payoff)
+
+        return outcome_payoff
+
+    def take_turn(self, strategy, payoffs):
+        self.check_partner()
+        versus_moves = {}
 
         for i in self.partner_IDs:
-            my_move = self.itermove_result[i]
+            move = self.pick_move(strategy, payoffs)
+            # print("For partner ", i, "I picked move ", move)
+            versus_moves[i] = move
 
-            this_partner_move = self.partner_latest_move[i]
-            outcome = [my_move, this_partner_move]
-            # print("Outcome with partner %i was:" % i, outcome)
-
-            outcome_payoff = payoffs[my_move, this_partner_move]
-            current_partner_payoff = self.per_partner_utility[i]
-            new_partner_payoff = current_partner_payoff + outcome_payoff
-            self.per_partner_utility[i] = new_partner_payoff
-            total_utility += outcome_payoff
-            print("I am agent", self.ID, ", I chose", my_move, ", my partner is:", i, ", they picked ",
-                  this_partner_move, ", so my payoff is ", outcome_payoff)
-
-        # self.score = self.score + total_utility
-        return total_utility
+        self.next_move = versus_moves  # this is effectively self.next_move = pick move
+        # self.previous_moves.append([self.itermove_result])  # this might break
+        # return versus_moves
 
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
         if self.stepCount == 0:
-            # print(self.strategy)
             if self.strategy is None or 0 or []:
-                self.strategy = self.pick_strategy()  # this will eventually do something
-                self.next_move = self.pick_move(self.strategy, self.payoffs)
-                self.previous_moves.append(self.move)
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+                self.strategy = self.pick_strategy()
+                self.take_turn(self.strategy, self.payoffs)
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
                 self.stepCount += 1
             else:
-                self.next_move = self.pick_move(self.strategy, self.payoffs)
-                # print("My move is ", self.move)
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
-                self.previous_moves.append(self.move)
+                self.take_turn(self.strategy, self.payoffs)
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
                 self.stepCount += 1
+
         else:
-            self.next_move = self.pick_move(self.strategy, self.payoffs)
-            # print("My move is ", self.move)
-            self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
-            self.previous_moves.append(self.move)
+            self.take_turn(self.strategy, self.payoffs)
 
             if self.model.schedule_type != "Simultaneous":
                 self.advance()
 
             self.stepCount += 1
 
-        move_list = []
-        for n in self.itermove_result:
-            move_list.append(self.itermove_result[n])
-
-        move_counter = {}
-        for move in move_list:
-            if move in move_counter:
-                move_counter[move] += 1
-            else:
-                move_counter[move] = 1
-
-        commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
-        self.common_move = commonest_move[:1]
-        print("My most chosen move is:", self.common_move)
 
     def advance(self):
+        comparison = self.move
         self.move = self.next_move
-        self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
-        round_payoffs = self.increment_score(self.payoffs)
+        round_utility = 0
 
-        if round_payoffs is not None:
-            print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
-            self.score += round_payoffs
-            # print("My total overall score is:", self.score)
-            return
+        self.check_partner()
+        for n in self.partner_IDs:
+            partner_payoff = self.increment_score(self.payoffs, comparison, n)
+            round_utility += partner_payoff
+
+        print("I am agent", self.ID, ", and I have earned", round_utility, "this round")
+        self.score += round_utility
+
+        return
