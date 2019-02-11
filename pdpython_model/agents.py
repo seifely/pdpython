@@ -1,5 +1,7 @@
 from mesa import Agent
 import random
+import csv
+import time
 
 class PDAgent(Agent):
     def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="RANDOM", starting_move="C"):
@@ -30,6 +32,10 @@ class PDAgent(Agent):
         self.per_partner_utility = {}
         self.itermove_result = {}
         self.common_move = ""
+
+        # ----------------------- DATA TO OUTPUT --------------------------
+        self.number_of_c = 0
+        self.number_of_d = 0
 
     # pick a strategy - either by force, or by a decision mechanism
     # *** FOR FUTURE: *** Should agents pick strategies for each of their partners, or for all of their
@@ -85,9 +91,11 @@ class PDAgent(Agent):
             self.pick_strategy()
         elif strategy == "ANGEL":
             # print("I'm an angel, so I'll cooperate")
+            self.number_of_c += 1
             return "C"
         elif strategy == "DEVIL":
             # print("I'm a devil, so I'll defect")
+            self.number_of_d += 1
             return "D"
 
         elif strategy == "FP":  # this is under assumption of heterogeneity of agents
@@ -109,19 +117,28 @@ class PDAgent(Agent):
             # print("Highest EU: ", highest_eu)
             if highest_eu == 0:
                 # print("Cooperate is best")
+                self.number_of_c += 1
                 return "C"
             elif highest_eu == 1:
                 # print("Cooperate is best")
+                self.number_of_c += 1
                 return "C"
             elif highest_eu == 2:
                 # print("Defect is best")
+                self.number_of_d += 1
                 return "D"
             elif highest_eu == 3:
                 # print("Defect is best")
+                self.number_of_d += 1
                 return "D"
 
         elif strategy == "RANDOM":
-            return self.random.choice(["C", "D"])
+            choice = self.random.choice(["C", "D"])
+            if choice == "C":
+                self.number_of_c += 1
+            elif choice == "D":
+                self.number_of_d += 1
+            return choice
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -198,6 +215,70 @@ class PDAgent(Agent):
         # self.score = self.score + total_utility
         return total_utility
 
+    def output_data_to_model(self):
+        """ This sends the data to the model so the model can output it (I HOPE) """
+        if self.common_move == "C":
+            self.model.agents_cooperating += 1
+        elif self.common_move == "D":
+            self.model.agents_defecting += 1
+
+        self.model.number_of_defects += self.number_of_d
+        self.model.number_of_coops += self.number_of_c
+
+        # also want to output every agent's utility into one big vector - HOW DO THIS
+        # either every agent creates a new column in the SAME document -
+        # this is dangerous because they will all be editing the same file so probably a big fuck up
+
+        # and also time each agent's step to create a total time thingybob
+
+    def output_data_to_file(self):
+        # output utility this round
+        # output my moves picked
+        # output my round outcomes
+        # output the step number
+        # output my average move
+        
+        # open the csv files 
+        ofile = open('%d.csv' % (self.ID), "a")
+        writer = csv.writer(ofile, delimiter=',')
+
+        # writer.writerow("-----------")
+        # writer.writerow([self.stepCount])
+        # writer.writerow([self.score])
+        # writer.writerow([self.current_step_time])
+        # writer.writerow([distance_to_goal])
+        # writer.writerow([self.overall_time_elapsed])
+        return
+
+    def reset_values(self):
+        self.number_of_d = 0
+        self.number_of_c = 0
+
+    def find_average_move(self):
+        move_list = []
+        for n in self.itermove_result:
+            move_list.append(self.itermove_result[n])
+
+        move_counter = {}
+        for move in move_list:
+            if move in move_counter:
+                move_counter[move] += 1
+            else:
+                move_counter[move] = 1
+        # print("Move counter:", move_counter)
+
+        if move_counter.get('C') and move_counter.get('D') is not None:
+            if move_counter['C'] == move_counter['D']:
+                self.common_move = 'Eq'
+            else:
+                commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
+                self.common_move = commonest_move[
+                                   :1]  # This isn't perfect as it doesn't display ties -----------------------
+                # print("My most chosen move is:", self.common_move)
+        else:
+            commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
+            self.common_move = commonest_move[:1]
+
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
         if self.stepCount == 0:
@@ -210,6 +291,8 @@ class PDAgent(Agent):
                 self.previous_moves.append(self.move)
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
+                self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
@@ -219,6 +302,8 @@ class PDAgent(Agent):
                 # print("My move is ", self.move)
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
+
+                self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -230,33 +315,14 @@ class PDAgent(Agent):
             self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
             self.previous_moves.append(self.move)
 
+            self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+
             if self.model.schedule_type != "Simultaneous":
                 self.advance()
 
             self.stepCount += 1
 
-        move_list = []
-        for n in self.itermove_result:
-            move_list.append(self.itermove_result[n])
-
-        move_counter = {}
-        for move in move_list:
-            if move in move_counter:
-                move_counter[move] += 1
-            else:
-                move_counter[move] = 1
-        print("Move counter:", move_counter)
-
-        if move_counter.get('C') and move_counter.get('D') is not None:
-            if move_counter['C'] == move_counter['D']:
-                self.common_move = 'Eq'
-            else:
-                commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
-                self.common_move = commonest_move[:1]   # This isn't perfect as it doesn't display ties -----------------------
-                # print("My most chosen move is:", self.common_move)
-        else:
-            commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
-            self.common_move = commonest_move[:1]
+        self.find_average_move()
 
         for n in range(1):
             print("----------------------------------------------------------")
@@ -266,6 +332,7 @@ class PDAgent(Agent):
         self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
         round_payoffs = self.increment_score(self.payoffs)
 
+        self.reset_values()
         if round_payoffs is not None:
             print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
             self.score += round_payoffs

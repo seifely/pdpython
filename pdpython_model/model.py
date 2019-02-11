@@ -45,9 +45,29 @@ class PDModel(Model):
         })
         self.cooperating_agents = lambda m: len([a for a in m.schedule.agents if a.common_move == "C"])
 
+        # ----- Storage -----
+        self.agents_cooperating = 0
+        self.agents_defecting = 0
+        self.number_of_defects = 0
+        self.number_of_coops = 0
+        self.coops_utility = 0
+        self.defects_utility = 0
+
         self.make_agents()
         self.running = True
         self.datacollector.collect(self)
+
+    def output_data(self):
+        # take in how many agents are cooperating, how many are defecting, and how many are 'equal'
+        # how many co-operations and defections occurred this round TOTAL
+        # make sure to reset these values to zero at the end of each step - AFTER WE OUTPUT THE DATA TO FILE
+        return
+
+    def reset_values(self):
+        self.agents_defecting = 0
+        self.agents_cooperating = 0
+        self.number_of_defects = 0
+        self.number_of_coops = 0
 
     def make_agents(self):
         for i in range(self.number_of_agents):

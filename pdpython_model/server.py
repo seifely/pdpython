@@ -5,7 +5,6 @@ from mesa.visualization.UserParam import UserSettableParameter
 from pdpython_model.agents import PDAgent
 from pdpython_model.model import PDModel
 
-
 def gen_Model_Portrayal(agent):
     if agent is None:
         return
