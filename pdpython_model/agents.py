@@ -245,10 +245,19 @@ class PDAgent(Agent):
                 move_counter[move] += 1
             else:
                 move_counter[move] = 1
+        print("Move counter:", move_counter)
 
-        commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
-        self.common_move = commonest_move[:1]   # This isn't perfect as it doesn't display ties -----------------------
-        # print("My most chosen move is:", self.common_move)
+        if move_counter.get('C') and move_counter.get('D') is not None:
+            if move_counter['C'] == move_counter['D']:
+                self.common_move = 'Eq'
+            else:
+                commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
+                self.common_move = commonest_move[:1]   # This isn't perfect as it doesn't display ties -----------------------
+                # print("My most chosen move is:", self.common_move)
+        else:
+            commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
+            self.common_move = commonest_move[:1]
+
         for n in range(1):
             print("----------------------------------------------------------")
 
