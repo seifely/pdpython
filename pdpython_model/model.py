@@ -39,8 +39,15 @@ class PDModel(Model):
 
         self.agentIDs = list(range(1, (number_of_agents + 1)))
 
+        self.datacollector = DataCollector({
+            "Cooperating_Agents":
+                lambda m: len([a for a in m.schedule.agents if a.common_move == "C"])
+        })
+        self.cooperating_agents = lambda m: len([a for a in m.schedule.agents if a.common_move == "C"])
+
         self.make_agents()
         self.running = True
+        self.datacollector.collect(self)
 
     def make_agents(self):
         for i in range(self.number_of_agents):
@@ -54,6 +61,7 @@ class PDModel(Model):
     def step(self):
         self.schedule.step()
         self.step_count += 1
+        print("Step:", self.step_count)
 
     def run_model(self, rounds=200):
         for i in range(rounds):
