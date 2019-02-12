@@ -12,6 +12,7 @@ class PDAgent(Agent):
         self.ID = self.model.agentIDs.pop(0)
         self.score = 0
         self.strategy = strategy
+        self.filename = ('%s agent %d.csv' % (self.model.exp_n, self.ID), "a")
         self.previous_moves = []
         self.pickstrat = pick_strat
         self.move = None
@@ -231,7 +232,7 @@ class PDAgent(Agent):
 
         # and also time each agent's step to create a total time thingybob
 
-    def output_data_to_file(self):
+    def output_data_to_file(self, outcomes):
         # output utility this round
         # output my moves picked
         # output my round outcomes
@@ -239,16 +240,20 @@ class PDAgent(Agent):
         # output my average move
         
         # open the csv files 
-        ofile = open('%d.csv' % (self.ID), "a")
-        writer = csv.writer(ofile, delimiter=',')
+        with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+            fieldnames = ['stepcount', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
+                          'outcomes']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-        # writer.writerow("-----------")
-        # writer.writerow([self.stepCount])
-        # writer.writerow([self.score])
-        # writer.writerow([self.current_step_time])
-        # writer.writerow([distance_to_goal])
-        # writer.writerow([self.overall_time_elapsed])
-        return
+            if self.stepCount == 0 or 1:
+                writer.writeheader()
+                writer.writerow({'stepcount': self.stepCount, 'move': self.move, 'utility': self.score,
+                             'common_move': self.common_move, 'number_coop': self.number_of_c,
+                             'number_defect': self.number_of_d, 'outcomes': outcomes})
+            else:
+                writer.writerow({'stepcount': self.stepCount, 'move': self.move, 'utility': self.score,
+                                 'common_move': self.common_move, 'number_coop': self.number_of_c,
+                                 'number_defect': self.number_of_d, 'outcomes': outcomes})
 
     def reset_values(self):
         self.number_of_d = 0
@@ -270,11 +275,13 @@ class PDAgent(Agent):
         if move_counter.get('C') and move_counter.get('D') is not None:
             if move_counter['C'] == move_counter['D']:
                 self.common_move = 'Eq'
+                print("My most chosen move is:", self.common_move, 'because my counters are:', move_counter['C'], move_counter['D'])
+
             else:
                 commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
                 self.common_move = commonest_move[
                                    :1]  # This isn't perfect as it doesn't display ties -----------------------
-                # print("My most chosen move is:", self.common_move)
+                print("My most chosen move is:", self.common_move)
         else:
             commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
             self.common_move = commonest_move[:1]
@@ -292,6 +299,7 @@ class PDAgent(Agent):
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+                self.output_data_to_file('outcomes go here')
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -304,6 +312,7 @@ class PDAgent(Agent):
                 self.previous_moves.append(self.move)
 
                 self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+                self.output_data_to_file('outcomes go here')
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -316,6 +325,7 @@ class PDAgent(Agent):
             self.previous_moves.append(self.move)
 
             self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+            self.output_data_to_file('outcomes go here')
 
             if self.model.schedule_type != "Simultaneous":
                 self.advance()
@@ -332,7 +342,7 @@ class PDAgent(Agent):
         self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
         round_payoffs = self.increment_score(self.payoffs)
 
-        self.reset_values()
+        self.reset_values()  # ------------------> Or do they need to go here?
         if round_payoffs is not None:
             print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
             self.score += round_payoffs

@@ -4,6 +4,8 @@ from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
 from pdpython_model.agents import PDAgent
 
 from mesa.datacollection import DataCollector
+import time
+import csv
 
 
 class PDModel(Model):
@@ -23,6 +25,8 @@ class PDModel(Model):
         self.width = width
         self.number_of_agents = number_of_agents
         self.step_count = 0
+        self.exp_n = 'trial zero'
+        self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
         self.payoffs = {("C", "C"): 3,
                         ("C", "D"): 0,
@@ -57,17 +61,36 @@ class PDModel(Model):
         self.running = True
         self.datacollector.collect(self)
 
-    def output_data(self):
+    def output_data(self, steptime):
+        with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+            fieldnames = ['stepcount', 'steptime', 'cooperating', 'defecting', 'coop total', 'defect total', 'coop total utility',
+                          'defect total utility']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            if self.step_count == 0 or 1:
+                writer.writeheader()
+                writer.writerow({'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating, 'defecting': self.agents_defecting,
+                             'coop total': self.number_of_coops, 'defect total': self.number_of_defects,
+                             'coop total utility': self.coops_utility, 'defect total utility': self.defects_utility})
+            else:
+                writer.writerow({'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating,
+                                 'defecting': self.agents_defecting,
+                                 'coop total': self.number_of_coops, 'defect total': self.number_of_defects,
+                                 'coop total utility': self.coops_utility,
+                                 'defect total utility': self.defects_utility})
+
+
         # take in how many agents are cooperating, how many are defecting, and how many are 'equal'
         # how many co-operations and defections occurred this round TOTAL
         # make sure to reset these values to zero at the end of each step - AFTER WE OUTPUT THE DATA TO FILE
-        return
 
     def reset_values(self):
         self.agents_defecting = 0
         self.agents_cooperating = 0
         self.number_of_defects = 0
         self.number_of_coops = 0
+        # don't want to reset the total of utility because - CRUCIALLY - utility will never decrease, it will only +0
+        # at minimum
 
     def make_agents(self):
         for i in range(self.number_of_agents):
@@ -79,9 +102,14 @@ class PDModel(Model):
             self.schedule.add(pdagent)
 
     def step(self):
+        start = time.time()
         self.schedule.step()
         self.step_count += 1
         print("Step:", self.step_count)
+        end = time.time()
+        steptime = end - start
+        self.output_data(steptime)
+        self.reset_values()
 
     def run_model(self, rounds=200):
         for i in range(rounds):
