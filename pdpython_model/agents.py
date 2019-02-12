@@ -92,11 +92,11 @@ class PDAgent(Agent):
             self.pick_strategy()
         elif strategy == "ANGEL":
             # print("I'm an angel, so I'll cooperate")
-            self.number_of_c += 1
+            # self.number_of_c += 1
             return "C"
         elif strategy == "DEVIL":
             # print("I'm a devil, so I'll defect")
-            self.number_of_d += 1
+            # self.number_of_d += 1
             return "D"
 
         elif strategy == "FP":  # this is under assumption of heterogeneity of agents
@@ -118,27 +118,27 @@ class PDAgent(Agent):
             # print("Highest EU: ", highest_eu)
             if highest_eu == 0:
                 # print("Cooperate is best")
-                self.number_of_c += 1
+                # self.number_of_c += 1
                 return "C"
             elif highest_eu == 1:
                 # print("Cooperate is best")
-                self.number_of_c += 1
+                # self.number_of_c += 1
                 return "C"
             elif highest_eu == 2:
                 # print("Defect is best")
-                self.number_of_d += 1
+                # self.number_of_d += 1
                 return "D"
             elif highest_eu == 3:
                 # print("Defect is best")
-                self.number_of_d += 1
+                # self.number_of_d += 1
                 return "D"
 
         elif strategy == "RANDOM":
             choice = self.random.choice(["C", "D"])
-            if choice == "C":
-                self.number_of_c += 1
-            elif choice == "D":
-                self.number_of_d += 1
+            # if choice == "C":
+                # self.number_of_c += 1
+            # elif choice == "D":
+                # self.number_of_d += 1
             return choice
 
     def check_partner(self):
@@ -218,10 +218,12 @@ class PDAgent(Agent):
 
     def output_data_to_model(self):
         """ This sends the data to the model so the model can output it (I HOPE) """
-        if self.common_move == "C":
+        print("Common move", self.common_move)
+        if self.common_move == ['C']:
             self.model.agents_cooperating += 1
-        elif self.common_move == "D":
+        elif self.common_move == ['D']:
             self.model.agents_defecting += 1
+        # No line for Eq because the agent hasn't got a preference either way
 
         self.model.number_of_defects += self.number_of_d
         self.model.number_of_coops += self.number_of_c
@@ -234,10 +236,6 @@ class PDAgent(Agent):
 
     def output_data_to_file(self, outcomes):
         # output utility this round
-        # output my moves picked
-        # output my round outcomes
-        # output the step number
-        # output my average move
         
         # open the csv files 
         with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
@@ -245,15 +243,15 @@ class PDAgent(Agent):
                           'outcomes']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            if self.stepCount == 0 or 1:
+            # moves = []
+            # for i in self.move:
+            #     moves.append(self.move[i])
+
+            if self.stepCount == 1:
                 writer.writeheader()
-                writer.writerow({'stepcount': self.stepCount, 'move': self.move, 'utility': self.score,
+            writer.writerow({'stepcount': self.stepCount, 'move': self.itermove_result, 'utility': self.score,
                              'common_move': self.common_move, 'number_coop': self.number_of_c,
                              'number_defect': self.number_of_d, 'outcomes': outcomes})
-            else:
-                writer.writerow({'stepcount': self.stepCount, 'move': self.move, 'utility': self.score,
-                                 'common_move': self.common_move, 'number_coop': self.number_of_c,
-                                 'number_defect': self.number_of_d, 'outcomes': outcomes})
 
     def reset_values(self):
         self.number_of_d = 0
@@ -273,15 +271,18 @@ class PDAgent(Agent):
         # print("Move counter:", move_counter)
 
         if move_counter.get('C') and move_counter.get('D') is not None:
+            self.number_of_d += move_counter.get('D')
+            self.number_of_c += move_counter.get('C')
             if move_counter['C'] == move_counter['D']:
                 self.common_move = 'Eq'
-                print("My most chosen move is:", self.common_move, 'because my counters are:', move_counter['C'], move_counter['D'])
+                # print("Moves", self.move, "Counters: ", move_counter)
+                # print("My most chosen move is:", self.common_move, 'because my counters are:', move_counter['C'], move_counter['D'])
 
             else:
                 commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
                 self.common_move = commonest_move[
                                    :1]  # This isn't perfect as it doesn't display ties -----------------------
-                print("My most chosen move is:", self.common_move)
+                # print("My most chosen move is:", self.common_move)
         else:
             commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
             self.common_move = commonest_move[:1]
@@ -297,9 +298,11 @@ class PDAgent(Agent):
                 self.next_move = self.pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
-
+                self.find_average_move()
                 self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
-                self.output_data_to_file('outcomes go here')
+                if self.model.collect_data:
+                    self.output_data_to_file('outcomes go here')
+                self.reset_values()  # ------------------> Or do they need to go here?
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -310,9 +313,11 @@ class PDAgent(Agent):
                 # print("My move is ", self.move)
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-
+                self.find_average_move()
                 self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
-                self.output_data_to_file('outcomes go here')
+                if self.model.collect_data:
+                    self.output_data_to_file('outcomes go here')
+                self.reset_values()  # ------------------> Or do they need to go here?
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -323,16 +328,18 @@ class PDAgent(Agent):
             # print("My move is ", self.move)
             self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
             self.previous_moves.append(self.move)
-
+            self.find_average_move()
             self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
-            self.output_data_to_file('outcomes go here')
+            if self.model.collect_data:
+                self.output_data_to_file('outcomes go here')
+            self.reset_values()  # ------------------> Or do they need to go here?
 
             if self.model.schedule_type != "Simultaneous":
                 self.advance()
 
             self.stepCount += 1
 
-        self.find_average_move()
+        # self.find_average_move()
 
         for n in range(1):
             print("----------------------------------------------------------")
@@ -342,7 +349,6 @@ class PDAgent(Agent):
         self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
         round_payoffs = self.increment_score(self.payoffs)
 
-        self.reset_values()  # ------------------> Or do they need to go here?
         if round_payoffs is not None:
             print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
             self.score += round_payoffs

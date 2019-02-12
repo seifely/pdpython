@@ -17,7 +17,8 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=2,
                  schedule_type="Simultaneous",
-                 rounds=1,):
+                 rounds=1,
+                 collect_data=False):
 
 
         # Model Parameters
@@ -32,6 +33,7 @@ class PDModel(Model):
                         ("C", "D"): 0,
                         ("D", "C"): 5,
                         ("D", "D"): 2}
+        self.collect_data = collect_data
 
 
         # Model Functions
@@ -63,22 +65,20 @@ class PDModel(Model):
 
     def output_data(self, steptime):
         with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-            fieldnames = ['stepcount', 'steptime', 'cooperating', 'defecting', 'coop total', 'defect total', 'coop total utility',
-                          'defect total utility']
+            fieldnames = ['n agents', 'stepcount', 'steptime', 'cooperating', 'defecting', 'coop total', 'defect total',]
+            # 'coop total utility', 'defect total utility'
+            # I mean, it would nice to see utility per strategy if strategies were fixed
+
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            if self.step_count == 0 or 1:
+            if self.step_count == 1:
                 writer.writeheader()
-                writer.writerow({'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating, 'defecting': self.agents_defecting,
+            writer.writerow({'number of agents': self.number_of_agents, 'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating, 'defecting': self.agents_defecting,
                              'coop total': self.number_of_coops, 'defect total': self.number_of_defects,
-                             'coop total utility': self.coops_utility, 'defect total utility': self.defects_utility})
-            else:
-                writer.writerow({'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating,
-                                 'defecting': self.agents_defecting,
-                                 'coop total': self.number_of_coops, 'defect total': self.number_of_defects,
-                                 'coop total utility': self.coops_utility,
-                                 'defect total utility': self.defects_utility})
+                             })
+            # 'coop total utility': self.coops_utility, 'defect total utility': self.defects_utility
 
+            # WE ALSO WANNA OUTPUT HOW MANY AGENTS THERE ARE, HOW MANY AGENTS IN EACH STRATEGY
 
         # take in how many agents are cooperating, how many are defecting, and how many are 'equal'
         # how many co-operations and defections occurred this round TOTAL
@@ -108,7 +108,8 @@ class PDModel(Model):
         print("Step:", self.step_count)
         end = time.time()
         steptime = end - start
-        self.output_data(steptime)
+        if self.collect_data:
+            self.output_data(steptime)
         self.reset_values()
 
     def run_model(self, rounds=200):
