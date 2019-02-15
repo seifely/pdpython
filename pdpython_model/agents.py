@@ -4,8 +4,12 @@ import csv
 import time
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="RANDOM", starting_move="C"):
+    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy=None, starting_move="C",
+                 ):
         super().__init__(pos, model)
+        """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
+            are to spawn along a distribution, set number of strategy types, or with
+            random strategies, use pick_strat and set strategy to None """
 
         self.pos = pos
         self.stepCount = stepcount
@@ -17,6 +21,7 @@ class PDAgent(Agent):
         self.pickstrat = pick_strat
         self.move = None
         self.next_move = None
+        self.printing = self.model.agent_printing
         if starting_move:
             self.move = starting_move
         else:
@@ -47,14 +52,19 @@ class PDAgent(Agent):
         # if self.strategy is None:
             # decision mechanism goes here
             # return
-        if self.pickstrat == "HET":
-            # all agents must use the same strategy
-            return
-        elif self.pickstrat == "RANDOM":
+        # if self.pickstrat == "HET":
+        #
+        #     return
+        if self.pickstrat == "RANDOM":
+            # print("IM GONNA PICK ONE AT RANDOM")
             choices = ["FP", "ANGEL", "RANDOM", "DEVIL"]
             strat = random.choice(choices)
             # print("strat is", strat)
             return str(strat)
+        elif self.pickstrat == "DISTRIBUTION":
+            """ This is for having x agents start on y strategy and the remaining p agents
+                start on q strategy """
+            return
 
     def iter_pick_move(self, strategy, payoffs):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
@@ -210,15 +220,16 @@ class PDAgent(Agent):
             new_partner_payoff = current_partner_payoff + outcome_payoff
             self.per_partner_utility[i] = new_partner_payoff
             total_utility += outcome_payoff
-            print("I am agent", self.ID, ", I chose", my_move, ", my partner is:", i, ", they picked ",
-                  this_partner_move, ", so my payoff is ", outcome_payoff)
+            if self.printing:
+                print("I am agent", self.ID, ", I chose", my_move, ", my partner is:", i, ", they picked ",
+                    this_partner_move, ", so my payoff is ", outcome_payoff)
 
         # self.score = self.score + total_utility
         return total_utility
 
     def output_data_to_model(self):
         """ This sends the data to the model so the model can output it (I HOPE) """
-        print("Common move", self.common_move)
+        # print("Common move", self.common_move)
         if self.common_move == ['C']:
             self.model.agents_cooperating += 1
         elif self.common_move == ['D']:
@@ -239,7 +250,7 @@ class PDAgent(Agent):
         
         # open the csv files 
         with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-            fieldnames = ['stepcount', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
+            fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
                           'outcomes']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -249,7 +260,7 @@ class PDAgent(Agent):
 
             if self.stepCount == 1:
                 writer.writeheader()
-            writer.writerow({'stepcount': self.stepCount, 'move': self.itermove_result, 'utility': self.score,
+            writer.writerow({'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result, 'utility': self.score,
                              'common_move': self.common_move, 'number_coop': self.number_of_c,
                              'number_defect': self.number_of_d, 'outcomes': outcomes})
 
@@ -324,25 +335,41 @@ class PDAgent(Agent):
 
                 self.stepCount += 1
         else:
-            self.next_move = self.pick_move(self.strategy, self.payoffs)
-            # print("My move is ", self.move)
-            self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
-            self.previous_moves.append(self.move)
-            self.find_average_move()
-            self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
-            if self.model.collect_data:
-                self.output_data_to_file('outcomes go here')
-            self.reset_values()  # ------------------> Or do they need to go here?
+            if self.strategy is None or 0 or []:
+                self.strategy = self.pick_strategy()  # this will eventually do something
+                self.next_move = self.pick_move(self.strategy, self.payoffs)
+                self.previous_moves.append(self.move)
+                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+                self.find_average_move()
+                self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+                if self.model.collect_data:
+                    self.output_data_to_file('outcomes go here')
+                self.reset_values()  # ------------------> Or do they need to go here?
 
-            if self.model.schedule_type != "Simultaneous":
-                self.advance()
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
 
-            self.stepCount += 1
+                self.stepCount += 1
+            else:
+                self.next_move = self.pick_move(self.strategy, self.payoffs)
+                # print("My move is ", self.move)
+                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+                self.previous_moves.append(self.move)
+                self.find_average_move()
+                self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+                if self.model.collect_data:
+                    self.output_data_to_file('outcomes go here')
+                self.reset_values()  # ------------------> Or do they need to go here?
+
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
+
+                self.stepCount += 1
 
         # self.find_average_move()
-
-        for n in range(1):
-            print("----------------------------------------------------------")
+        if self.printing:
+            for n in range(1):
+                print("----------------------------------------------------------")
 
     def advance(self):
         self.move = self.next_move
@@ -350,7 +377,8 @@ class PDAgent(Agent):
         round_payoffs = self.increment_score(self.payoffs)
 
         if round_payoffs is not None:
-            print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
+            if self.printing:
+                print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
             self.score += round_payoffs
             # print("My total overall score is:", self.score)
             return

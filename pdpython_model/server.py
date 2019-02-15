@@ -77,6 +77,7 @@ canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
 
 model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 2, 2, 64, 1),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', False),
+                "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False)
                 }
 
 server = ModularServer(PDModel, [canvas_element], "Generic Model", model_params)

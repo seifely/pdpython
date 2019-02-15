@@ -18,7 +18,8 @@ class PDModel(Model):
                  number_of_agents=2,
                  schedule_type="Simultaneous",
                  rounds=1,
-                 collect_data=False):
+                 collect_data=False,
+                 agent_printing=False):
 
 
         # Model Parameters
@@ -34,6 +35,7 @@ class PDModel(Model):
                         ("D", "C"): 5,
                         ("D", "D"): 2}
         self.collect_data = collect_data
+        self.agent_printing = agent_printing
 
 
         # Model Functions
@@ -73,7 +75,7 @@ class PDModel(Model):
 
             if self.step_count == 1:
                 writer.writeheader()
-            writer.writerow({'number of agents': self.number_of_agents, 'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating, 'defecting': self.agents_defecting,
+            writer.writerow({'n agents': self.number_of_agents, 'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating, 'defecting': self.agents_defecting,
                              'coop total': self.number_of_coops, 'defect total': self.number_of_defects,
                              })
             # 'coop total utility': self.coops_utility, 'defect total utility': self.defects_utility
@@ -94,6 +96,7 @@ class PDModel(Model):
 
     def make_agents(self):
         for i in range(self.number_of_agents):
+            """This is for adding agents in sequentially."""
             x, y = self.coordinates.pop(0)
             # print("x, y:", x, y)
             # x, y = self.grid.find_empty()
