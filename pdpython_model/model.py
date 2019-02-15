@@ -17,7 +17,7 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=2,
                  schedule_type="Simultaneous",
-                 rounds=1,
+                 rounds=200,
                  collect_data=False,
                  agent_printing=False):
 

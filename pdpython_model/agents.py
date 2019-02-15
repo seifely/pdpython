@@ -3,8 +3,16 @@ import random
 import csv
 import time
 
+"""Note on Strategies:
+    RANDOM - Does what it says on the tin, each turn a random move is selected.
+    FP - Fixed Probabilities. Has a static probability of prediction of what other partner
+        will do, and picks the highest expected utility from those
+    ANGEL - Always co-operate.
+    DEVIL - Always defect.
+    CONSEQUENCE - Agent reacts to partner's previous move."""
+
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy=None, starting_move="C",
+    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="CONSEQUENCE", starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -43,9 +51,34 @@ class PDAgent(Agent):
         self.number_of_c = 0
         self.number_of_d = 0
 
-    # pick a strategy - either by force, or by a decision mechanism
-    # *** FOR FUTURE: *** Should agents pick strategies for each of their partners, or for all of their
-    # interactions?
+        # ----------------------- INTERACTIVE VARIABLES ----------------------
+        # these values are increased if partner defects. ppC for each is 1 - ppD
+        self.ppD_partner = {}
+        self.get_IDs()
+        for i in self.partner_IDs:
+            self.ppD_partner[i] = 0.5
+            # this is for initialising the probability that partners will defect
+
+    def get_IDs(self):
+        x, y = self.pos
+        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+
+        # First, get the neighbours
+        for i in neighbouring_cells:
+            bound_checker = self.model.grid.out_of_bounds(i)
+            if not bound_checker:
+                this_cell = self.model.grid.get_cell_list_contents([i])
+                # print("This cell", this_cell)
+
+                if len(this_cell) > 0:
+                    partner = [obj for obj in this_cell
+                               if isinstance(obj, PDAgent)][0]
+
+                    partner_ID = partner.ID
+
+                    if partner_ID not in self.partner_IDs:
+                        self.partner_IDs.append(partner_ID)
+
     def pick_strategy(self):
         """ This will later need more information coming into it - on what should I base my
         strategy selection? """
@@ -87,13 +120,13 @@ class PDAgent(Agent):
                     partner_ID = partner.ID
 
                     # pick a move
-                    move = self.pick_move(strategy, payoffs)
+                    move = self.pick_move(strategy, payoffs, partner_ID)
                     # add that move, with partner ID, to the versus choice dictionary
                     versus_moves[partner_ID] = move
         # print("agent", self.ID,"versus moves:", versus_moves)
         return versus_moves
 
-    def pick_move(self, strategy, payoffs):
+    def pick_move(self, strategy, payoffs, ID):
         """ given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
             calculate the expected utility of each move, and then pick the highest"""
         """AT THE MOMENT, THIS IS A GENERAL ONCE-A-ROUND FUNCTION, AND ISN'T PER PARTNER - THIS NEEDS TO CHANGE """
@@ -104,6 +137,7 @@ class PDAgent(Agent):
             # print("I'm an angel, so I'll cooperate")
             # self.number_of_c += 1
             return "C"
+
         elif strategy == "DEVIL":
             # print("I'm a devil, so I'll defect")
             # self.number_of_d += 1
@@ -115,7 +149,7 @@ class PDAgent(Agent):
             # Current set-up: We assume partner will defect
 
             ppD = 0.2  # probability of partner's defection
-            ppC = 0.8  # probability of partner's cooperation
+            ppC = 1 - ppD  # probability of partner's cooperation
 
             euCC = (payoffs["C", "C"] * ppC)
             euCD = (payoffs["C", "D"] * ppD)
@@ -150,6 +184,36 @@ class PDAgent(Agent):
             # elif choice == "D":
                 # self.number_of_d += 1
             return choice
+
+        elif strategy == "CDTRUST":
+            ppD = self.ppD_partner[ID]
+            ppC = 1 - self.ppD_partner[ID]
+
+            euCC = (payoffs["C", "C"] * ppC)
+            euCD = (payoffs["C", "D"] * ppD)
+            euDC = (payoffs["D", "C"] * ppC)
+            euDD = (payoffs["C", "D"] * ppD)
+
+            exp_util = (euCC, euCD, euDC, euDD)
+            # print("EXPUTIL: ", exp_util)
+            highest_eu = exp_util.index(max(exp_util))
+            # print("Highest EU: ", highest_eu)
+            if highest_eu == 0:
+                # print("Cooperate is best")
+                # self.number_of_c += 1
+                return "C"
+            elif highest_eu == 1:
+                # print("Cooperate is best")
+                # self.number_of_c += 1
+                return "C"
+            elif highest_eu == 2:
+                # print("Defect is best")
+                # self.number_of_d += 1
+                return "D"
+            elif highest_eu == 3:
+                # print("Defect is best")
+                # self.number_of_d += 1
+                return "D"
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -214,6 +278,10 @@ class PDAgent(Agent):
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
             # print("Outcome with partner %i was:" % i, outcome)
+
+            # ------- Here is where we change variables based on the outcome -------
+            if this_partner_move == "D":
+                self.ppD_partner[i] -= 0.01  # THIS RATE IS REALLY LOW BUT OH WELL
 
             outcome_payoff = payoffs[my_move, this_partner_move]
             current_partner_payoff = self.per_partner_utility[i]
@@ -306,9 +374,10 @@ class PDAgent(Agent):
 
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()  # this will eventually do something
-                self.next_move = self.pick_move(self.strategy, self.payoffs)
+                self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 self.previous_moves.append(self.move)
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+
                 self.find_average_move()
                 self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
                 if self.model.collect_data:
@@ -320,7 +389,7 @@ class PDAgent(Agent):
 
                 self.stepCount += 1
             else:
-                self.next_move = self.pick_move(self.strategy, self.payoffs)
+                self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 # print("My move is ", self.move)
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
@@ -337,7 +406,7 @@ class PDAgent(Agent):
         else:
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()  # this will eventually do something
-                self.next_move = self.pick_move(self.strategy, self.payoffs)
+                self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 self.previous_moves.append(self.move)
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.find_average_move()
@@ -351,7 +420,7 @@ class PDAgent(Agent):
 
                 self.stepCount += 1
             else:
-                self.next_move = self.pick_move(self.strategy, self.payoffs)
+                self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 # print("My move is ", self.move)
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
