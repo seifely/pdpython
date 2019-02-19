@@ -6,6 +6,7 @@ from pdpython_model.agents import PDAgent
 from mesa.datacollection import DataCollector
 import time
 import csv
+import sys
 
 
 class PDModel(Model):
@@ -17,7 +18,7 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=2,
                  schedule_type="Simultaneous",
-                 rounds=200,
+                 rounds=20,
                  collect_data=False,
                  agent_printing=False):
 
@@ -27,6 +28,7 @@ class PDModel(Model):
         self.width = width
         self.number_of_agents = number_of_agents
         self.step_count = 0
+        self.rounds = rounds
         self.exp_n = 'trial zero'
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
@@ -114,6 +116,9 @@ class PDModel(Model):
         if self.collect_data:
             self.output_data(steptime)
         self.reset_values()
+
+        if self.step_count >= self.rounds:
+            sys.exit()
 
     def run_model(self, rounds=200):
         for i in range(rounds):

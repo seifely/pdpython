@@ -12,7 +12,7 @@ import time
     CONSEQUENCE - Agent reacts to partner's previous move."""
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="CONSEQUENCE", starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="RANDOM", starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -54,10 +54,10 @@ class PDAgent(Agent):
         # ----------------------- INTERACTIVE VARIABLES ----------------------
         # these values are increased if partner defects. ppC for each is 1 - ppD
         self.ppD_partner = {}
-        self.get_IDs()
-        for i in self.partner_IDs:
-            self.ppD_partner[i] = 0.5
+        # for i in self.partner_IDs:
+        #     self.ppD_partner[i] = 0.5
             # this is for initialising the probability that partners will defect
+        # print("MY PPDs ARE:", self.ppD_partner)
 
     def get_IDs(self):
         x, y = self.pos
@@ -78,6 +78,12 @@ class PDAgent(Agent):
 
                     if partner_ID not in self.partner_IDs:
                         self.partner_IDs.append(partner_ID)
+
+                    # self.ppD_partner[partner_ID] = 0.5
+
+    def set_defaults(self, ids):
+        for i in ids:
+            self.ppD_partner[i] = 0.5
 
     def pick_strategy(self):
         """ This will later need more information coming into it - on what should I base my
@@ -126,7 +132,7 @@ class PDAgent(Agent):
         # print("agent", self.ID,"versus moves:", versus_moves)
         return versus_moves
 
-    def pick_move(self, strategy, payoffs, ID):
+    def pick_move(self, strategy, payoffs, id):
         """ given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
             calculate the expected utility of each move, and then pick the highest"""
         """AT THE MOMENT, THIS IS A GENERAL ONCE-A-ROUND FUNCTION, AND ISN'T PER PARTNER - THIS NEEDS TO CHANGE """
@@ -154,7 +160,7 @@ class PDAgent(Agent):
             euCC = (payoffs["C", "C"] * ppC)
             euCD = (payoffs["C", "D"] * ppD)
             euDC = (payoffs["D", "C"] * ppC)
-            euDD = (payoffs["C", "D"] * ppD)
+            euDD = (payoffs["D", "D"] * ppD)
 
             exp_util = (euCC, euCD, euDC, euDD)
             # print("EXPUTIL: ", exp_util)
@@ -185,14 +191,14 @@ class PDAgent(Agent):
                 # self.number_of_d += 1
             return choice
 
-        elif strategy == "CDTRUST":
-            ppD = self.ppD_partner[ID]
-            ppC = 1 - self.ppD_partner[ID]
+        elif strategy == "CONSEQUENCE":
+            ppD = self.ppD_partner[id]
+            ppC = 1 - self.ppD_partner[id]
 
             euCC = (payoffs["C", "C"] * ppC)
             euCD = (payoffs["C", "D"] * ppD)
             euDC = (payoffs["D", "C"] * ppC)
-            euDD = (payoffs["C", "D"] * ppD)
+            euDD = (payoffs["D", "D"] * ppD)
 
             exp_util = (euCC, euCD, euDC, euDD)
             # print("EXPUTIL: ", exp_util)
@@ -267,9 +273,7 @@ class PDAgent(Agent):
         # print("Partner IDs: ", self.partner_IDs)
         # print("Partner Latest Moves:", self.partner_latest_move)
 
-    # increment the agent's score - for iterated games
     def increment_score(self, payoffs):
-        # my_move = self.move=
         total_utility = 0
 
         for i in self.partner_IDs:
@@ -280,8 +284,12 @@ class PDAgent(Agent):
             # print("Outcome with partner %i was:" % i, outcome)
 
             # ------- Here is where we change variables based on the outcome -------
-            if this_partner_move == "D":
-                self.ppD_partner[i] -= 0.01  # THIS RATE IS REALLY LOW BUT OH WELL
+            if self.strategy == "CONSEQUENCE":
+                if this_partner_move == "D":
+                    self.ppD_partner[i] += 0.05
+                elif this_partner_move == "C":
+                    self.ppD_partner[i] -= 0.5
+
 
             outcome_payoff = payoffs[my_move, this_partner_move]
             current_partner_payoff = self.per_partner_utility[i]
@@ -368,36 +376,43 @@ class PDAgent(Agent):
 
     def step(self):
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
-        if self.stepCount == 0:
-            self.strategy = self.pick_strategy()  # this will eventually do something
-            # print(self.strategy)
+        if self.stepCount == 1:
+            # self.strategy = self.pick_strategy()
+            self.set_defaults(self.partner_IDs)
+            self.get_IDs()
 
             if self.strategy is None or 0 or []:
-                self.strategy = self.pick_strategy()  # this will eventually do something
-                self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
+                self.strategy = self.pick_strategy()
+                # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 self.previous_moves.append(self.move)
+                self.set_defaults(self.partner_IDs)
+                print("My ppDs are:", self.ppD_partner)
+
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 self.find_average_move()
-                self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+                self.output_data_to_model()
                 if self.model.collect_data:
-                    self.output_data_to_file('outcomes go here')
-                self.reset_values()  # ------------------> Or do they need to go here?
+                    self.output_data_to_file('outcomes')
+                self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
                 self.stepCount += 1
             else:
-                self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
-                # print("My move is ", self.move)
+                # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
+                # this line is now redundant in a system that picks multiple moves per turn
+                self.set_defaults(self.partner_IDs)
+                print("My ppDs are:", self.ppD_partner)
+
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
                 self.find_average_move()
-                self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+                self.output_data_to_model()
                 if self.model.collect_data:
-                    self.output_data_to_file('outcomes go here')
-                self.reset_values()  # ------------------> Or do they need to go here?
+                    self.output_data_to_file('outcomes')
+                self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -405,30 +420,34 @@ class PDAgent(Agent):
                 self.stepCount += 1
         else:
             if self.strategy is None or 0 or []:
-                self.strategy = self.pick_strategy()  # this will eventually do something
-                self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
+                self.strategy = self.pick_strategy()
+                # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 self.previous_moves.append(self.move)
+                print("My ppDs are:", self.ppD_partner)
+
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.find_average_move()
-                self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+                self.output_data_to_model()
                 if self.model.collect_data:
-                    self.output_data_to_file('outcomes go here')
-                self.reset_values()  # ------------------> Or do they need to go here?
+                    self.output_data_to_file('outcomes')
+                self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
                 self.stepCount += 1
             else:
-                self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
-                # print("My move is ", self.move)
+                # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
+                # this line is now redundant in a system that picks multiple moves per turn
+                print("My ppDs are:", self.ppD_partner)
+
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
                 self.find_average_move()
-                self.output_data_to_model()  # DOES RESET VALUES NEED TO COME AFTER THIS HERE?
+                self.output_data_to_model()
                 if self.model.collect_data:
-                    self.output_data_to_file('outcomes go here')
-                self.reset_values()  # ------------------> Or do they need to go here?
+                    self.output_data_to_file('outcomes')
+                self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -441,8 +460,8 @@ class PDAgent(Agent):
                 print("----------------------------------------------------------")
 
     def advance(self):
-        self.move = self.next_move
-        self.check_partner()  # Check what all of our partners picked, so our knowledge is up-to-date
+        # self.move = self.next_move
+        self.check_partner()  # Update Knowledge
         round_payoffs = self.increment_score(self.payoffs)
 
         if round_payoffs is not None:

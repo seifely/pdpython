@@ -67,6 +67,17 @@ def gen_Model_Portrayal(agent):
                          "text_color": "white",
                          "scale": 1
                          }
+        elif agent.strategy == "CONSEQUENCE":
+            portrayal = {"Shape": "circle",
+                         "scale": 1,
+                         "Color": "blue",
+                         "Filled": "true",
+                         "Layer": 1,
+                         "r": 0.5,
+                         "text": [agent.common_move, " ", agent.score],
+                         "text_color": "white",
+                         "scale": 1
+                         }
 
     return portrayal
 
