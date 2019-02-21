@@ -9,10 +9,10 @@ import time
         will do, and picks the highest expected utility from those
     ANGEL - Always co-operate.
     DEVIL - Always defect.
-    CONSEQUENCE - Agent reacts to partner's previous move."""
+    VP - Agent reacts to partner's previous move."""
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="RANDOM", starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="CONSPLIT", strategy=None, starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -96,14 +96,17 @@ class PDAgent(Agent):
         #     return
         if self.pickstrat == "RANDOM":
             # print("IM GONNA PICK ONE AT RANDOM")
-            choices = ["FP", "ANGEL", "RANDOM", "DEVIL"]
+            choices = ["FP", "ANGEL", "RANDOM", "DEVIL", "VP"]
             strat = random.choice(choices)
             # print("strat is", strat)
             return str(strat)
         elif self.pickstrat == "DISTRIBUTION":
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
-            return
+        elif self.pickstrat == "CONSPLIT":
+            choices = ["VP", "ANGEL"]
+            strat = random.choice(choices)
+            return str(strat)
 
     def iter_pick_move(self, strategy, payoffs):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
@@ -139,6 +142,7 @@ class PDAgent(Agent):
 
         if strategy is None or [] or 0:
             self.pick_strategy()
+
         elif strategy == "ANGEL":
             # print("I'm an angel, so I'll cooperate")
             # self.number_of_c += 1
@@ -191,7 +195,7 @@ class PDAgent(Agent):
                 # self.number_of_d += 1
             return choice
 
-        elif strategy == "CONSEQUENCE":
+        elif strategy == "VP":
             ppD = self.ppD_partner[id]
             ppC = 1 - self.ppD_partner[id]
 
@@ -220,6 +224,12 @@ class PDAgent(Agent):
                 # print("Defect is best")
                 # self.number_of_d += 1
                 return "D"
+
+        elif strategy == "TITFORTAT":
+            if self.stepCount == 1:
+                return "C"
+            else:
+                return self.partner_latest_move
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -284,12 +294,12 @@ class PDAgent(Agent):
             # print("Outcome with partner %i was:" % i, outcome)
 
             # ------- Here is where we change variables based on the outcome -------
-            if self.strategy == "CONSEQUENCE":
-                if this_partner_move == "D":
-                    self.ppD_partner[i] += 0.05
-                elif this_partner_move == "C":
-                    self.ppD_partner[i] -= 0.5
-
+            if self.strategy == "VP":
+                if self.ppD_partner[i] <= 1 and self.ppD_partner[i] >= 0:
+                    if this_partner_move == "D":
+                        self.ppD_partner[i] += 0.05
+                    elif this_partner_move == "C":
+                        self.ppD_partner[i] -= 0.05
 
             outcome_payoff = payoffs[my_move, this_partner_move]
             current_partner_payoff = self.per_partner_utility[i]
@@ -326,8 +336,12 @@ class PDAgent(Agent):
         
         # open the csv files 
         with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-            fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
-                          'outcomes']
+            if self.strategy == "VP":
+                fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
+                            'outcomes', 'probabilities']
+            else:
+                fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
+                              'outcomes']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             # moves = []
@@ -336,9 +350,16 @@ class PDAgent(Agent):
 
             if self.stepCount == 1:
                 writer.writeheader()
-            writer.writerow({'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result, 'utility': self.score,
-                             'common_move': self.common_move, 'number_coop': self.number_of_c,
-                             'number_defect': self.number_of_d, 'outcomes': outcomes})
+            
+            if self.strategy == "VP":
+                writer.writerow({'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result, 'utility': self.score,
+                                'common_move': self.common_move, 'number_coop': self.number_of_c,
+                                'number_defect': self.number_of_d, 'outcomes': outcomes, 'probabilities': self.ppD_partner})
+            else:
+                writer.writerow({'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
+                                 'utility': self.score,
+                                 'common_move': self.common_move, 'number_coop': self.number_of_c,
+                                 'number_defect': self.number_of_d, 'outcomes': outcomes})
 
     def reset_values(self):
         self.number_of_d = 0
