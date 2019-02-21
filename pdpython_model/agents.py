@@ -54,6 +54,7 @@ class PDAgent(Agent):
         # ----------------------- INTERACTIVE VARIABLES ----------------------
         # these values are increased if partner defects. ppC for each is 1 - ppD
         self.ppD_partner = {}
+        self.rounds_left = self.model.rounds - self.stepCount
         # for i in self.partner_IDs:
         #     self.ppD_partner[i] = 0.5
             # this is for initialising the probability that partners will defect
@@ -104,7 +105,7 @@ class PDAgent(Agent):
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
         elif self.pickstrat == "CONSPLIT":
-            choices = ["VP", "ANGEL"]
+            choices = ["VP", "RANDOM"]
             strat = random.choice(choices)
             return str(strat)
 
@@ -295,11 +296,18 @@ class PDAgent(Agent):
 
             # ------- Here is where we change variables based on the outcome -------
             if self.strategy == "VP":
-                if self.ppD_partner[i] <= 1 and self.ppD_partner[i] >= 0:
+                if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
                     if this_partner_move == "D":
                         self.ppD_partner[i] += 0.05
                     elif this_partner_move == "C":
                         self.ppD_partner[i] -= 0.05
+
+                if self.ppD_partner[i] > 1:
+                    self.ppD_partner[i] = 1
+                elif self.ppD_partner[i] < 0:
+                    self.ppD_partner[i] = 0
+                elif self.ppD_partner[i] == 6.938893903907228e-17:
+                    self.ppD_partner[i] = 0
 
             outcome_payoff = payoffs[my_move, this_partner_move]
             current_partner_payoff = self.per_partner_utility[i]
@@ -338,7 +346,8 @@ class PDAgent(Agent):
         with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
             if self.strategy == "VP":
                 fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
-                            'outcomes', 'probabilities']
+                              'outcomes', 'probabilities']
+            #     'pN', 'pE', 'pS', 'pW'
             else:
                 fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
                               'outcomes']
@@ -350,11 +359,14 @@ class PDAgent(Agent):
 
             if self.stepCount == 1:
                 writer.writeheader()
-            
+
             if self.strategy == "VP":
                 writer.writerow({'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result, 'utility': self.score,
                                 'common_move': self.common_move, 'number_coop': self.number_of_c,
-                                'number_defect': self.number_of_d, 'outcomes': outcomes, 'probabilities': self.ppD_partner})
+                                'number_defect': self.number_of_d, 'outcomes': outcomes,
+                                 'probabilities': self.ppD_partner})
+            #     'pN': self.ppD_partner[0],
+            #                                  'pE': self.ppD_partner[1], 'pS': self.ppD_partner[2], 'pW': self.ppD_partner[3],
             else:
                 writer.writerow({'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
                                  'utility': self.score,
