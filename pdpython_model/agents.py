@@ -393,6 +393,9 @@ class PDAgent(Agent):
             else:
                 ppd_partner_4 = 'None'
 
+            """ The above will error catch for when agents don't have those values, and will still let us print 
+                to csv. """
+
             with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
                 if self.strategy == "VP":
                     fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
