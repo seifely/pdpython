@@ -15,8 +15,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="484">
-                  <caret line="396" column="23" selection-start-line="396" selection-start-column="23" selection-end-line="396" selection-end-column="23" />
+                <state relative-caret-position="210">
+                  <caret line="564" column="31" selection-start-line="564" selection-start-column="25" selection-end-line="564" selection-end-column="31" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                     <element signature="e#2528#3306#0" />
@@ -29,7 +29,7 @@
                     <element signature="e#13775#14598#0" />
                     <element signature="e#16516#16565#0" />
                     <element signature="e#16608#17928#0" />
-                    <element signature="e#17958#21496#0" />
+                    <element signature="e#21529#21952#0" />
                   </folding>
                 </state>
               </provider>
@@ -38,8 +38,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1309">
-                  <caret line="82" column="36" selection-start-line="82" selection-start-column="36" selection-end-line="82" selection-end-column="36" />
+                <state relative-caret-position="1088">
+                  <caret line="69" selection-start-line="69" selection-end-line="69" />
                   <folding>
                     <element signature="e#0#65#0" expanded="true" />
                   </folding>
@@ -55,7 +55,7 @@
             <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="204">
-                  <caret line="31" column="33" lean-forward="true" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
+                  <caret line="31" column="33" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                   </folding>
@@ -93,6 +93,7 @@
       <find>self.ppD_partner</find>
       <find>CONSEQUENCE</find>
       <find>.get</find>
+      <find>my ppD</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -268,7 +269,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32932165" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.33044422" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33044422" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -382,8 +383,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1309">
-          <caret line="82" column="36" selection-start-line="82" selection-start-column="36" selection-end-line="82" selection-end-column="36" />
+        <state relative-caret-position="1088">
+          <caret line="69" selection-start-line="69" selection-end-line="69" />
           <folding>
             <element signature="e#0#65#0" expanded="true" />
           </folding>
@@ -393,7 +394,7 @@
     <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
-          <caret line="31" column="33" lean-forward="true" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
+          <caret line="31" column="33" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
@@ -402,8 +403,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="396" column="23" selection-start-line="396" selection-start-column="23" selection-end-line="396" selection-end-column="23" />
+        <state relative-caret-position="210">
+          <caret line="564" column="31" selection-start-line="564" selection-start-column="25" selection-end-line="564" selection-end-column="31" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#2528#3306#0" />
@@ -416,7 +417,7 @@
             <element signature="e#13775#14598#0" />
             <element signature="e#16516#16565#0" />
             <element signature="e#16608#17928#0" />
-            <element signature="e#17958#21496#0" />
+            <element signature="e#21529#21952#0" />
           </folding>
         </state>
       </provider>

@@ -12,7 +12,7 @@ import time
     VP - Agent reacts to partner's previous move."""
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="CONSPLIT", strategy=None, starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="CONSPLIT", strategy="VP", starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -55,10 +55,6 @@ class PDAgent(Agent):
         # these values are increased if partner defects. ppC for each is 1 - ppD
         self.ppD_partner = {}
         self.rounds_left = self.model.rounds - self.stepCount
-        # for i in self.partner_IDs:
-        #     self.ppD_partner[i] = 0.5
-            # this is for initialising the probability that partners will defect
-        # print("MY PPDs ARE:", self.ppD_partner)
 
     def get_IDs(self):
         x, y = self.pos
@@ -341,57 +337,40 @@ class PDAgent(Agent):
 
     def output_data_to_file(self, outcomes):
 
-        if self.stepCount == 0 or 1:
-            # just collect the whole of itermove result and probabilities result, as this will fuck up less
+            prob_list = []
+            for i in self.ppD_partner:
+                prob_list.append(self.ppD_partner[i])
 
-            with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-                if self.strategy == "VP":
-                    fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
-                                  'number_defect',
-                                  'outcomes', 'probabilities']
+            ppd_partner_1 = 'None'
+            ppd_partner_2 = 'None'
+            ppd_partner_3 = 'None'
+            ppd_partner_4 = 'None'
 
-                else:
-                    fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
-                                  'number_defect',
-                                  'outcomes']
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-
-                if self.stepCount == 1:
-                    writer.writeheader()
-
-                if self.strategy == "VP":
-                    writer.writerow(
-                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
-                         'utility': self.score,
-                         'common_move': self.common_move, 'number_coop': self.number_of_c,
-                         'number_defect': self.number_of_d, 'outcomes': outcomes,
-                         'probabilities': self.ppD_partner})
-
-                else:
-                    writer.writerow(
-                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
-                         'utility': self.score,
-                         'common_move': self.common_move, 'number_coop': self.number_of_c,
-                         'number_defect': self.number_of_d, 'outcomes': outcomes})
-        else:
-
-            if self.ppD_partner[0] is not None:
-                ppd_partner_1 = self.ppD_partner[0]
-            else:
+            if len(prob_list) == 0:
                 ppd_partner_1 = 'None'
-            if self.ppD_partner[1] is not None:
-                ppd_partner_2 = self.ppD_partner[1]
-            else:
                 ppd_partner_2 = 'None'
-            if self.ppD_partner[2] is not None:
-                ppd_partner_3 = self.ppD_partner[2]
-            else:
                 ppd_partner_3 = 'None'
-            if self.ppD_partner[3] is not None:
-                ppd_partner_4 = self.ppD_partner[3]
-            else:
                 ppd_partner_4 = 'None'
+            elif len(prob_list) == 1:
+                ppd_partner_1 = prob_list[0]
+                ppd_partner_2 = 'None'
+                ppd_partner_3 = 'None'
+                ppd_partner_4 = 'None'
+            elif len(prob_list) == 2:
+                ppd_partner_1 = prob_list[0]
+                ppd_partner_2 = prob_list[1]
+                ppd_partner_3 = 'None'
+                ppd_partner_4 = 'None'
+            elif len(prob_list) == 3:
+                ppd_partner_1 = prob_list[0]
+                ppd_partner_2 = prob_list[1]
+                ppd_partner_3 = prob_list[2]
+                ppd_partner_4 = 'None'
+            elif len(prob_list) == 4:
+                ppd_partner_1 = prob_list[0]
+                ppd_partner_2 = prob_list[1]
+                ppd_partner_3 = prob_list[2]
+                ppd_partner_4 = prob_list[3]
 
             """ The above will error catch for when agents don't have those values, and will still let us print 
                 to csv. """
@@ -430,7 +409,6 @@ class PDAgent(Agent):
                          'utility': self.score,
                          'common_move': self.common_move, 'number_coop': self.number_of_c,
                          'number_defect': self.number_of_d, 'outcomes': outcomes})
-
 
     def reset_values(self):
         self.number_of_d = 0
@@ -478,7 +456,7 @@ class PDAgent(Agent):
                 # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 self.previous_moves.append(self.move)
                 self.set_defaults(self.partner_IDs)
-                print("My ppDs are:", self.ppD_partner)
+                # print("My ppDs are:", self.ppD_partner)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
@@ -496,7 +474,7 @@ class PDAgent(Agent):
                 # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 # this line is now redundant in a system that picks multiple moves per turn
                 self.set_defaults(self.partner_IDs)
-                print("My ppDs are:", self.ppD_partner)
+                # print("My ppDs are:", self.ppD_partner)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
@@ -515,7 +493,7 @@ class PDAgent(Agent):
                 self.strategy = self.pick_strategy()
                 # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 self.previous_moves.append(self.move)
-                print("My ppDs are:", self.ppD_partner)
+                # print("My ppDs are:", self.ppD_partner)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.find_average_move()
@@ -531,7 +509,7 @@ class PDAgent(Agent):
             else:
                 # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 # this line is now redundant in a system that picks multiple moves per turn
-                print("My ppDs are:", self.ppD_partner)
+                # print("My ppDs are:", self.ppD_partner)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
