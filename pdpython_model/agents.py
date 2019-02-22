@@ -12,7 +12,7 @@ import time
     VP - Agent reacts to partner's previous move."""
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="CONSPLIT", strategy="VP", starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="CONSPLIT", strategy=None , starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -373,7 +373,7 @@ class PDAgent(Agent):
                 ppd_partner_4 = prob_list[3]
 
             """ The above will error catch for when agents don't have those values, and will still let us print 
-                to csv. """
+                to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
 
             with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
                 if self.strategy == "VP":
