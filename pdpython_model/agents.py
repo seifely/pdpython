@@ -340,38 +340,94 @@ class PDAgent(Agent):
         # and also time each agent's step to create a total time thingybob
 
     def output_data_to_file(self, outcomes):
-        # output utility this round
-        
-        # open the csv files 
-        with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-            if self.strategy == "VP":
-                fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
-                              'outcomes', 'probabilities']
-            #     'pN', 'pE', 'pS', 'pW'
+
+        if self.stepCount == 0 or 1:
+            # just collect the whole of itermove result and probabilities result, as this will fuck up less
+
+            with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+                if self.strategy == "VP":
+                    fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
+                                  'number_defect',
+                                  'outcomes', 'probabilities']
+
+                else:
+                    fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
+                                  'number_defect',
+                                  'outcomes']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+
+                if self.stepCount == 1:
+                    writer.writeheader()
+
+                if self.strategy == "VP":
+                    writer.writerow(
+                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
+                         'utility': self.score,
+                         'common_move': self.common_move, 'number_coop': self.number_of_c,
+                         'number_defect': self.number_of_d, 'outcomes': outcomes,
+                         'probabilities': self.ppD_partner})
+
+                else:
+                    writer.writerow(
+                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
+                         'utility': self.score,
+                         'common_move': self.common_move, 'number_coop': self.number_of_c,
+                         'number_defect': self.number_of_d, 'outcomes': outcomes})
+        else:
+
+            if self.ppD_partner[0] is not None:
+                ppd_partner_1 = self.ppD_partner[0]
             else:
-                fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop', 'number_defect',
-                              'outcomes']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-            # moves = []
-            # for i in self.move:
-            #     moves.append(self.move[i])
-
-            if self.stepCount == 1:
-                writer.writeheader()
-
-            if self.strategy == "VP":
-                writer.writerow({'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result, 'utility': self.score,
-                                'common_move': self.common_move, 'number_coop': self.number_of_c,
-                                'number_defect': self.number_of_d, 'outcomes': outcomes,
-                                 'probabilities': self.ppD_partner})
-            #     'pN': self.ppD_partner[0],
-            #                                  'pE': self.ppD_partner[1], 'pS': self.ppD_partner[2], 'pW': self.ppD_partner[3],
+                ppd_partner_1 = 'None'
+            if self.ppD_partner[1] is not None:
+                ppd_partner_2 = self.ppD_partner[1]
             else:
-                writer.writerow({'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
-                                 'utility': self.score,
-                                 'common_move': self.common_move, 'number_coop': self.number_of_c,
-                                 'number_defect': self.number_of_d, 'outcomes': outcomes})
+                ppd_partner_2 = 'None'
+            if self.ppD_partner[2] is not None:
+                ppd_partner_3 = self.ppD_partner[2]
+            else:
+                ppd_partner_3 = 'None'
+            if self.ppD_partner[3] is not None:
+                ppd_partner_4 = self.ppD_partner[3]
+            else:
+                ppd_partner_4 = 'None'
+
+            with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+                if self.strategy == "VP":
+                    fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
+                                  'number_defect', 'p1', 'p2', 'p3', 'p4',
+                                  'outcomes', 'probabilities']
+                #     'p1', 'p2', 'p3', 'p4'
+                else:
+                    fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
+                                  'number_defect',
+                                  'outcomes']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                # moves = []
+                # for i in self.move:
+                #     moves.append(self.move[i])
+
+                if self.stepCount == 1:
+                    writer.writeheader()
+
+                if self.strategy == "VP":
+                    writer.writerow(
+                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
+                         'utility': self.score,
+                         'common_move': self.common_move, 'number_coop': self.number_of_c,
+                         'number_defect': self.number_of_d,  'p1': ppd_partner_1,
+                        'p2': ppd_partner_2, 'p3': ppd_partner_3, 'p4': ppd_partner_4,'outcomes': outcomes,
+                         'probabilities': self.ppD_partner})
+                #
+                else:
+                    writer.writerow(
+                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
+                         'utility': self.score,
+                         'common_move': self.common_move, 'number_coop': self.number_of_c,
+                         'number_defect': self.number_of_d, 'outcomes': outcomes})
+
 
     def reset_values(self):
         self.number_of_d = 0
