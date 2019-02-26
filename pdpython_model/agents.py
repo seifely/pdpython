@@ -9,10 +9,11 @@ import time
         will do, and picks the highest expected utility from those
     ANGEL - Always co-operate.
     DEVIL - Always defect.
-    VP - Agent reacts to partner's previous move."""
+    VP - Agent reacts to partner's previous move.
+    TITFORTAT - The classic Tit for Tat strategy. """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="CONSPLIT", strategy=None , starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy=None , starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -291,7 +292,7 @@ class PDAgent(Agent):
             # print("Outcome with partner %i was:" % i, outcome)
 
             # ------- Here is where we change variables based on the outcome -------
-            if self.strategy == "VP":
+            if self.strategy == "VP" or "RANDOM":
                 if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
                     if this_partner_move == "D":
                         self.ppD_partner[i] += 0.05
@@ -338,6 +339,9 @@ class PDAgent(Agent):
     def output_data_to_file(self, outcomes):
 
             prob_list = []
+            util_list = []
+            move_list = []
+
             for i in self.ppD_partner:
                 prob_list.append(self.ppD_partner[i])
 
@@ -372,19 +376,105 @@ class PDAgent(Agent):
                 ppd_partner_3 = prob_list[2]
                 ppd_partner_4 = prob_list[3]
 
+            for i in self.per_partner_utility:
+                util_list.append(self.per_partner_utility[i])
+
+            utility_partner_1 = 'None'
+            utility_partner_2 = 'None'
+            utility_partner_3 = 'None'
+            utility_partner_4 = 'None'
+
+            if len(util_list) == 0:
+                utility_partner_1 = 'None'
+                utility_partner_2 = 'None'
+                utility_partner_3 = 'None'
+                utility_partner_4 = 'None'
+            elif len(util_list) == 1:
+                utility_partner_1 = util_list[0]
+                utility_partner_2 = 'None'
+                utility_partner_3 = 'None'
+                utility_partner_4 = 'None'
+            elif len(util_list) == 2:
+                utility_partner_1 = util_list[0]
+                utility_partner_2 = util_list[1]
+                utility_partner_3 = 'None'
+                utility_partner_4 = 'None'
+            elif len(util_list) == 3:
+                utility_partner_1 = util_list[0]
+                utility_partner_2 = util_list[1]
+                utility_partner_3 = util_list[2]
+                utility_partner_4 = 'None'
+            elif len(util_list) == 4:
+                utility_partner_1 = util_list[0]
+                utility_partner_2 = util_list[1]
+                utility_partner_3 = util_list[2]
+                utility_partner_4 = util_list[3]
+
+            for i in self.itermove_result:  # This encoding is per move type, allows graphing trends in move selection
+                if i == 'C':
+                    move_list.append(1)
+                elif i == 'D':
+                    move_list.append(2)
+
+            move_partner_1 = 'None'
+            move_partner_2 = 'None'
+            move_partner_3 = 'None'
+            move_partner_4 = 'None'
+
+            if len(move_list) == 0:
+                move_partner_1 = 'None'
+                move_partner_2 = 'None'
+                move_partner_3 = 'None'
+                move_partner_4 = 'None'
+            elif len(move_list) == 1:
+                move_partner_1 = move_list[0]
+                move_partner_2 = 'None'
+                move_partner_3 = 'None'
+                move_partner_4 = 'None'
+            elif len(move_list) == 1:
+                move_partner_1 = move_list[0]
+                move_partner_2 = move_list[1]
+                move_partner_3 = 'None'
+                move_partner_4 = 'None'
+            elif len(move_list) == 2:
+                move_partner_1 = move_list[0]
+                move_partner_2 = move_list[1]
+                move_partner_3 = move_list[2]
+                move_partner_4 = 'None'
+            elif len(move_list) == 4:
+                move_partner_1 = move_list[0]
+                move_partner_2 = move_list[1]
+                move_partner_3 = move_list[2]
+                move_partner_4 = move_list[3]
+
+            strategy_code = 'None'
+
+            if self.strategy == 'RANDOM':
+                strategy_code = 0
+            elif self.strategy == 'ANGEL':
+                strategy_code = 1
+            elif self.strategy == 'DEVIL':
+                strategy_code = 2
+            elif self.strategy == 'FP':
+                strategy_code = 3
+            elif self.strategy == 'VP':
+                strategy_code = 4
+            elif self.strategy == 'TITFORTAT':
+                strategy_code = 5
+
             """ The above will error catch for when agents don't have those values, and will still let us print 
                 to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
 
             with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-                if self.strategy == "VP":
-                    fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
-                                  'number_defect', 'p1', 'p2', 'p3', 'p4',
-                                  'outcomes', 'probabilities']
+                if self.strategy == "VP" or "RANDOM":
+                    fieldnames = ['stepcount', 'strategy', 'strat code', 'move', 'probabilities', 'utility', 'common_move', 'number_coop',
+                                  'number_defect',
+                                  'outcomes', 'p1', 'p2', 'p3', 'p4', 'u1', 'u2', 'u3', 'u4', 'm1', 'm2', 'm3', 'm4']
                 #     'p1', 'p2', 'p3', 'p4'
                 else:
-                    fieldnames = ['stepcount', 'strategy', 'move', 'utility', 'common_move', 'number_coop',
+                    fieldnames = ['stepcount', 'strategy', 'strat code', 'move', 'utility', 'common_move', 'number_coop',
                                   'number_defect',
-                                  'outcomes']
+                                  'outcomes', 'u1', 'u2', 'u3', 'u4', 'm1', 'm2', 'm3', 'm4']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 # moves = []
@@ -394,21 +484,26 @@ class PDAgent(Agent):
                 if self.stepCount == 1:
                     writer.writeheader()
 
-                if self.strategy == "VP":
+                if self.strategy == "VP" or "RANDOM":
                     writer.writerow(
-                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
+                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'strategy code': strategy_code,
+                         'move': self.itermove_result, 'probabilities': self.ppD_partner,
                          'utility': self.score,
                          'common_move': self.common_move, 'number_coop': self.number_of_c,
-                         'number_defect': self.number_of_d,  'p1': ppd_partner_1,
-                        'p2': ppd_partner_2, 'p3': ppd_partner_3, 'p4': ppd_partner_4,'outcomes': outcomes,
-                         'probabilities': self.ppD_partner})
+                         'number_defect': self.number_of_d, 'outcomes': outcomes, 'p1': ppd_partner_1,
+                        'p2': ppd_partner_2, 'p3': ppd_partner_3, 'p4': ppd_partner_4, 'u1': utility_partner_1, 'u2': utility_partner_2,
+                         'u3': utility_partner_3, 'u4': utility_partner_4, 'm1': move_partner_1, 'm2': move_partner_2,
+                         'm3': move_partner_3, 'm4': move_partner_4
+                         })
                 #
                 else:
                     writer.writerow(
-                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'move': self.itermove_result,
-                         'utility': self.score,
+                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'strategy code': strategy_code,
+                         'move': self.itermove_result, 'utility': self.score,
                          'common_move': self.common_move, 'number_coop': self.number_of_c,
-                         'number_defect': self.number_of_d, 'outcomes': outcomes})
+                         'number_defect': self.number_of_d, 'outcomes': outcomes, 'u1': utility_partner_1, 'u2': utility_partner_2,
+                         'u3': utility_partner_3, 'u4': utility_partner_4, 'm1': move_partner_1, 'm2': move_partner_2,
+                         'm3': move_partner_3, 'm4': move_partner_4})
 
     def reset_values(self):
         self.number_of_d = 0
