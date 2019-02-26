@@ -15,14 +15,13 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="241">
-                  <caret line="416" column="51" lean-forward="true" selection-start-line="416" selection-start-column="51" selection-end-line="416" selection-end-column="51" />
+                <state relative-caret-position="196">
+                  <caret line="230" column="55" lean-forward="true" selection-start-line="230" selection-start-column="55" selection-end-line="230" selection-end-column="55" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                     <element signature="e#2321#3099#0" />
                     <element signature="e#3232#4114#0" />
                     <element signature="e#4173#5366#0" />
-                    <element signature="e#5424#9042#0" />
                     <element signature="e#9081#11902#0" />
                     <element signature="e#11952#13522#0" />
                     <element signature="e#14753#14892#0" />
@@ -36,6 +35,10 @@
                     <element signature="e#16802#16963#0" />
                     <element signature="e#17022#17201#0" />
                     <element signature="e#17498#17641#0" />
+                    <element signature="e#17912#18061#0" />
+                    <element signature="e#18116#18271#0" />
+                    <element signature="e#18326#18487#0" />
+                    <element signature="e#18542#18709#0" />
                     <element signature="e#17867#17916#0" />
                     <element signature="e#17959#19279#0" />
                     <element signature="e#19309#22855#0" />
@@ -97,7 +100,6 @@
       <find>common</find>
       <find>find</find>
       <find>output_data</find>
-      <find>number_of_c</find>
       <find>common m</find>
       <find>print(</find>
       <find>self.ppD_partner</find>
@@ -106,6 +108,7 @@
       <find>my ppD</find>
       <find>if self.strategy == &quot;VP</find>
       <find>self.per_pa</find>
+      <find>number_of_c</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -415,14 +418,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="241">
-          <caret line="416" column="51" lean-forward="true" selection-start-line="416" selection-start-column="51" selection-end-line="416" selection-end-column="51" />
+        <state relative-caret-position="196">
+          <caret line="230" column="55" lean-forward="true" selection-start-line="230" selection-start-column="55" selection-end-line="230" selection-end-column="55" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#2321#3099#0" />
             <element signature="e#3232#4114#0" />
             <element signature="e#4173#5366#0" />
-            <element signature="e#5424#9042#0" />
             <element signature="e#9081#11902#0" />
             <element signature="e#11952#13522#0" />
             <element signature="e#14753#14892#0" />
@@ -436,6 +438,10 @@
             <element signature="e#16802#16963#0" />
             <element signature="e#17022#17201#0" />
             <element signature="e#17498#17641#0" />
+            <element signature="e#17912#18061#0" />
+            <element signature="e#18116#18271#0" />
+            <element signature="e#18326#18487#0" />
+            <element signature="e#18542#18709#0" />
             <element signature="e#17867#17916#0" />
             <element signature="e#17959#19279#0" />
             <element signature="e#19309#22855#0" />

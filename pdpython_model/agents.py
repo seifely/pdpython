@@ -143,12 +143,12 @@ class PDAgent(Agent):
 
         elif strategy == "ANGEL":
             # print("I'm an angel, so I'll cooperate")
-            # self.number_of_c += 1
+            self.number_of_c += 1
             return "C"
 
         elif strategy == "DEVIL":
             # print("I'm a devil, so I'll defect")
-            # self.number_of_d += 1
+            self.number_of_d += 1
             return "D"
 
         elif strategy == "FP":  # this is under assumption of heterogeneity of agents
@@ -170,27 +170,27 @@ class PDAgent(Agent):
             # print("Highest EU: ", highest_eu)
             if highest_eu == 0:
                 # print("Cooperate is best")
-                # self.number_of_c += 1
+                self.number_of_c += 1
                 return "C"
             elif highest_eu == 1:
                 # print("Cooperate is best")
-                # self.number_of_c += 1
+                self.number_of_c += 1
                 return "C"
             elif highest_eu == 2:
                 # print("Defect is best")
-                # self.number_of_d += 1
+                self.number_of_d += 1
                 return "D"
             elif highest_eu == 3:
                 # print("Defect is best")
-                # self.number_of_d += 1
+                self.number_of_d += 1
                 return "D"
 
         elif strategy == "RANDOM":
             choice = self.random.choice(["C", "D"])
-            # if choice == "C":
-                # self.number_of_c += 1
-            # elif choice == "D":
-                # self.number_of_d += 1
+            if choice == "C":
+                self.number_of_c += 1
+            elif choice == "D":
+                self.number_of_d += 1
             return choice
 
         elif strategy == "VP":
@@ -208,26 +208,31 @@ class PDAgent(Agent):
             # print("Highest EU: ", highest_eu)
             if highest_eu == 0:
                 # print("Cooperate is best")
-                # self.number_of_c += 1
+                self.number_of_c += 1
                 return "C"
             elif highest_eu == 1:
                 # print("Cooperate is best")
-                # self.number_of_c += 1
+                self.number_of_c += 1
                 return "C"
             elif highest_eu == 2:
                 # print("Defect is best")
-                # self.number_of_d += 1
+                self.number_of_d += 1
                 return "D"
             elif highest_eu == 3:
                 # print("Defect is best")
-                # self.number_of_d += 1
+                self.number_of_d += 1
                 return "D"
 
         elif strategy == "TITFORTAT":
             if self.stepCount == 1:
+                self.number_of_c += 1
                 return "C"
             else:
-                return self.partner_latest_move
+                if self.partner_latest_move[id] == 'C':
+                    self.number_of_c += 1
+                elif self.partner_latest_move[id] == 'D':
+                    self.number_of_d += 1
+                return self.partner_latest_move[id]
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -421,8 +426,6 @@ class PDAgent(Agent):
             move_partner_2 = 'None'
             move_partner_3 = 'None'
             move_partner_4 = 'None'
-
-
 
             if len(move_list) == 0:
                 move_partner_1 = 'None'
