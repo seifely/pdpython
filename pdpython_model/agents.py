@@ -13,7 +13,7 @@ import time
     TITFORTAT - The classic Tit for Tat strategy. """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy=None , starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy=None, starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -411,15 +411,18 @@ class PDAgent(Agent):
                 utility_partner_4 = util_list[3]
 
             for i in self.itermove_result:  # This encoding is per move type, allows graphing trends in move selection
-                if i == 'C':
+                if self.itermove_result[i] == 'C':
                     move_list.append(1)
-                elif i == 'D':
+                    print()
+                elif self.itermove_result[i] == 'D':
                     move_list.append(2)
 
             move_partner_1 = 'None'
             move_partner_2 = 'None'
             move_partner_3 = 'None'
             move_partner_4 = 'None'
+
+
 
             if len(move_list) == 0:
                 move_partner_1 = 'None'
@@ -431,12 +434,12 @@ class PDAgent(Agent):
                 move_partner_2 = 'None'
                 move_partner_3 = 'None'
                 move_partner_4 = 'None'
-            elif len(move_list) == 1:
+            elif len(move_list) == 2:
                 move_partner_1 = move_list[0]
                 move_partner_2 = move_list[1]
                 move_partner_3 = 'None'
                 move_partner_4 = 'None'
-            elif len(move_list) == 2:
+            elif len(move_list) == 3:
                 move_partner_1 = move_list[0]
                 move_partner_2 = move_list[1]
                 move_partner_3 = move_list[2]
@@ -486,7 +489,7 @@ class PDAgent(Agent):
 
                 if self.strategy == "VP" or "RANDOM":
                     writer.writerow(
-                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'strategy code': strategy_code,
+                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'strat code': strategy_code,
                          'move': self.itermove_result, 'probabilities': self.ppD_partner,
                          'utility': self.score,
                          'common_move': self.common_move, 'number_coop': self.number_of_c,
@@ -498,7 +501,7 @@ class PDAgent(Agent):
                 #
                 else:
                     writer.writerow(
-                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'strategy code': strategy_code,
+                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'strat code': strategy_code,
                          'move': self.itermove_result, 'utility': self.score,
                          'common_move': self.common_move, 'number_coop': self.number_of_c,
                          'number_defect': self.number_of_d, 'outcomes': outcomes, 'u1': utility_partner_1, 'u2': utility_partner_2,
