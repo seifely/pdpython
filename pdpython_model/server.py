@@ -78,7 +78,7 @@ def gen_Model_Portrayal(agent):
                          "text_color": "white",
                          "scale": 1
                          }
-        elif agent.strategy == "TITFORTAT":
+        elif agent.strategy == "TFT":
             portrayal = {"Shape": "circle",
                          "scale": 1,
                          "Color": "purple",

@@ -18,7 +18,7 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=2,
                  schedule_type="Simultaneous",
-                 rounds=100,
+                 rounds=10,
                  collect_data=False,
                  agent_printing=False):
 
@@ -110,7 +110,7 @@ class PDModel(Model):
         start = time.time()
         self.schedule.step()
         self.step_count += 1
-        print("Step:", self.step_count)
+        # print("Step:", self.step_count)
         end = time.time()
         steptime = end - start
         if self.collect_data:

@@ -10,10 +10,10 @@ import time
     ANGEL - Always co-operate.
     DEVIL - Always defect.
     VP - Agent reacts to partner's previous move.
-    TITFORTAT - The classic Tit for Tat strategy. """
+    TFT - The classic Tit for Tat strategy. """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy=None, starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -47,6 +47,7 @@ class PDAgent(Agent):
         self.per_partner_utility = {}
         self.itermove_result = {}
         self.common_move = ""
+        self.last_round = False
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
@@ -101,8 +102,8 @@ class PDAgent(Agent):
         elif self.pickstrat == "DISTRIBUTION":
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
-        elif self.pickstrat == "CONSPLIT":
-            choices = ["VP", "RANDOM"]
+        elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
+            choices = ["TFT", "RANDOM"]
             strat = random.choice(choices)
             return str(strat)
 
@@ -223,7 +224,7 @@ class PDAgent(Agent):
                 self.number_of_d += 1
                 return "D"
 
-        elif strategy == "TITFORTAT":
+        elif strategy == "TFT":
             if self.stepCount == 1:
                 self.number_of_c += 1
                 return "C"
@@ -465,7 +466,7 @@ class PDAgent(Agent):
                 strategy_code = 3
             elif self.strategy == 'VP':
                 strategy_code = 4
-            elif self.strategy == 'TITFORTAT':
+            elif self.strategy == 'TFT':
                 strategy_code = 5
 
             """ The above will error catch for when agents don't have those values, and will still let us print 
@@ -570,7 +571,7 @@ class PDAgent(Agent):
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
-                self.stepCount += 1
+                # self.stepCount += 1
             else:
                 # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 # this line is now redundant in a system that picks multiple moves per turn
@@ -588,7 +589,7 @@ class PDAgent(Agent):
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
-                self.stepCount += 1
+                # self.stepCount += 1
         else:
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
@@ -623,7 +624,9 @@ class PDAgent(Agent):
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
-                self.stepCount += 1
+        if self.stepCount == (self.model.rounds - 1):
+            print("My stepcount is", self.stepCount, "Next round is", (self.model.rounds - 1), "Next round is the last round!")
+            self.last_round = True
 
         # self.find_average_move()
         if self.printing:
@@ -634,6 +637,8 @@ class PDAgent(Agent):
         # self.move = self.next_move
         self.check_partner()  # Update Knowledge
         round_payoffs = self.increment_score(self.payoffs)
+
+        self.stepCount += 1
 
         if round_payoffs is not None:
             if self.printing:
