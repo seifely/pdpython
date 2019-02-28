@@ -5,15 +5,18 @@ import time
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
-    FP - Fixed Probabilities. Has a static probability of prediction of what other partner
-        will do, and picks the highest expected utility from those
+    EV - Expected Value. Has a static probability of prediction of what other partner
+        will do, and picks the highest expected VALUE from those.
+    VEV - Variable Expected Value. Agent reacts to partner's previous move, through altering EV probabilities.
+    VPP - Variable Personal Probability. Agent changes own likelihood that it will defect in response to defection.
     ANGEL - Always co-operate.
     DEVIL - Always defect.
-    VP - Agent reacts to partner's previous move.
-    TFT - The classic Tit for Tat strategy. """
+    
+    TFT - The classic Tit for Tat strategy.
+    WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="VPP", starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -85,17 +88,10 @@ class PDAgent(Agent):
             self.ppD_partner[i] = 0.5
 
     def pick_strategy(self):
-        """ This will later need more information coming into it - on what should I base my
-        strategy selection? """
-        # if self.strategy is None:
-            # decision mechanism goes here
-            # return
-        # if self.pickstrat == "HET":
-        #
-        #     return
+        """ This is an initial strategy selector for agents """
+
         if self.pickstrat == "RANDOM":
-            # print("IM GONNA PICK ONE AT RANDOM")
-            choices = ["FP", "ANGEL", "RANDOM", "DEVIL", "VP"]
+            choices = ["EV", "ANGEL", "RANDOM", "DEVIL", "VEV", "TFT", "WSLS", "VPP"]
             strat = random.choice(choices)
             # print("strat is", strat)
             return str(strat)
@@ -103,9 +99,12 @@ class PDAgent(Agent):
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["TFT", "RANDOM"]
+            choices = ["VEV", "ANGEL"]
             strat = random.choice(choices)
             return str(strat)
+
+    def change_strategy(self):
+        return
 
     def iter_pick_move(self, strategy, payoffs):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
@@ -152,36 +151,34 @@ class PDAgent(Agent):
             self.number_of_d += 1
             return "D"
 
-        elif strategy == "FP":  # this is under assumption of heterogeneity of agents
-            """ FP is designed as a strategy not based on 'trust' (though it can reflect that), but instead on 
+        elif strategy == "EV":  # this is under assumption of heterogeneity of agents
+            """ EV is designed as a strategy not based on 'trust' (though it can reflect that), but instead on 
             the logic; 'I know they know defect is the best strategy usually, just as they know I know that'. """
             # Current set-up: We assume partner will defect
 
             ppD = 0.2  # probability of partner's defection
             ppC = 1 - ppD  # probability of partner's cooperation
 
-            euCC = (payoffs["C", "C"] * ppC)
-            euCD = (payoffs["C", "D"] * ppD)
-            euDC = (payoffs["D", "C"] * ppC)
-            euDD = (payoffs["D", "D"] * ppD)
+            evCC = (payoffs["C", "C"] * ppC)
+            evCD = (payoffs["C", "D"] * ppD)
+            evDC = (payoffs["D", "C"] * ppC)
+            evDD = (payoffs["D", "D"] * ppD)
 
-            exp_util = (euCC, euCD, euDC, euDD)
-            # print("EXPUTIL: ", exp_util)
-            highest_eu = exp_util.index(max(exp_util))
-            # print("Highest EU: ", highest_eu)
-            if highest_eu == 0:
+            exp_util = (evCC, evCD, evDC, evDD)
+            highest_ev = exp_util.index(max(exp_util))
+            if highest_ev == 0:
                 # print("Cooperate is best")
                 self.number_of_c += 1
                 return "C"
-            elif highest_eu == 1:
+            elif highest_ev == 1:
                 # print("Cooperate is best")
                 self.number_of_c += 1
                 return "C"
-            elif highest_eu == 2:
+            elif highest_ev== 2:
                 # print("Defect is best")
                 self.number_of_d += 1
                 return "D"
-            elif highest_eu == 3:
+            elif highest_ev == 3:
                 # print("Defect is best")
                 self.number_of_d += 1
                 return "D"
@@ -194,33 +191,27 @@ class PDAgent(Agent):
                 self.number_of_d += 1
             return choice
 
-        elif strategy == "VP":
+        elif strategy == "VEV":
             ppD = self.ppD_partner[id]
             ppC = 1 - self.ppD_partner[id]
 
-            euCC = (payoffs["C", "C"] * ppC)
-            euCD = (payoffs["C", "D"] * ppD)
-            euDC = (payoffs["D", "C"] * ppC)
-            euDD = (payoffs["D", "D"] * ppD)
+            evCC = (payoffs["C", "C"] * ppC)
+            evCD = (payoffs["C", "D"] * ppD)
+            evDC = (payoffs["D", "C"] * ppC)
+            evDD = (payoffs["D", "D"] * ppD)
 
-            exp_util = (euCC, euCD, euDC, euDD)
-            # print("EXPUTIL: ", exp_util)
-            highest_eu = exp_util.index(max(exp_util))
-            # print("Highest EU: ", highest_eu)
-            if highest_eu == 0:
-                # print("Cooperate is best")
+            exp_value = (evCC, evCD, evDC, evDD)
+            highest_ev = exp_value.index(max(exp_value))
+            if highest_ev == 0:
                 self.number_of_c += 1
                 return "C"
-            elif highest_eu == 1:
-                # print("Cooperate is best")
+            elif highest_ev == 1:
                 self.number_of_c += 1
                 return "C"
-            elif highest_eu == 2:
-                # print("Defect is best")
+            elif highest_ev == 2:
                 self.number_of_d += 1
                 return "D"
-            elif highest_eu == 3:
-                # print("Defect is best")
+            elif highest_ev == 3:
                 self.number_of_d += 1
                 return "D"
 
@@ -234,6 +225,27 @@ class PDAgent(Agent):
                 elif self.partner_latest_move[id] == 'D':
                     self.number_of_d += 1
                 return self.partner_latest_move[id]
+
+        elif strategy == "WSLS":
+            self.number_of_d += 1
+            return "D"
+
+        elif strategy == "VPP":
+            ppD = self.ppD_partner[id]
+            ppC = 1 - self.ppD_partner[id]
+
+            # Instead of using these values to calculate expected values/expected utilities, we use them to pick
+            # our own move. This is a stochastic move selection weighted to respond to our partner's moves
+
+            choices = ["C", "D"]
+            weights = [ppC, ppD]
+
+            choice = random.choices(population=choices, weights=weights, k=1)
+            if choice == "C":
+                self.number_of_c += 1
+            elif choice == "D":
+                self.number_of_d += 1
+            return choice[0]
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -298,12 +310,12 @@ class PDAgent(Agent):
             # print("Outcome with partner %i was:" % i, outcome)
 
             # ------- Here is where we change variables based on the outcome -------
-            if self.strategy == "VP" or "RANDOM":
+            if self.strategy == "VEV" or "RANDOM":
                 if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
                     if this_partner_move == "D":
                         self.ppD_partner[i] += 0.05
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= 0.05
+                        self.ppD_partner[i] -= 0.07
 
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
@@ -462,9 +474,9 @@ class PDAgent(Agent):
                 strategy_code = 1
             elif self.strategy == 'DEVIL':
                 strategy_code = 2
-            elif self.strategy == 'FP':
+            elif self.strategy == 'EV':
                 strategy_code = 3
-            elif self.strategy == 'VP':
+            elif self.strategy == 'VEV':
                 strategy_code = 4
             elif self.strategy == 'TFT':
                 strategy_code = 5
@@ -473,7 +485,7 @@ class PDAgent(Agent):
                 to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
 
             with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-                if self.strategy == "VP" or "RANDOM":
+                if self.strategy == "VEV" or "RANDOM":
                     fieldnames = ['stepcount', 'strategy', 'strat code', 'move', 'probabilities', 'utility', 'common_move', 'number_coop',
                                   'number_defect',
                                   'outcomes', 'p1', 'p2', 'p3', 'p4', 'u1', 'u2', 'u3', 'u4', 'm1', 'm2', 'm3', 'm4']
@@ -491,7 +503,7 @@ class PDAgent(Agent):
                 if self.stepCount == 1:
                     writer.writeheader()
 
-                if self.strategy == "VP" or "RANDOM":
+                if self.strategy == "VEV" or "RANDOM":
                     writer.writerow(
                         {'stepcount': self.stepCount, 'strategy': self.strategy, 'strat code': strategy_code,
                          'move': self.itermove_result, 'probabilities': self.ppD_partner,
