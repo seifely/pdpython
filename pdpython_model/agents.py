@@ -16,7 +16,7 @@ import time
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy="VPP", starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -51,6 +51,7 @@ class PDAgent(Agent):
         self.itermove_result = {}
         self.common_move = ""
         self.last_round = False
+        self.wsls_failed = False
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
@@ -99,7 +100,7 @@ class PDAgent(Agent):
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VEV", "ANGEL"]
+            choices = ["WSLS", "RANDOM"]
             strat = random.choice(choices)
             return str(strat)
 
@@ -227,8 +228,48 @@ class PDAgent(Agent):
                 return self.partner_latest_move[id]
 
         elif strategy == "WSLS":
-            self.number_of_d += 1
-            return "D"
+            """ This strategy picks C in the first turn, and then changes its move only if it 'loses' 
+                - e.g. if it gets pwned or if both defect. """
+            # if it's turn one, cooperate
+            # after this, if the outcome for this partner was a winning one (either C-D or C-C?) then play the
+            # same move again, if not, play the opposite move.
+
+            if self.stepCount == 1:
+                return "C"
+
+            my_move = self.itermove_result[id]
+
+            this_partner_move = self.partner_latest_move[id]
+            outcome = [my_move, this_partner_move]
+
+            failure_outcomes = [["C", "D"], ["D", "D"]]
+
+            self.wsls_failed = False
+
+            if outcome == ['C', 'C']:
+                self.wsls_failed = False
+            elif outcome == ['D', 'C']:
+                self.wsls_failed = False
+            elif outcome == ['C', 'D']:
+                self.wsls_failed = True
+                print("I failed! Switching")
+            elif outcome == ['D', 'D']:
+                self.wsls_failed = True
+                print("I failed! Switching")
+
+            if self.wsls_failed == True:
+                if my_move == "C":
+                    print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick D")
+                    self.wsls_failed = False
+                    return "D"
+                if my_move == "D":
+                    print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick C")
+                    self.wsls_failed = False
+                    return "C"
+            else:
+                print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I picked the same as last time")
+                self.wsls_failed = False
+                return my_move
 
         elif strategy == "VPP":
             ppD = self.ppD_partner[id]
@@ -296,8 +337,6 @@ class PDAgent(Agent):
                     if partner_ID not in self.partner_IDs:
                         self.partner_IDs.append(partner_ID)
 
-        # print("Partner IDs: ", self.partner_IDs)
-        # print("Partner Latest Moves:", self.partner_latest_move)
 
     def increment_score(self, payoffs):
         total_utility = 0
