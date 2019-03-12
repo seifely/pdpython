@@ -4,6 +4,7 @@ from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
 from pdpython_model.agents import PDAgent
 
 from mesa.datacollection import DataCollector
+import random
 import time
 import csv
 import sys
@@ -20,25 +21,46 @@ class PDModel(Model):
                  schedule_type="Simultaneous",
                  rounds=100,
                  collect_data=False,
-                 agent_printing=False):
+                 agent_printing=False,
+                 randspawn=False,
+                 DD=2,
+                 CC=3,
+                 CD=0,
+                 DC=5,
+                 simplified_payoffs=False,
+                 b=0,
+                 c=0):
 
-
-        # Model Parameters
+        # ---------- Model Parameters --------
         self.height = height
         self.width = width
         self.number_of_agents = number_of_agents
         self.step_count = 0
+        self.DD = DD
+        self.CC = CC
+        self.CD = CD
+        self.DC = DC
+        self.b = b
+        self.c = c
+        self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
+        self.randspawn = randspawn
         self.exp_n = 'trial zero'
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
-        self.payoffs = {("C", "C"): 3,
-                        ("C", "D"): 0,
-                        ("D", "C"): 5,
-                        ("D", "D"): 2}
+        if not self.simplified_payoffs:
+            self.payoffs = {("C", "C"): self.CC,
+                            ("C", "D"): self.CD,
+                            ("D", "C"): self.DC,
+                            ("D", "D"): self.DD}
+        elif self.simplified_payoffs:
+            self.payoffs = {("C", "C"): self.b - self.c,
+                            ("C", "D"): - self.c,
+                            ("D", "C"): self.c,
+                            ("D", "D"): 0}
+
         self.collect_data = collect_data
         self.agent_printing = agent_printing
-
 
         # Model Functions
         self.schedule = self.schedule_types[self.schedule_type](self)
@@ -97,14 +119,25 @@ class PDModel(Model):
         # at minimum
 
     def make_agents(self):
-        for i in range(self.number_of_agents):
-            """This is for adding agents in sequentially."""
-            x, y = self.coordinates.pop(0)
-            # print("x, y:", x, y)
-            # x, y = self.grid.find_empty()
-            pdagent = PDAgent((x, y), self, True)
-            self.grid.place_agent(pdagent, (x, y))
-            self.schedule.add(pdagent)
+        if not self.randspawn:
+            for i in range(self.number_of_agents):
+                """This is for adding agents in sequentially."""
+                x, y = self.coordinates.pop(0)
+                # print("x, y:", x, y)
+                # x, y = self.grid.find_empty()
+                pdagent = PDAgent((x, y), self, True)
+                self.grid.place_agent(pdagent, (x, y))
+                self.schedule.add(pdagent)
+
+        elif self.randspawn:
+            """ This is for adding in agents randomly """
+            for i in range(self.number_of_agents):
+                x, y = self.coordinates.pop(random.randrange(len(self.coordinates)))
+                # print("x, y:", x, y)
+                # x, y = self.grid.find_empty()
+                pdagent = PDAgent((x, y), self, True)
+                self.grid.place_agent(pdagent, (x, y))
+                self.schedule.add(pdagent)
 
     def step(self):
         start = time.time()

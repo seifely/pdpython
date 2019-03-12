@@ -121,8 +121,16 @@ canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
 
 model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 2, 2, 64, 1),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', False),
-                "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False)
+                "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),
+                "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),
+                "CC": UserSettableParameter('number', 'Payoff for C-C (Default: 3)', value=3),
+                "CD": UserSettableParameter('number', 'Payoff for C-D (Default: 0)', value=0),
+                "DC": UserSettableParameter('number', 'Payoff for D-C (Default: 5)', value=5),
+                "DD": UserSettableParameter('number', 'Payoff for D-D (Default: 2)', value=2),
+
+                "b": UserSettableParameter('number', 'Simplified Payoffs: Benefit of Co-op', value=8),
+                "c": UserSettableParameter('number', 'Simplified Payoffs: Cost of Co-op', value=2),
                 }
 
-server = ModularServer(PDModel, [canvas_element], "Generic Model", model_params)
+server = ModularServer(PDModel, [canvas_element], "Prisoner's Dilemma Simulation", model_params)
 server.port = 8521
