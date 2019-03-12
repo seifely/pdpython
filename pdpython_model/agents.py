@@ -252,22 +252,22 @@ class PDAgent(Agent):
                 self.wsls_failed = False
             elif outcome == ['C', 'D']:
                 self.wsls_failed = True
-                print("I failed! Switching")
+                # print("I failed! Switching")
             elif outcome == ['D', 'D']:
                 self.wsls_failed = True
-                print("I failed! Switching")
+                # print("I failed! Switching")
 
             if self.wsls_failed == True:
                 if my_move == "C":
-                    print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick D")
+                    # print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick D")
                     self.wsls_failed = False
                     return "D"
                 if my_move == "D":
-                    print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick C")
+                    # print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick C")
                     self.wsls_failed = False
                     return "C"
             else:
-                print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I picked the same as last time")
+                # print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I picked the same as last time")
                 self.wsls_failed = False
                 return my_move
 

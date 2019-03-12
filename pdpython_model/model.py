@@ -29,7 +29,7 @@ class PDModel(Model):
                  DC=5,
                  simplified_payoffs=False,
                  b=0,
-                 c=0):
+                 c=0,):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -154,6 +154,6 @@ class PDModel(Model):
             sys.exit()
 
     def run_model(self, rounds=200):
-        for i in range(rounds):
+        for i in range(self.rounds):
             self.step()
 
