@@ -1,9 +1,10 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.modules import CanvasGrid, ChartModule
+from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 
 from pdpython_model.agents import PDAgent
 from pdpython_model.model import PDModel
+
 
 def gen_Model_Portrayal(agent):
     if agent is None:
@@ -115,7 +116,14 @@ def gen_Model_Portrayal(agent):
     return portrayal
 
 
+class StepCountDisplay(TextElement):
+
+    def render(self, model):
+        return "Step Count: " + str(model.step_count)
+
+
 canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
+step_element = StepCountDisplay()
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
@@ -129,9 +137,9 @@ model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of A
                 "DD": UserSettableParameter('number', 'Payoff for D-D (Default: 2)', value=2),
 
                 "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),
-                "b": UserSettableParameter('number', 'Simplified Payoffs: Benefit of Co-op', value=8),
-                "c": UserSettableParameter('number', 'Simplified Payoffs: Cost of Co-op', value=2),
+                "b": UserSettableParameter('number', 'Simplified Payoffs: Benefit of Co-op', value=4),
+                "c": UserSettableParameter('number', 'Simplified Payoffs: Cost of Co-op', value=1),
                 }
 
-server = ModularServer(PDModel, [canvas_element], "Prisoner's Dilemma Simulation", model_params)
+server = ModularServer(PDModel, [canvas_element, step_element,], "Prisoner's Dilemma Simulation", model_params)
 server.port = 8521

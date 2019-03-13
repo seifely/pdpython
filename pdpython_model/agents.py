@@ -16,7 +16,7 @@ import time
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy='VPP', starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -48,6 +48,7 @@ class PDAgent(Agent):
         self.partner_latest_move = {}  # this is a popped list
         self.partner_scores = {}
         self.per_partner_utility = {}
+        self.outcome_list = {}
         self.itermove_result = {}
         self.common_move = ""
         self.last_round = False
@@ -337,19 +338,19 @@ class PDAgent(Agent):
                     if partner_ID not in self.partner_IDs:
                         self.partner_IDs.append(partner_ID)
 
-
     def increment_score(self, payoffs):
         total_utility = 0
-
+        outcome_listicle = {}
         for i in self.partner_IDs:
             my_move = self.itermove_result[i]
 
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
+            outcome_listicle[i] = outcome
             # print("Outcome with partner %i was:" % i, outcome)
 
             # ------- Here is where we change variables based on the outcome -------
-            if self.strategy == "VEV" or "RANDOM":
+            if self.strategy == "VEV" or "RANDOM" or "VPP":
                 if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
                     if this_partner_move == "D":
                         self.ppD_partner[i] += 0.05
@@ -369,10 +370,11 @@ class PDAgent(Agent):
             self.per_partner_utility[i] = new_partner_payoff
             total_utility += outcome_payoff
             if self.printing:
-                print("I am agent", self.ID, ", I chose", my_move, ", my partner is:", i, ", they picked ",
-                    this_partner_move, ", so my payoff is ", outcome_payoff)
+                print("I am agent", self.ID, " I chose", my_move, " my partner is:", i, " they picked ",
+                    this_partner_move, " so my payoff is ", outcome_payoff, " The p I will defect is now,", self.ppD_partner)
 
         # self.score = self.score + total_utility
+        self.outcome_list = outcome_listicle
         return total_utility
 
     def output_data_to_model(self):
@@ -519,20 +521,29 @@ class PDAgent(Agent):
                 strategy_code = 4
             elif self.strategy == 'TFT':
                 strategy_code = 5
+            elif self.strategy == 'VPP':
+                strategy_code = 6
+            elif self.strategy == 'WSLS':
+                strategy_code = 7
 
             """ The above will error catch for when agents don't have those values, and will still let us print 
                 to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
 
             with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
                 if self.strategy == "VEV" or "RANDOM":
-                    fieldnames = ['stepcount', 'strategy', 'strat code', 'move', 'probabilities', 'utility', 'common_move', 'number_coop',
-                                  'number_defect',
-                                  'outcomes', 'p1', 'p2', 'p3', 'p4', 'u1', 'u2', 'u3', 'u4', 'm1', 'm2', 'm3', 'm4']
+                    fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID, 'move_%d' % self.ID,
+                                  'probabilities_%d' % self.ID, 'utility_%d' % self.ID, 'common_move_%d' % self.ID,
+                                  'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
+                                  'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
+                                  'p4_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID, 'u4_%d' % self.ID,
+                                  'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID]
                 #     'p1', 'p2', 'p3', 'p4'
                 else:
-                    fieldnames = ['stepcount', 'strategy', 'strat code', 'move', 'utility', 'common_move', 'number_coop',
-                                  'number_defect',
-                                  'outcomes', 'u1', 'u2', 'u3', 'u4', 'm1', 'm2', 'm3', 'm4']
+                    fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID, 'move_%d' % self.ID,
+                                  'utility_%d' % self.ID, 'common_move_%d' % self.ID, 'number_coop_%d' % self.ID,
+                                  'number_defect_%d' % self.ID,
+                                  'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
+                                  'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID]
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 # moves = []
@@ -544,24 +555,25 @@ class PDAgent(Agent):
 
                 if self.strategy == "VEV" or "RANDOM":
                     writer.writerow(
-                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'strat code': strategy_code,
-                         'move': self.itermove_result, 'probabilities': self.ppD_partner,
-                         'utility': self.score,
-                         'common_move': self.common_move, 'number_coop': self.number_of_c,
-                         'number_defect': self.number_of_d, 'outcomes': outcomes, 'p1': ppd_partner_1,
-                        'p2': ppd_partner_2, 'p3': ppd_partner_3, 'p4': ppd_partner_4, 'u1': utility_partner_1, 'u2': utility_partner_2,
-                         'u3': utility_partner_3, 'u4': utility_partner_4, 'm1': move_partner_1, 'm2': move_partner_2,
-                         'm3': move_partner_3, 'm4': move_partner_4
+                        {'stepcount_%d' % self.ID: self.stepCount, 'strategy_%d' % self.ID: self.strategy, 'strat code_%d' % self.ID: strategy_code,
+                         'move_%d' % self.ID: self.itermove_result, 'probabilities_%d' % self.ID: self.ppD_partner,
+                         'utility_%d' % self.ID: self.score,
+                         'common_move_%d' % self.ID: self.common_move, 'number_coop_%d' % self.ID: self.number_of_c,
+                         'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'p1_%d' % self.ID: ppd_partner_1,
+                        'p2_%d' % self.ID: ppd_partner_2, 'p3_%d' % self.ID: ppd_partner_3, 'p4_%d' % self.ID: ppd_partner_4,
+                         'u1_%d' % self.ID: utility_partner_1, 'u2_%d' % self.ID: utility_partner_2,
+                         'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
+                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4
                          })
                 #
                 else:
                     writer.writerow(
-                        {'stepcount': self.stepCount, 'strategy': self.strategy, 'strat code': strategy_code,
-                         'move': self.itermove_result, 'utility': self.score,
-                         'common_move': self.common_move, 'number_coop': self.number_of_c,
-                         'number_defect': self.number_of_d, 'outcomes': outcomes, 'u1': utility_partner_1, 'u2': utility_partner_2,
-                         'u3': utility_partner_3, 'u4': utility_partner_4, 'm1': move_partner_1, 'm2': move_partner_2,
-                         'm3': move_partner_3, 'm4': move_partner_4})
+                        {'stepcount_%d' % self.ID: self.stepCount, 'strategy_%d' % self.ID: self.strategy, 'strat code_%d' % self.ID: strategy_code,
+                         'move_%d' % self.ID: self.itermove_result, 'utility_%d' % self.ID: self.score,
+                         'common_move_%d' % self.ID: self.common_move, 'number_coop_%d' % self.ID: self.number_of_c,
+                         'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'u1_%d' % self.ID: utility_partner_1,
+                         'u2': utility_partner_2, 'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
+                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4})
 
     def reset_values(self):
         self.number_of_d = 0
@@ -616,7 +628,7 @@ class PDAgent(Agent):
                 self.find_average_move()
                 self.output_data_to_model()
                 if self.model.collect_data:
-                    self.output_data_to_file('outcomes')
+                    self.output_data_to_file(self.outcome_list)
                 self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
@@ -634,7 +646,7 @@ class PDAgent(Agent):
                 self.find_average_move()
                 self.output_data_to_model()
                 if self.model.collect_data:
-                    self.output_data_to_file('outcomes')
+                    self.output_data_to_file(self.outcome_list)
                 self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
@@ -652,7 +664,7 @@ class PDAgent(Agent):
                 self.find_average_move()
                 self.output_data_to_model()
                 if self.model.collect_data:
-                    self.output_data_to_file('outcomes')
+                    self.output_data_to_file(self.outcome_list)
                 self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
@@ -669,7 +681,7 @@ class PDAgent(Agent):
                 self.find_average_move()
                 self.output_data_to_model()
                 if self.model.collect_data:
-                    self.output_data_to_file('outcomes')
+                    self.output_data_to_file(self.outcome_list)
                 self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":

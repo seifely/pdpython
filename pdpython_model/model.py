@@ -45,7 +45,7 @@ class PDModel(Model):
         self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
         self.randspawn = randspawn
-        self.exp_n = 'trial zero'
+        self.exp_n = 'base_vpp_simplified'
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
         if not self.simplified_payoffs:
@@ -54,8 +54,8 @@ class PDModel(Model):
                             ("D", "C"): self.DC,
                             ("D", "D"): self.DD}
         elif self.simplified_payoffs:
-            self.payoffs = {("C", "C"): self.b - self.c,
-                            ("C", "D"): - self.c,
+            self.payoffs = {("C", "C"): self.b - abs(self.c),
+                            ("C", "D"): - abs(self.c),
                             ("D", "C"): self.c,
                             ("D", "D"): 0}
 
