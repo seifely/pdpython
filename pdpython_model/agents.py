@@ -355,7 +355,7 @@ class PDAgent(Agent):
                     if this_partner_move == "D":
                         self.ppD_partner[i] += 0.05
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= 0.07
+                        self.ppD_partner[i] -= 0.05
 
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
