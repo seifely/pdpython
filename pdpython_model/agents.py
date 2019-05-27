@@ -347,15 +347,38 @@ class PDAgent(Agent):
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
             outcome_listicle[i] = outcome
+            outcome_payoff = payoffs[my_move, this_partner_move]
             # print("Outcome with partner %i was:" % i, outcome)
 
             # ------- Here is where we change variables based on the outcome -------
             if self.strategy == "VEV" or "RANDOM" or "VPP":
                 if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
+
+                    # if this_partner_move == "D":
+                    #     self.ppD_partner[i] += 0.05
+                    # elif this_partner_move == "C":
+                    #     self.ppD_partner[i] -= 0.05
+
+                    # AUGMENTATION ATTEMPT
                     if this_partner_move == "D":
-                        self.ppD_partner[i] += 0.05
+                        self.ppD_partner[i] += (outcome_payoff * 0.05)
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= 0.05
+                        self.ppD_partner[i] -= (outcome_payoff * 0.05)
+
+                # MISGUIDED ATTEMPT BELOW
+                    # update_preset = 0.05
+                    # # if outcome_payoff > 0 and outcome_payoff <= 10:
+                    # #     update_value = outcome_payoff / 100
+                    # # elif outcome_payoff > 10 and outcome_payoff <= 100:
+                    # #     update_value = outcome_payoff / 1000
+                    # update_value = update_preset * outcome_payoff
+                    #
+                    # if this_partner_move == "C":
+                    #     if self.move == "C":
+                    #         self.ppD_partner[i] -= update_value
+                    # else:
+                    #     self.ppD_partner[i] += update_value
+
 
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
@@ -364,7 +387,6 @@ class PDAgent(Agent):
                 elif self.ppD_partner[i] == 6.938893903907228e-17:
                     self.ppD_partner[i] = 0
 
-            outcome_payoff = payoffs[my_move, this_partner_move]
             current_partner_payoff = self.per_partner_utility[i]
             new_partner_payoff = current_partner_payoff + outcome_payoff
             self.per_partner_utility[i] = new_partner_payoff

@@ -136,9 +136,9 @@ model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of A
                 "DC": UserSettableParameter('number', 'Payoff for D-C (Default: 5)', value=5),
                 "DD": UserSettableParameter('number', 'Payoff for D-D (Default: 2)', value=2),
 
-                "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),
+                "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', True),
                 "b": UserSettableParameter('number', 'Simplified Payoffs: Benefit of Co-op', value=4),
-                "c": UserSettableParameter('number', 'Simplified Payoffs: Cost of Co-op', value=1),
+                "c": UserSettableParameter('number', 'Simplified Payoffs: Cost of Co-op', value=3),
                 }
 
 server = ModularServer(PDModel, [canvas_element, step_element,], "Prisoner's Dilemma Simulation", model_params)
