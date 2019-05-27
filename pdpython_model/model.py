@@ -23,13 +23,13 @@ class PDModel(Model):
                  collect_data=False,
                  agent_printing=False,
                  randspawn=False,
-                 DD=2,
-                 CC=3,
-                 CD=0,
-                 DC=5,
+                 DD=1,
+                 CC=1.5,
+                 CD=-2,
+                 DC=2,
                  simplified_payoffs=False,
-                 b=0,
-                 c=0,):
+                 b=3,
+                 c=2,):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -45,7 +45,7 @@ class PDModel(Model):
         self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
         self.randspawn = randspawn
-        self.exp_n = 'vpp_simp_base_variance5'
+        self.exp_n = 'vpp_new_test'
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
         if not self.simplified_payoffs:

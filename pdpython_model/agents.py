@@ -361,9 +361,9 @@ class PDAgent(Agent):
 
                     # AUGMENTATION ATTEMPT
                     if this_partner_move == "D":
-                        self.ppD_partner[i] += (outcome_payoff * 0.05)
+                        self.ppD_partner[i] += abs((outcome_payoff * 0.02)) # I think having the ABS here means the proportions are maintained?
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= (outcome_payoff * 0.05)
+                        self.ppD_partner[i] -= abs((outcome_payoff * 0.02))
 
                 # MISGUIDED ATTEMPT BELOW
                     # update_preset = 0.05
