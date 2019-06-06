@@ -146,11 +146,14 @@ class PDAgent(Agent):
         elif strategy == "ANGEL":
             # print("I'm an angel, so I'll cooperate")
             self.number_of_c += 1
+            print("I increased number_of_c by 1", self.number_of_c)
             return "C"
 
         elif strategy == "DEVIL":
             # print("I'm a devil, so I'll defect")
             self.number_of_d += 1
+            print("I increased number_of_d by 1", self.number_of_d)
+
             return "D"
 
         elif strategy == "EV":  # this is under assumption of heterogeneity of agents
@@ -283,9 +286,12 @@ class PDAgent(Agent):
             weights = [ppC, ppD]
 
             choice = random.choices(population=choices, weights=weights, k=1)
-            if choice == "C":
+            print(choice[0])
+            if choice == ["C"]:
+                print("lel")
                 self.number_of_c += 1
-            elif choice == "D":
+            elif choice == ["D"]:
+                print("kek")
                 self.number_of_d += 1
             return choice[0]
 
@@ -410,6 +416,8 @@ class PDAgent(Agent):
 
         self.model.number_of_defects += self.number_of_d
         self.model.number_of_coops += self.number_of_c
+
+        # --> POSSIBLY ISN'T COUNTING NUMBER OF COOPS OR DEFECTS
 
         # also want to output every agent's utility into one big vector - HOW DO THIS
         # either every agent creates a new column in the SAME document -
