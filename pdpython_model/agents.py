@@ -16,7 +16,7 @@ import time
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy="VPP", starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -265,12 +265,12 @@ class PDAgent(Agent):
 
             if self.wsls_failed == True:
                 if my_move == "C":
-                    self.number_of_c += 1
+                    # self.number_of_c += 1
                     # print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick D")
                     self.wsls_failed = False
                     return "D"
                 if my_move == "D":
-                    self.number_of_d += 1
+                    # self.number_of_d += 1
                     # print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick C")
                     self.wsls_failed = False
                     return "C"
@@ -660,11 +660,11 @@ class PDAgent(Agent):
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-                print("Number of c and d at V3S3: ", self.number_of_c, self.number_of_d)
-                print("Number of C and D at V3S3: ", self.model.number_of_coops, self.model.number_of_defects)
+                # print("Number of c and d at V3S3: ", self.number_of_c, self.number_of_d)
+                # print("Number of C and D at V3S3: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.find_average_move()
-                print("Number of c and d at V3S4: ", self.number_of_c, self.number_of_d)
-                print("Number of C and D at V3S4: ", self.model.number_of_coops, self.model.number_of_defects)
+                # print("Number of c and d at V3S4: ", self.number_of_c, self.number_of_d)
+                # print("Number of C and D at V3S4: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.output_data_to_model()
                 if self.model.collect_data:
                     self.output_data_to_file(self.outcome_list)
@@ -699,11 +699,11 @@ class PDAgent(Agent):
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-                print("Number of c and d at V4S3: ", self.number_of_c, self.number_of_d)
-                print("Number of C and D at V4S3: ", self.model.number_of_coops, self.model.number_of_defects)
+                # print("Number of c and d at V4S3: ", self.number_of_c, self.number_of_d)
+                # print("Number of C and D at V4S3: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.find_average_move()
-                print("Number of c and d at V4S4: ", self.number_of_c, self.number_of_d)
-                print("Number of C and D at V4S4: ", self.model.number_of_coops, self.model.number_of_defects)
+                # print("Number of c and d at V4S4: ", self.number_of_c, self.number_of_d)
+                # print("Number of C and D at V4S4: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.output_data_to_model()
                 if self.model.collect_data:
                     self.output_data_to_file(self.outcome_list)
@@ -718,7 +718,7 @@ class PDAgent(Agent):
 
         # self.find_average_move()
         print("At the end of this agent, model C and D are:", self.model.number_of_coops,
-              self.model.number_of_defects)
+              self.model.number_of_defects, ", total:", (self.model.number_of_defects + self.model.number_of_coops))
         if self.printing:
             for n in range(1):
                 print("----------------------------------------------------------")
