@@ -16,7 +16,7 @@ import time
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy='VPP', starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy="VPP", starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -236,6 +236,7 @@ class PDAgent(Agent):
             # same move again, if not, play the opposite move.
 
             if self.stepCount == 1:
+                self.number_of_c += 1
                 return "C"
 
             my_move = self.itermove_result[id]
@@ -248,22 +249,28 @@ class PDAgent(Agent):
             self.wsls_failed = False
 
             if outcome == ['C', 'C']:
+                self.number_of_c += 1
                 self.wsls_failed = False
             elif outcome == ['D', 'C']:
+                self.number_of_d += 1
                 self.wsls_failed = False
             elif outcome == ['C', 'D']:
+                self.number_of_c += 1
                 self.wsls_failed = True
                 # print("I failed! Switching")
             elif outcome == ['D', 'D']:
+                self.number_of_d += 1
                 self.wsls_failed = True
                 # print("I failed! Switching")
 
             if self.wsls_failed == True:
                 if my_move == "C":
+                    self.number_of_c += 1
                     # print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick D")
                     self.wsls_failed = False
                     return "D"
                 if my_move == "D":
+                    self.number_of_d += 1
                     # print("Outcome was", outcome, "so Failure = ", self.wsls_failed, "So I will pick C")
                     self.wsls_failed = False
                     return "C"
@@ -283,10 +290,12 @@ class PDAgent(Agent):
             weights = [ppC, ppD]
 
             choice = random.choices(population=choices, weights=weights, k=1)
-            if choice == "C":
+            if choice == ["C"]:
                 self.number_of_c += 1
-            elif choice == "D":
+                print("number_of_c increased by 1, is now", self.number_of_c)
+            elif choice == ["D"]:
                 self.number_of_d += 1
+                print("number_of_d increased by 1, is now", self.number_of_d)
             return choice[0]
 
     def check_partner(self):
@@ -347,15 +356,21 @@ class PDAgent(Agent):
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
             outcome_listicle[i] = outcome
+            outcome_payoff = payoffs[my_move, this_partner_move]
             # print("Outcome with partner %i was:" % i, outcome)
 
             # ------- Here is where we change variables based on the outcome -------
             if self.strategy == "VEV" or "RANDOM" or "VPP":
                 if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
+
+                    # if this_partner_move == "D":
+                    #     self.ppD_partner[i] += 0.05
+                    # elif this_partner_move == "C":
+                    #     self.ppD_partner[i] -= 0.05
                     if this_partner_move == "D":
-                        self.ppD_partner[i] += 0.05
+                        self.ppD_partner[i] += abs((outcome_payoff * 0.02))
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= 0.05
+                        self.ppD_partner[i] -= abs((outcome_payoff * 0.02))
 
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
@@ -593,8 +608,10 @@ class PDAgent(Agent):
         # print("Move counter:", move_counter)
 
         if move_counter.get('C') and move_counter.get('D') is not None:
-            self.number_of_d += move_counter.get('D')
-            self.number_of_c += move_counter.get('C')
+
+            # self.number_of_d += move_counter.get('D')
+            # self.number_of_c += move_counter.get('C')
+
             if move_counter['C'] == move_counter['D']:
                 self.common_move = 'Eq'
                 # print("Moves", self.move, "Counters: ", move_counter)
@@ -643,7 +660,11 @@ class PDAgent(Agent):
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
+                print("Number of c and d at V3S3: ", self.number_of_c, self.number_of_d)
+                print("Number of C and D at V3S3: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.find_average_move()
+                print("Number of c and d at V3S4: ", self.number_of_c, self.number_of_d)
+                print("Number of C and D at V3S4: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.output_data_to_model()
                 if self.model.collect_data:
                     self.output_data_to_file(self.outcome_list)
@@ -678,7 +699,11 @@ class PDAgent(Agent):
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
+                print("Number of c and d at V4S3: ", self.number_of_c, self.number_of_d)
+                print("Number of C and D at V4S3: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.find_average_move()
+                print("Number of c and d at V4S4: ", self.number_of_c, self.number_of_d)
+                print("Number of C and D at V4S4: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.output_data_to_model()
                 if self.model.collect_data:
                     self.output_data_to_file(self.outcome_list)
@@ -692,6 +717,8 @@ class PDAgent(Agent):
             self.last_round = True
 
         # self.find_average_move()
+        print("At the end of this agent, model C and D are:", self.model.number_of_coops,
+              self.model.number_of_defects)
         if self.printing:
             for n in range(1):
                 print("----------------------------------------------------------")
