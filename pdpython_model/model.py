@@ -45,7 +45,7 @@ class PDModel(Model):
         self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
         self.randspawn = randspawn
-        self.exp_n = 'vpp_fixed_test_four'
+        self.exp_n = 'vpp_test_vs_wsls'
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
         if not self.simplified_payoffs:
@@ -61,6 +61,7 @@ class PDModel(Model):
 
         self.collect_data = collect_data
         self.agent_printing = agent_printing
+        self.agent_list = []
 
         # Model Functions
         self.schedule = self.schedule_types[self.schedule_type](self)
@@ -105,6 +106,18 @@ class PDModel(Model):
             # 'coop total utility': self.coops_utility, 'defect total utility': self.defects_utility
 
             # WE ALSO WANNA OUTPUT HOW MANY AGENTS THERE ARE, HOW MANY AGENTS IN EACH STRATEGY
+
+        # if self.step_count == 2:
+            with open('{} agent list.csv'.format(self.filename), 'a', newline='') as csvfile:
+                fieldnames = ['agent_value', 'stepcount']
+                # 'coop total utility', 'defect total utility'
+                # I mean, it would nice to see utility per strategy if strategies were fixed
+
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                if self.step_count == 1:
+                    writer.writeheader()
+                writer.writerow({'agent_value': self.agent_list, 'stepcount': self.step_count})
 
         # take in how many agents are cooperating, how many are defecting, and how many are 'equal'
         # how many co-operations and defections occurred this round TOTAL

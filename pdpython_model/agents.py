@@ -16,7 +16,7 @@ import time
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy="VPP", starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -100,8 +100,9 @@ class PDAgent(Agent):
         elif self.pickstrat == "DISTRIBUTION":
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
+
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["WSLS", "RANDOM"]
+            choices = ["VPP", "WSLS"]
             strat = random.choice(choices)
             return str(strat)
 
@@ -404,6 +405,7 @@ class PDAgent(Agent):
         self.model.number_of_defects += self.number_of_d
         self.model.number_of_coops += self.number_of_c
 
+        self.model.agent_list.append('{}, {}'.format(self.ID, self.strategy))
         # also want to output every agent's utility into one big vector - HOW DO THIS
         # either every agent creates a new column in the SAME document -
         # this is dangerous because they will all be editing the same file so probably a big fuck up
