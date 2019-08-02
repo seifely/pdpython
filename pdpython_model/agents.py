@@ -31,6 +31,10 @@ class PDAgent(Agent):
         self.filename = ('%s agent %d.csv' % (self.model.exp_n, self.ID), "a")
         self.previous_moves = []
         self.pickstrat = pick_strat
+
+        self.update_value = 0.02
+        self.delta = 3
+
         self.move = None
         self.next_move = None
         self.printing = self.model.agent_printing
@@ -53,6 +57,8 @@ class PDAgent(Agent):
         self.common_move = ""
         self.last_round = False
         self.wsls_failed = False
+
+        self.working_memory = {}  # this is a popped list of size self.delta
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
@@ -293,10 +299,10 @@ class PDAgent(Agent):
             choice = random.choices(population=choices, weights=weights, k=1)
             if choice == ["C"]:
                 self.number_of_c += 1
-                print("number_of_c increased by 1, is now", self.number_of_c)
+                # print("number_of_c increased by 1, is now", self.number_of_c)
             elif choice == ["D"]:
                 self.number_of_d += 1
-                print("number_of_d increased by 1, is now", self.number_of_d)
+                # print("number_of_d increased by 1, is now", self.number_of_d)
             return choice[0]
 
     def check_partner(self):
@@ -332,6 +338,12 @@ class PDAgent(Agent):
 
                     if self.per_partner_utility.get(partner_ID) is None:
                         self.per_partner_utility[partner_ID] = 0
+
+                    """ Below is the code for adding to and/or updating self.working_memory"""
+                    # if WM does not have a key for current partner's ID in it, we open one
+                    # if it does, we extract it to a local variable by popping it
+                    # boobly boo, mess about with it and check what it means for us here
+                    # after it is updated and checked, we send it back to working memory
 
                     # First, check if we have a casefile on them in each memory slot
                     if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
@@ -369,9 +381,9 @@ class PDAgent(Agent):
                     # elif this_partner_move == "C":
                     #     self.ppD_partner[i] -= 0.05
                     if this_partner_move == "D":
-                        self.ppD_partner[i] += abs((outcome_payoff * 0.02))
+                        self.ppD_partner[i] += abs((outcome_payoff * self.update_value))
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= abs((outcome_payoff * 0.02))
+                        self.ppD_partner[i] -= abs((outcome_payoff * self.update_value))
 
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
@@ -719,8 +731,8 @@ class PDAgent(Agent):
             self.last_round = True
 
         # self.find_average_move()
-        print("At the end of this agent, model C and D are:", self.model.number_of_coops,
-              self.model.number_of_defects, ", total:", (self.model.number_of_defects + self.model.number_of_coops))
+        # print("At the end of this agent, model C and D are:", self.model.number_of_coops,
+        #       self.model.number_of_defects, ", total:", (self.model.number_of_defects + self.model.number_of_coops))
         if self.printing:
             for n in range(1):
                 print("----------------------------------------------------------")
