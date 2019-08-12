@@ -32,7 +32,7 @@ class PDAgent(Agent):
         self.previous_moves = []
         self.pickstrat = pick_strat
 
-        self.update_value = 0.02
+        self.update_values = {}
         self.delta = 3
 
         self.move = None
@@ -305,6 +305,10 @@ class PDAgent(Agent):
                 # print("number_of_d increased by 1, is now", self.number_of_d)
             return choice[0]
 
+    def change_update_value(self, partner_behaviour):
+        """ Change the self.update_value global """
+        return
+
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
         x, y = self.pos
@@ -339,11 +343,33 @@ class PDAgent(Agent):
                     if self.per_partner_utility.get(partner_ID) is None:
                         self.per_partner_utility[partner_ID] = 0
 
-                    """ Below is the code for adding to and/or updating self.working_memory"""
-                    # if WM does not have a key for current partner's ID in it, we open one
-                    # if it does, we extract it to a local variable by popping it
-                    # boobly boo, mess about with it and check what it means for us here
-                    # after it is updated and checked, we send it back to working memory
+                    if self.update_values.get(partner_ID) is None:  # add in default update value per partner
+                        self.update_values[partner_ID] = 0.02  # this has to happen before change update value occurs!!
+
+                    """ Below is the code for adding to and/or updating self.working_memory.
+                     if WM does not have a key for current partner's ID in it, we open one
+                     if it does, we extract it to a local variable by popping it
+                     boobly boo, mess about with it and check what it means for us here
+                     after it is updated and checked, we send it back to working memory
+                    """
+
+                    if self.working_memory.get(partner_ID) is None:
+                        self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
+                    else:
+                        current_partner = self.working_memory.pop(partner_ID)
+                        # first, check if it has more than three values
+                        if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
+                            current_partner.append(partner_move)
+                        elif len(current_partner) == self.delta:
+                            current_partner.pop(0)
+                            current_partner.append(partner_move)  # we have the updated move list for that partner here
+
+                        # for now, let's add the evaluation of a partner's treatment of us here
+                        self.change_update_value()
+
+                        self.working_memory[partner_ID] = current_partner  # reinstantiate the
+
+
 
                     # First, check if we have a casefile on them in each memory slot
                     if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
@@ -381,9 +407,9 @@ class PDAgent(Agent):
                     # elif this_partner_move == "C":
                     #     self.ppD_partner[i] -= 0.05
                     if this_partner_move == "D":
-                        self.ppD_partner[i] += abs((outcome_payoff * self.update_value))
+                        self.ppD_partner[i] += abs((outcome_payoff * self.update_values))
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= abs((outcome_payoff * self.update_value))
+                        self.ppD_partner[i] -= abs((outcome_payoff * self.update_values))
 
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
