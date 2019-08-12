@@ -305,9 +305,26 @@ class PDAgent(Agent):
                 # print("number_of_d increased by 1, is now", self.number_of_d)
             return choice[0]
 
-    def change_update_value(self, partner_behaviour):
-        """ Change the self.update_value global """
-        return
+    def change_update_value(self, partner_behaviour, current_uv):
+        """ Produce a new update value given their current uv and the behaviour that partner has shown.
+        Partner behaviour should be a list of self.delta size, ordered by eldest behaviour observed to most recent.
+        current_uv should be a singular value """
+        # let's start with a very simple lookup table version of behaviour comparison - probably only usable if
+        # delta is fairly small, as we have to outline the specific behavioural patterns we are comparing
+        # THESE CONDITIONS BELOW ARE ONLY USABLE FOR A DELTA OF 3 EXACTLY
+
+        # ** PROG NOTE: behaviour strings are capital letters
+        # ** PROG NOTE: we never want the update value to be zero...
+        gamma = 0.25  # THIS
+        new_uv = current_uv
+        if partner_behaviour == ["C", "C", "C"]:
+            new_uv = 1  # set it to one
+        if partner_behaviour == ["C", "C", "D"]:
+            new_uv = 1
+
+        # if new_uv = 0
+        #       new_uv = 0.001?
+        return new_uv  # needs to return the new update value!
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -363,9 +380,10 @@ class PDAgent(Agent):
                         elif len(current_partner) == self.delta:
                             current_partner.pop(0)
                             current_partner.append(partner_move)  # we have the updated move list for that partner here
+                            current_uv = self.update_values[partner_ID]
 
                         # for now, let's add the evaluation of a partner's treatment of us here
-                        self.change_update_value()
+                        self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
 
                         self.working_memory[partner_ID] = current_partner  # reinstantiate the
 
