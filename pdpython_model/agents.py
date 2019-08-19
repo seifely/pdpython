@@ -35,6 +35,7 @@ class PDAgent(Agent):
         self.update_values = {}
         self.update_value = 0.02
         self.delta = 3
+        self.gamma = 0.02
 
         self.move = None
         self.next_move = None
@@ -312,16 +313,22 @@ class PDAgent(Agent):
         current_uv should be a singular value """
         # let's start with a very simple lookup table version of behaviour comparison - probably only usable if
         # delta is fairly small, as we have to outline the specific behavioural patterns we are comparing
+        """ NEW NOTE: Shaheen wants to use unordered lists, so the value judgements are just made on quantity of 
+            recent good or bad interactions."""
         # THESE CONDITIONS BELOW ARE ONLY USABLE FOR A DELTA OF 3 EXACTLY
 
         # ** PROG NOTE: behaviour strings are capital letters
         # ** PROG NOTE: we never want the update value to be zero...
-        gamma = 0.25  # THIS
         new_uv = current_uv
-        if partner_behaviour == ["C", "C", "C"]:
-            new_uv = 1  # set it to one
-        if partner_behaviour == ["C", "C", "D"]:
-            new_uv = 1
+        # --- add in a behaviour count
+        # --- if that behaviour count = low c high d, then set uv to gamma
+        # --- if behaviour is mid c low d, then set uv to 2gamma
+        # --- if all c has been witnessed recently, then use 3gamma
+        # the inverse needs to be done for
+
+        # we also need an emergency catch-all for up and down behaviour, to break us out of toxic loops
+        # this either needs to come from LONG TERM MEMORY or it needs to come here ??? figure this out after testing
+        # round one 
 
         # if new_uv = 0
         #       new_uv = 0.001?
@@ -428,9 +435,9 @@ class PDAgent(Agent):
                     # elif this_partner_move == "C":
                     #     self.ppD_partner[i] -= 0.05
                     if this_partner_move == "D":
-                        self.ppD_partner[i] += abs((outcome_payoff * 0.02))  # self.update_values
+                        self.ppD_partner[i] += abs((outcome_payoff * self.update_value))  # self.update_values
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= abs((outcome_payoff * 0.02))  # self.update_values
+                        self.ppD_partner[i] -= abs((outcome_payoff * self.update_value))  # self.update_values
 
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
@@ -792,7 +799,7 @@ class PDAgent(Agent):
         # self.move = self.next_move
         self.check_partner()  # Update Knowledge
         round_payoffs = self.increment_score(self.payoffs)
-        """ TEMPORARILY TESTING MOVING OF THE OUTPUT AND RESET HERE """
+        """ Because model outputting is below, we can add update values to the list before it *may get reset """
         self.output_data_to_model()
         if self.model.collect_data:
             self.output_data_to_file(self.outcome_list)
