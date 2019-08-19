@@ -33,6 +33,7 @@ class PDAgent(Agent):
         self.pickstrat = pick_strat
 
         self.update_values = {}
+        self.update_value = 0.02
         self.delta = 3
 
         self.move = None
@@ -369,6 +370,7 @@ class PDAgent(Agent):
                      boobly boo, mess about with it and check what it means for us here
                      after it is updated and checked, we send it back to working memory
                     """
+                    current_uv = self.update_value
 
                     if self.working_memory.get(partner_ID) is None:
                         self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
@@ -383,7 +385,8 @@ class PDAgent(Agent):
                             current_uv = self.update_values[partner_ID]
 
                         # for now, let's add the evaluation of a partner's treatment of us here
-                        self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
+                        # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
+                        self.update_value = self.change_update_value(current_partner, current_uv)
 
                         self.working_memory[partner_ID] = current_partner  # reinstantiate the
 
@@ -425,9 +428,9 @@ class PDAgent(Agent):
                     # elif this_partner_move == "C":
                     #     self.ppD_partner[i] -= 0.05
                     if this_partner_move == "D":
-                        self.ppD_partner[i] += abs((outcome_payoff * self.update_values))
+                        self.ppD_partner[i] += abs((outcome_payoff * 0.02))  # self.update_values
                     elif this_partner_move == "C":
-                        self.ppD_partner[i] -= abs((outcome_payoff * self.update_values))
+                        self.ppD_partner[i] -= abs((outcome_payoff * 0.02))  # self.update_values
 
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
@@ -701,10 +704,11 @@ class PDAgent(Agent):
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 self.find_average_move()
-                self.output_data_to_model()
-                if self.model.collect_data:
-                    self.output_data_to_file(self.outcome_list)
-                self.reset_values()
+
+                # self.output_data_to_model()
+                # if self.model.collect_data:
+                #     self.output_data_to_file(self.outcome_list)
+                # self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -723,10 +727,11 @@ class PDAgent(Agent):
                 self.find_average_move()
                 # print("Number of c and d at V3S4: ", self.number_of_c, self.number_of_d)
                 # print("Number of C and D at V3S4: ", self.model.number_of_coops, self.model.number_of_defects)
-                self.output_data_to_model()
-                if self.model.collect_data:
-                    self.output_data_to_file(self.outcome_list)
-                self.reset_values()
+
+                # self.output_data_to_model()
+                # if self.model.collect_data:
+                #     self.output_data_to_file(self.outcome_list)
+                # self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -741,10 +746,11 @@ class PDAgent(Agent):
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.find_average_move()
-                self.output_data_to_model()
-                if self.model.collect_data:
-                    self.output_data_to_file(self.outcome_list)
-                self.reset_values()
+
+                # self.output_data_to_model()
+                # if self.model.collect_data:
+                #     self.output_data_to_file(self.outcome_list)
+                # self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -762,10 +768,11 @@ class PDAgent(Agent):
                 self.find_average_move()
                 # print("Number of c and d at V4S4: ", self.number_of_c, self.number_of_d)
                 # print("Number of C and D at V4S4: ", self.model.number_of_coops, self.model.number_of_defects)
-                self.output_data_to_model()
-                if self.model.collect_data:
-                    self.output_data_to_file(self.outcome_list)
-                self.reset_values()
+
+                # self.output_data_to_model()
+                # if self.model.collect_data:
+                #     self.output_data_to_file(self.outcome_list)
+                # self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -785,6 +792,11 @@ class PDAgent(Agent):
         # self.move = self.next_move
         self.check_partner()  # Update Knowledge
         round_payoffs = self.increment_score(self.payoffs)
+        """ TEMPORARILY TESTING MOVING OF THE OUTPUT AND RESET HERE """
+        self.output_data_to_model()
+        if self.model.collect_data:
+            self.output_data_to_file(self.outcome_list)
+        self.reset_values()
 
         self.stepCount += 1
 
