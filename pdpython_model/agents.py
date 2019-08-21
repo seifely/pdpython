@@ -2,6 +2,7 @@ from mesa import Agent
 import random
 import csv
 import time
+from math import ceil
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
@@ -16,7 +17,7 @@ import time
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RANDOM", strategy=None, starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -97,6 +98,27 @@ class PDAgent(Agent):
         for i in ids:
             self.ppD_partner[i] = 0.5
 
+    # def pattern_detector(self, input_list):
+    #     """ This isn't learning, it's a small, imprecise detector for history of consistency in behaviour.
+    #         It returns true if, in over half the instances of the memory list, point-to-point repeated behaviour was
+    #         detected over two rounds. ONLY USEFUL FOR SMALL MEMORIES. """
+    #     list_len = len(input_list)
+    #     repeated_behaviour = 0
+    #     non_repeated_behaviour = 0
+    #
+    #     for i in input_list:
+    #         if i != 0:
+    #             if input_list[i] != input_list[i - 1]:
+    #                 non_repeated_behaviour += 1
+    #             else:
+    #                 repeated_behaviour += 1
+    #
+    #     if repeated_behaviour >= ceil(list_len/2):
+    #         # some behavioural consistency
+    #         return True
+    #     else:
+    #         return False
+
     def pick_strategy(self):
         """ This is an initial strategy selector for agents """
 
@@ -110,7 +132,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "WSLS"]
+            choices = ["VPP", "RANDOM"]
             strat = random.choice(choices)
             return str(strat)
 
@@ -307,32 +329,53 @@ class PDAgent(Agent):
                 # print("number_of_d increased by 1, is now", self.number_of_d)
             return choice[0]
 
-    def change_update_value(self, partner_behaviour, current_uv):
-        """ Produce a new update value given their current uv and the behaviour that partner has shown.
+    def change_update_value(self, partner_behaviour):
+        """ Produce a [new update value] VALUE BY WHICH TO ALTER THE CURRENT UV given the current uv and the
+        behaviour that partner has shown.
         Partner behaviour should be a list of self.delta size, ordered by eldest behaviour observed to most recent.
         current_uv should be a singular value """
         # let's start with a very simple lookup table version of behaviour comparison - probably only usable if
         # delta is fairly small, as we have to outline the specific behavioural patterns we are comparing
         """ NEW NOTE: Shaheen wants to use unordered lists, so the value judgements are just made on quantity of 
-            recent good or bad interactions."""
+            recent good or bad interactions. This reduces the options down to 'do we have a hat trick' or 
+            'is behaviour more one way or another'
+            NEW NOTE mk. II: I have decided to disregard the above. Unordered lists that are only three long
+            don't allow for any variability, so I'm just going to hard code it for now."""
         # THESE CONDITIONS BELOW ARE ONLY USABLE FOR A DELTA OF 3 EXACTLY
 
         # ** PROG NOTE: behaviour strings are capital letters
         # ** PROG NOTE: we never want the update value to be zero...
-        new_uv = current_uv
-        # --- add in a behaviour count
-        # --- if that behaviour count = low c high d, then set uv to gamma
-        # --- if behaviour is mid c low d, then set uv to 2gamma
-        # --- if all c has been witnessed recently, then use 3gamma
-        # the inverse needs to be done for
+        # new_uv = current_uv
+        # default
+        # uv_modifier = 0
+        gamma = self.gamma
+
+        numberC = partner_behaviour.count('C')
+        numberD = partner_behaviour.count('D')
+        #
+        # consistency = self.pattern_detector(partner_behaviour)
+        # if consistency:
+        #
+        if numberC or numberD == self.delta:
+            return gamma * 3
+
+        if partner_behaviour == ['C', 'D', 'C'] or ['D', 'C', 'D']:
+            return gamma * 3
+
+        elif partner_behaviour == ['C', 'C', 'D'] or ['D', 'C', 'C']:
+            return gamma
+
+        elif partner_behaviour == ['C', 'C', 'D'] or ['D', 'D', 'C']:
+            return gamma * 2
+        #
+        # elif not consistency:
+        #     return gamma * 2
 
         # we also need an emergency catch-all for up and down behaviour, to break us out of toxic loops
         # this either needs to come from LONG TERM MEMORY or it needs to come here ??? figure this out after testing
         # round one
-
         # if new_uv = 0
         #       new_uv = 0.001?
-        return new_uv  # needs to return the new update value!
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -393,13 +436,13 @@ class PDAgent(Agent):
 
                         # for now, let's add the evaluation of a partner's treatment of us here
                         # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                        self.update_value = self.change_update_value(current_partner, current_uv)
+                        print("Gonna update my UV!", self.update_value)
+                        self.update_value = self.update_value + self.change_update_value(current_partner)
+                        print("I updated it!", self.update_value)
 
-                        self.working_memory[partner_ID] = current_partner  # reinstantiate the
+                        self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
 
-
-
-                    # First, check if we have a casefile on them in each memory slot
+                    # First, check if we have a case file on them in each memory slot
                     if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
                         self.partner_moves[partner_ID] = []
                         # print("partner moves dict:", self.partner_moves)
@@ -472,7 +515,6 @@ class PDAgent(Agent):
         self.model.number_of_coops += self.number_of_c
 
         self.model.agent_list.append('{}, {}'.format(self.ID, self.strategy))
-
 
         # and also time each agent's step to create a total time thingybob
 
@@ -617,14 +659,16 @@ class PDAgent(Agent):
                                   'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
                                   'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
                                   'p4_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID, 'u4_%d' % self.ID,
-                                  'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID]
+                                  'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID,
+                                  'wm_%d' % self.ID]
                 #     'p1', 'p2', 'p3', 'p4'
                 else:
                     fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID, 'move_%d' % self.ID,
                                   'utility_%d' % self.ID, 'common_move_%d' % self.ID, 'number_coop_%d' % self.ID,
                                   'number_defect_%d' % self.ID,
                                   'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
-                                  'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID]
+                                  'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID,
+                                  'wm_%d' % self.ID]
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 # moves = []
@@ -645,7 +689,7 @@ class PDAgent(Agent):
                          'u1_%d' % self.ID: utility_partner_1, 'u2_%d' % self.ID: utility_partner_2,
                          'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
                          'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4,
-                         'uv_%d' % self.ID: self.update_value})
+                         'uv_%d' % self.ID: self.update_value, 'wm_%d' % self.ID: self.working_memory})
                 #
                 else:
                     writer.writerow(
@@ -654,11 +698,13 @@ class PDAgent(Agent):
                          'common_move_%d' % self.ID: self.common_move, 'number_coop_%d' % self.ID: self.number_of_c,
                          'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'u1_%d' % self.ID: utility_partner_1,
                          'u2': utility_partner_2, 'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
-                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value})
+                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value,
+                         'wm_%d' % self.ID: self.working_memory})
 
     def reset_values(self):
         self.number_of_d = 0
         self.number_of_c = 0
+        self.update_value = 0.02
 
     def find_average_move(self):
         move_list = []
@@ -675,13 +721,11 @@ class PDAgent(Agent):
 
         if move_counter.get('C') and move_counter.get('D') is not None:
 
-            # self.number_of_d += move_counter.get('D')
-            # self.number_of_c += move_counter.get('C')
-
             if move_counter['C'] == move_counter['D']:
                 self.common_move = 'Eq'
                 # print("Moves", self.move, "Counters: ", move_counter)
-                # print("My most chosen move is:", self.common_move, 'because my counters are:', move_counter['C'], move_counter['D'])
+                # print("My most chosen move is:", self.common_move, 'because my counters are:', move_counter['C'],
+                # move_counter['D'])
 
             else:
                 commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)

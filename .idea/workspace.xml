@@ -10,7 +10,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/run.py">
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
@@ -26,18 +26,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3187">
-              <caret line="652" column="103" lean-forward="true" selection-start-line="652" selection-start-column="103" selection-end-line="652" selection-end-column="103" />
+            <state relative-caret-position="17">
+              <caret line="19" column="66" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#2862#3640#0" />
-                <element signature="e#3773#4452#0" />
+                <element signature="e#3762#3803#0" />
                 <element signature="e#4558#5751#0" />
                 <element signature="e#5809#12210#0" />
+                <element signature="e#18604#20754#0" />
                 <element signature="e#20800#21701#0" />
+                <element signature="e#21761#30644#0" />
                 <element signature="e#30774#32100#0" />
                 <element signature="e#32278#34435#0" />
                 <element signature="e#34515#35208#0" />
@@ -50,7 +52,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="-816">
               <folding>
                 <element signature="e#0#65#0" expanded="true" />
               </folding>
@@ -59,6 +61,11 @@
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>number</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -100,6 +107,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
@@ -163,7 +171,7 @@
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14541623" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Python Console" weight="0.32936078" />
       <window_info anchor="bottom" id="Terminal" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -179,6 +187,18 @@
     </layout>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/run.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-816">
+          <folding>
+            <element signature="e#0#65#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -188,26 +208,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#65#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3187">
-          <caret line="652" column="103" lean-forward="true" selection-start-line="652" selection-start-column="103" selection-end-line="652" selection-end-column="103" />
+        <state relative-caret-position="17">
+          <caret line="19" column="66" selection-start-line="19" selection-start-column="66" selection-end-line="19" selection-end-column="66" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#2862#3640#0" />
-            <element signature="e#3773#4452#0" />
+            <element signature="e#3762#3803#0" />
             <element signature="e#4558#5751#0" />
             <element signature="e#5809#12210#0" />
+            <element signature="e#18604#20754#0" />
             <element signature="e#20800#21701#0" />
+            <element signature="e#21761#30644#0" />
             <element signature="e#30774#32100#0" />
             <element signature="e#32278#34435#0" />
             <element signature="e#34515#35208#0" />
@@ -215,9 +228,6 @@
           </folding>
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/run.py">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
 </project>
