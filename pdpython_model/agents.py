@@ -328,7 +328,7 @@ class PDAgent(Agent):
 
         # we also need an emergency catch-all for up and down behaviour, to break us out of toxic loops
         # this either needs to come from LONG TERM MEMORY or it needs to come here ??? figure this out after testing
-        # round one 
+        # round one
 
         # if new_uv = 0
         #       new_uv = 0.001?
@@ -472,9 +472,7 @@ class PDAgent(Agent):
         self.model.number_of_coops += self.number_of_c
 
         self.model.agent_list.append('{}, {}'.format(self.ID, self.strategy))
-        # also want to output every agent's utility into one big vector - HOW DO THIS
-        # either every agent creates a new column in the SAME document -
-        # this is dangerous because they will all be editing the same file so probably a big fuck up
+
 
         # and also time each agent's step to create a total time thingybob
 
@@ -619,14 +617,14 @@ class PDAgent(Agent):
                                   'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
                                   'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
                                   'p4_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID, 'u4_%d' % self.ID,
-                                  'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID]
+                                  'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID]
                 #     'p1', 'p2', 'p3', 'p4'
                 else:
                     fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID, 'move_%d' % self.ID,
                                   'utility_%d' % self.ID, 'common_move_%d' % self.ID, 'number_coop_%d' % self.ID,
                                   'number_defect_%d' % self.ID,
                                   'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
-                                  'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID]
+                                  'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID]
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 # moves = []
@@ -646,8 +644,8 @@ class PDAgent(Agent):
                         'p2_%d' % self.ID: ppd_partner_2, 'p3_%d' % self.ID: ppd_partner_3, 'p4_%d' % self.ID: ppd_partner_4,
                          'u1_%d' % self.ID: utility_partner_1, 'u2_%d' % self.ID: utility_partner_2,
                          'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
-                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4
-                         })
+                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4,
+                         'uv_%d' % self.ID: self.update_value})
                 #
                 else:
                     writer.writerow(
@@ -656,7 +654,7 @@ class PDAgent(Agent):
                          'common_move_%d' % self.ID: self.common_move, 'number_coop_%d' % self.ID: self.number_of_c,
                          'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'u1_%d' % self.ID: utility_partner_1,
                          'u2': utility_partner_2, 'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
-                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4})
+                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value})
 
     def reset_values(self):
         self.number_of_d = 0
