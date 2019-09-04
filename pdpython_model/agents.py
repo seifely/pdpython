@@ -17,7 +17,7 @@ from math import ceil
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy='VPP', starting_move=None,
+    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -36,7 +36,7 @@ class PDAgent(Agent):
         self.update_values = {}
         self.update_value = 0.02
         self.delta = 3
-        self.gamma = 0.01
+        self.gamma = 0.015
 
         self.move = None
         self.next_move = None
@@ -66,6 +66,8 @@ class PDAgent(Agent):
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
         self.number_of_d = 0
+        self.mutual_c_outcome = 0
+        self.n_partners = 0
 
         # ----------------------- INTERACTIVE VARIABLES ----------------------
         # these values are increased if partner defects. ppC for each is 1 - ppD
@@ -388,6 +390,9 @@ class PDAgent(Agent):
             if not bound_checker:
                 this_cell = self.model.grid.get_cell_list_contents([i])
                 # print("This cell", this_cell)
+                if self.stepCount == 2:
+                    self.n_partners += 1
+
 
                 if len(this_cell) > 0:
                     partner = [obj for obj in this_cell
@@ -465,6 +470,10 @@ class PDAgent(Agent):
 
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
+
+            if outcome == ['C','C']:
+                self.mutual_c_outcome += 1
+
             outcome_listicle[i] = outcome
             outcome_payoff = payoffs[my_move, this_partner_move]
             # print("Outcome with partner %i was:" % i, outcome)
@@ -660,7 +669,7 @@ class PDAgent(Agent):
                                   'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
                                   'p4_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID, 'u4_%d' % self.ID,
                                   'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID,
-                                  'wm_%d' % self.ID]
+                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID]
                 #     'p1', 'p2', 'p3', 'p4'
                 else:
                     fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID, 'move_%d' % self.ID,
@@ -668,7 +677,7 @@ class PDAgent(Agent):
                                   'number_defect_%d' % self.ID,
                                   'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
                                   'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID,
-                                  'wm_%d' % self.ID]
+                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID]
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 # moves = []
@@ -689,7 +698,8 @@ class PDAgent(Agent):
                          'u1_%d' % self.ID: utility_partner_1, 'u2_%d' % self.ID: utility_partner_2,
                          'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
                          'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4,
-                         'uv_%d' % self.ID: self.update_value, 'wm_%d' % self.ID: self.working_memory})
+                         'uv_%d' % self.ID: self.update_value, 'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c,
+                         'mutC_%d' % self.ID: self.mutual_c_outcome})
                 #
                 else:
                     writer.writerow(
@@ -699,12 +709,13 @@ class PDAgent(Agent):
                          'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'u1_%d' % self.ID: utility_partner_1,
                          'u2': utility_partner_2, 'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
                          'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value,
-                         'wm_%d' % self.ID: self.working_memory})
+                         'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c, 'mutC_%d' % self.ID: self.mutual_c_outcome})
 
     def reset_values(self):
         self.number_of_d = 0
         self.number_of_c = 0
         self.update_value = 0.02
+        self.mutual_c_outcome = 0
 
     def find_average_move(self):
         move_list = []
