@@ -36,7 +36,7 @@ class PDAgent(Agent):
         self.update_values = {}
         self.update_value = 0.02
         self.delta = 3
-        self.gamma = 0.015
+        self.gamma = 0.01
 
         self.move = None
         self.next_move = None
@@ -134,7 +134,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "RANDOM"]
+            choices = ["VPP", "WSLS"]
             strat = random.choice(choices)
             return str(strat)
 
@@ -441,9 +441,9 @@ class PDAgent(Agent):
 
                         # for now, let's add the evaluation of a partner's treatment of us here
                         # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                        print("Gonna update my UV!", self.update_value)
+                        # print("Gonna update my UV!", self.update_value)
                         self.update_value = self.update_value + self.change_update_value(current_partner)
-                        print("I updated it!", self.update_value)
+                        # print("I updated it!", self.update_value)
 
                         self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
 
