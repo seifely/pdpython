@@ -34,9 +34,9 @@ class PDAgent(Agent):
         self.pickstrat = pick_strat
 
         self.update_values = {}
-        self.update_value = 0.02
-        self.delta = 3
-        self.gamma = 0.01
+        self.update_value = 0.01
+        self.delta = 0
+        self.gamma = 0.02
 
         self.move = None
         self.next_move = None
@@ -417,7 +417,7 @@ class PDAgent(Agent):
                         self.per_partner_utility[partner_ID] = 0
 
                     if self.update_values.get(partner_ID) is None:  # add in default update value per partner
-                        self.update_values[partner_ID] = 0.02  # this has to happen before change update value occurs!!
+                        self.update_values[partner_ID] = 0.01  # this has to happen before change update value occurs!!
 
                     """ Below is the code for adding to and/or updating self.working_memory.
                      if WM does not have a key for current partner's ID in it, we open one
@@ -442,7 +442,7 @@ class PDAgent(Agent):
                         # for now, let's add the evaluation of a partner's treatment of us here
                         # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
                         # print("Gonna update my UV!", self.update_value)
-                        self.update_value = self.update_value + self.change_update_value(current_partner)
+                        # self.update_value = self.update_value + self.change_update_value(current_partner)  #- UNCOMMENT FOR MEMORY SYSTEM TO WORK
                         # print("I updated it!", self.update_value)
 
                         self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
