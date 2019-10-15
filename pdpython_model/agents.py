@@ -34,8 +34,8 @@ class PDAgent(Agent):
         self.pickstrat = pick_strat
 
         self.update_values = {}
-        self.update_value = 0.001
-        self.gamma = 0.001  # uv we manipulate
+        self.update_value = 0.02
+        self.gamma = 0.02  # uv we manipulate
         self.delta = 3  # max memory size
         self.init_uv = self.gamma
 
@@ -135,7 +135,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "WSLS"]
+            choices = ["VPP", "RANDOM"]
             strat = random.choice(choices)
             return str(strat)
 
