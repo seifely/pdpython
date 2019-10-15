@@ -34,9 +34,10 @@ class PDAgent(Agent):
         self.pickstrat = pick_strat
 
         self.update_values = {}
-        self.update_value = 0.01
-        self.delta = 0
-        self.gamma = 0.02
+        self.update_value = 0.001
+        self.gamma = 0.001  # uv we manipulate
+        self.delta = 3  # max memory size
+        self.init_uv = self.gamma
 
         self.move = None
         self.next_move = None
@@ -442,7 +443,8 @@ class PDAgent(Agent):
                         # for now, let's add the evaluation of a partner's treatment of us here
                         # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
                         # print("Gonna update my UV!", self.update_value)
-                        # self.update_value = self.update_value + self.change_update_value(current_partner)  #- UNCOMMENT FOR MEMORY SYSTEM TO WORK
+                        self.update_value = self.update_value + self.change_update_value(current_partner)
+                        # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
                         # print("I updated it!", self.update_value)
 
                         self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
@@ -714,7 +716,7 @@ class PDAgent(Agent):
     def reset_values(self):
         self.number_of_d = 0
         self.number_of_c = 0
-        self.update_value = 0.02
+        self.update_value = self.init_uv
         self.mutual_c_outcome = 0
 
     def find_average_move(self):
