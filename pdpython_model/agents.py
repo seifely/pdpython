@@ -356,19 +356,19 @@ class PDAgent(Agent):
         numberC = partner_behaviour.count('C')
         numberD = partner_behaviour.count('D')
         #
-        # consistency = self.pattern_detector(partner_behaviour)
-        # if consistency:
         #
-        if numberC or numberD == self.delta:
+        #
+        #
+        if numberC or numberD == self.delta:  # High Value due to High Confidence
             return gamma * 3
 
-        if partner_behaviour == ['C', 'D', 'C'] or ['D', 'C', 'D']:
+        if partner_behaviour == ['C', 'D', 'C'] or ['D', 'C', 'D']:  # Higher Value to Break Potential Cycles
             return gamma * 3
 
-        elif partner_behaviour == ['C', 'C', 'D'] or ['D', 'C', 'C']:
+        elif partner_behaviour == ['C', 'C', 'D'] or ['D', 'D', 'C']:  # Low Confidence due to New Behaviour
             return gamma
 
-        elif partner_behaviour == ['C', 'C', 'D'] or ['D', 'D', 'C']:
+        elif partner_behaviour == ['C', 'D', 'D'] or ['D', 'C', 'C']:  # Gaining Confidence/Trust
             return gamma * 2
         #
         # elif not consistency:
