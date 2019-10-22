@@ -824,3 +824,13 @@ True,VPP,6,{2: 'D'},{2: 0.48},0,['D'],0,1,"{2: ['D', 'C']}",0.48,None,None,None,
 3,VPP,6,{2: 'C'},{2: 0.475},3,['C'],1,0,"{2: ['C', 'C']}",0.475,None,None,None,4.5,None,None,None,1,None,None,None,0.01,"{2: ['C', 'D', 'C']}",1,1
 4,VPP,6,{2: 'C'},{2: 0.415},4.5,['C'],1,0,"{2: ['C', 'C']}",0.415,None,None,None,6.0,None,None,None,1,None,None,None,0.04,"{2: ['D', 'C', 'C']}",1,1
 5,VPP,6,{2: 'C'},{2: 0.495},6.0,['C'],1,0,"{2: ['C', 'D']}",0.495,None,None,None,4.0,None,None,None,1,None,None,None,0.04,"{2: ['C', 'C', 'D']}",1,0
+stepcount_1,strategy_1,strat code_1,move_1,probabilities_1,utility_1,common_move_1,number_coop_1,number_defect_1,outcomes_1,p1_1,p2_1,p3_1,p4_1,u1_1,u2_1,u3_1,u4_1,m1_1,m2_1,m3_1,m4_1,uv_1,wm_1,nc_1,mutC_1
+True,RANDOM,0,{2: 'D'},{2: 0.48},0,['D'],0,1,"{2: ['D', 'C']}",0.48,None,None,None,2,None,None,None,2,None,None,None,0.01,{2: ['C']},0,0
+stepcount_1,strategy_1,strat code_1,move_1,probabilities_1,utility_1,common_move_1,number_coop_1,number_defect_1,outcomes_1,p1_1,p2_1,p3_1,p4_1,u1_1,u2_1,u3_1,u4_1,m1_1,m2_1,m3_1,m4_1,uv_1,wm_1,nc_1,mutC_1
+True,RANDOM,0,{2: 'D'},{2: 0.48},0,['D'],0,1,"{2: ['D', 'C']}",0.48,None,None,None,2,None,None,None,2,None,None,None,0.01,{2: ['C']},0,0
+stepcount_1,strategy_1,strat code_1,move_1,probabilities_1,utility_1,common_move_1,number_coop_1,number_defect_1,outcomes_1,p1_1,p2_1,p3_1,p4_1,u1_1,u2_1,u3_1,u4_1,m1_1,m2_1,m3_1,m4_1,uv_1,wm_1,nc_1,mutC_1
+True,VPP,6,{2: 'C'},{2: 0.52},0,['C'],1,0,"{2: ['C', 'D']}",0.52,None,None,None,-2,None,None,None,1,None,None,None,0.01,{2: ['D']},1,0
+2,VPP,6,{2: 'D'},{2: 0.5},-2,['D'],0,1,"{2: ['D', 'C']}",0.5,None,None,None,0,None,None,None,2,None,None,None,0.01,"{2: ['D', 'C']}",0,0
+3,VPP,6,{2: 'D'},{2: 0.48},0,['D'],0,1,"{2: ['D', 'C']}",0.48,None,None,None,2,None,None,None,2,None,None,None,0.01,"{2: ['D', 'C', 'C']}",0,0
+4,VPP,6,{2: 'D'},{2: 0.39999999999999997},2,['D'],0,1,"{2: ['D', 'C']}",0.39999999999999997,None,None,None,4,None,None,None,2,None,None,None,0.04,"{2: ['C', 'C', 'C']}",0,0
+5,VPP,6,{2: 'C'},{2: 0.43999999999999995},4,['C'],1,0,"{2: ['C', 'D']}",0.43999999999999995,None,None,None,2,None,None,None,1,None,None,None,0.02,"{2: ['C', 'C', 'D']}",1,0

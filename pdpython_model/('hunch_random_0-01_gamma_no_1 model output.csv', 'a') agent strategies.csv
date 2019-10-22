@@ -824,3 +824,13 @@ stepcount,agent_strategy
 3,"['1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM']"
 4,"['1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM']"
 5,"['1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM']"
+stepcount,agent_strategy
+1,"['1, RANDOM', '2, RANDOM']"
+stepcount,agent_strategy
+1,"['1, RANDOM', '2, RANDOM']"
+stepcount,agent_strategy
+1,"['1, VPP', '2, RANDOM']"
+2,"['1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM']"
+3,"['1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM']"
+4,"['1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM']"
+5,"['1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM', '1, VPP', '2, RANDOM']"
