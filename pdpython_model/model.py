@@ -45,7 +45,7 @@ class PDModel(Model):
         self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
         self.randspawn = randspawn
-        self.exp_n = 'mem2_random_0-02_gamma_no_5'
+        self.exp_n = 'hunch_random_0-01_gamma_no_1'
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
         if not self.simplified_payoffs:

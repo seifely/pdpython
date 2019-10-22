@@ -34,8 +34,8 @@ class PDAgent(Agent):
         self.pickstrat = pick_strat
 
         self.update_values = {}
-        self.update_value = 0.02
-        self.gamma = 0.02  # uv we manipulate
+        self.update_value = 0.01
+        self.gamma = 0.01  # uv we manipulate
         self.delta = 3  # max memory size
         self.init_uv = self.gamma
 
@@ -355,21 +355,41 @@ class PDAgent(Agent):
 
         numberC = partner_behaviour.count('C')
         numberD = partner_behaviour.count('D')
+        print("Number of C is", numberC)
+        print("Number of D is", numberD)
         #
         #
         #
         #
-        if numberC or numberD == self.delta:  # High Value due to High Confidence
+
+        print("My partner did:", partner_behaviour)
+        if partner_behaviour == ['C', 'D', 'C']:  # Higher Value to Break Potential Cycles
+            print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
             return gamma * 3
 
-        if partner_behaviour == ['C', 'D', 'C'] or ['D', 'C', 'D']:  # Higher Value to Break Potential Cycles
+        elif partner_behaviour == ['D', 'C', 'D']:  # Higher Value to Break Potential Cycles
+            print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
             return gamma * 3
 
-        elif partner_behaviour == ['C', 'C', 'D'] or ['D', 'D', 'C']:  # Low Confidence due to New Behaviour
+        elif partner_behaviour == ['C', 'C', 'D']:  # Low Confidence due to New Behaviour
+            print("I used behavioural rule 2, and I'm gonna return update value", gamma)
             return gamma
 
-        elif partner_behaviour == ['C', 'D', 'D'] or ['D', 'C', 'C']:  # Gaining Confidence/Trust
+        elif partner_behaviour == ['D', 'D', 'C']:  # Low Confidence due to New Behaviour
+            print("I used behavioural rule 2, and I'm gonna return update value", gamma)
+            return gamma
+
+        elif partner_behaviour == ['C', 'D', 'D']:  # Gaining Confidence/Trust
+            print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
             return gamma * 2
+
+        elif partner_behaviour == ['D', 'C', 'C']:  # Gaining Confidence/Trust
+            print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
+            return gamma * 2
+
+        elif numberC or numberD == self.delta:  # High Value due to High Confidence
+            print("I used behavioural rule 4, and I'm gonna return update value", gamma * 3)
+            return gamma * 3
         #
         # elif not consistency:
         #     return gamma * 2
@@ -442,12 +462,13 @@ class PDAgent(Agent):
 
                         # for now, let's add the evaluation of a partner's treatment of us here
                         # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                        # print("Gonna update my UV!", self.update_value)
+                            print("Gonna update my UV!", self.update_value)
                             self.update_value = self.update_value + self.change_update_value(current_partner)
-                        # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
-                        # print("I updated it!", self.update_value)
 
-                            self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
+                        # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
+                            print("I updated it!", self.update_value)
+
+                        self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
 
                     # First, check if we have a case file on them in each memory slot
                     if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
@@ -840,7 +861,7 @@ class PDAgent(Agent):
                     self.advance()
 
         if self.stepCount == (self.model.rounds - 1):
-            print("My stepcount is", self.stepCount, "Next round is", (self.model.rounds - 1), "Next round is the last round!")
+            # print("My stepcount is", self.stepCount, "Next round is", (self.model.rounds - 1), "Next round is the last round!")
             self.last_round = True
 
         # self.find_average_move()
