@@ -443,11 +443,11 @@ class PDAgent(Agent):
                         # for now, let's add the evaluation of a partner's treatment of us here
                         # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
                         # print("Gonna update my UV!", self.update_value)
-                        self.update_value = self.update_value + self.change_update_value(current_partner)
+                            self.update_value = self.update_value + self.change_update_value(current_partner)
                         # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
                         # print("I updated it!", self.update_value)
 
-                        self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
+                            self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
 
                     # First, check if we have a case file on them in each memory slot
                     if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
