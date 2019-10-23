@@ -17,7 +17,13 @@ from math import ceil
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
+    def __init__(self, pos, model,
+                 stepcount=0,
+                 pick_strat="RDISTRO",
+                 strategy=None,
+                 starting_move=None,
+                 checkerboard=True,
+                 lineplace=False,
                  ):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
@@ -32,6 +38,8 @@ class PDAgent(Agent):
         self.filename = ('%s agent %d.csv' % (self.model.exp_n, self.ID), "a")
         self.previous_moves = []
         self.pickstrat = pick_strat
+        self.checkerboard = checkerboard
+        self.lineplace = lineplace
 
         self.update_values = {}
         self.update_value = 0.02
@@ -134,10 +142,96 @@ class PDAgent(Agent):
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
 
-        elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
+        elif self.pickstrat == "RDISTRO": # Random Distribution of the two selected strategies
             choices = ["VPP", "TFT"]
-            strat = random.choice(choices)
-            return str(strat)
+            if not self.checkerboard:
+                if not self.lineplace:
+                    strat = random.choice(choices)
+                    return str(strat)
+                elif self.lineplace:
+                        if len(choices) == 2:
+                            if (self.ID % 2) == 0:
+                                strat = choices[0]
+                                return str(strat)
+                            else:
+                                strat = choices[1]
+                                return str(strat)
+                        elif len(choices) == 3:
+                            # make choices into a popped queue, take the front most and then add it in at the back after
+                            # choosing
+                            return
+            elif self.checkerboard:
+                print("My ID is...", self.ID)
+                if len(choices) == 2:
+                    check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
+                               42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
+                    check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
+                               43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
+                    if self.ID in check_a:
+                        strat = choices[0]
+                        return str(strat)
+                    elif self.ID in check_b:
+                        strat = choices[1]
+                        return str(strat)
+
+                    # if (self.ID % 2) == 0:
+                    #     if self.ID >= 1 and self.ID < 9:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #     elif self.ID >= 9 and self.ID < 17:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #     elif self.ID >= 17 and self.ID < 25:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #     elif self.ID >= 25 and self.ID < 33:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #     elif self.ID >= 33 and self.ID < 41:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #     elif self.ID >= 41 and self.ID < 49:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #     elif self.ID >= 49 and self.ID < 57:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #     elif self.ID >= 57:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[0]
+                    #             return str(strat)
+
 
     def change_strategy(self):
         return
