@@ -143,7 +143,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO": # Random Distribution of the two selected strategies
-            choices = ["VPP", "TFT"]
+            choices = ["VPP", "RANDOM"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
@@ -553,14 +553,13 @@ class PDAgent(Agent):
                             current_partner.pop(0)
                             current_partner.append(partner_move)  # we have the updated move list for that partner here
                             current_uv = self.update_values[partner_ID]
-
-                        # for now, let's add the evaluation of a partner's treatment of us here
+                                             # for now, let's add the evaluation of a partner's treatment of us here
                         # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                            print("Gonna update my UV!", self.update_value)
+                        #     print("Gonna update my UV!", self.update_value)
                             self.update_value = self.update_value + self.change_update_value(current_partner)
 
                         # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
-                            print("I updated it!", self.update_value)
+                        #     print("I updated it!", self.update_value)
 
                         self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
 
