@@ -18,7 +18,7 @@ from math import ceil
 
 class PDAgent(Agent):
     def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
-                 ):
+                 memory_sys=True):
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
             are to spawn along a distribution, set number of strategy types, or with
@@ -32,10 +32,11 @@ class PDAgent(Agent):
         self.filename = ('%s agent %d.csv' % (self.model.exp_n, self.ID), "a")
         self.previous_moves = []
         self.pickstrat = pick_strat
+        self.memory_sys = memory_sys
 
         self.update_values = {}
-        self.update_value = 0.02
-        self.gamma = 0.02  # uv we manipulate
+        self.update_value = 0.001
+        self.gamma = 0.001  # uv we manipulate
         self.delta = 3  # max memory size
         self.init_uv = self.gamma
 
@@ -135,7 +136,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "TFT"]
+            choices = ["VPP", "WSLS"]
             strat = random.choice(choices)
             return str(strat)
 
@@ -448,42 +449,43 @@ class PDAgent(Agent):
                     """
                     current_uv = self.update_value
 
-                    if self.working_memory.get(partner_ID) is None:
-                        self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
-                    else:
-                        current_partner = self.working_memory.pop(partner_ID)
-                        # first, check if it has more than three values
-                        if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
-                            current_partner.append(partner_move)
-                        elif len(current_partner) == self.delta:
-                            current_partner.pop(0)
-                            current_partner.append(partner_move)  # we have the updated move list for that partner here
-                            current_uv = self.update_values[partner_ID]
+                    if self.memory_sys:
+                        if self.working_memory.get(partner_ID) is None:
+                            self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
+                        else:
+                            current_partner = self.working_memory.pop(partner_ID)
+                            # first, check if it has more than three values
+                            if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
+                                current_partner.append(partner_move)
+                            elif len(current_partner) == self.delta:
+                                current_partner.pop(0)
+                                current_partner.append(partner_move)  # we have the updated move list for that partner here
+                                current_uv = self.update_values[partner_ID]
 
-                        # for now, let's add the evaluation of a partner's treatment of us here
-                        # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                            print("Gonna update my UV!", self.update_value)
-                            self.update_value = self.update_value + self.change_update_value(current_partner)
+                            # for now, let's add the evaluation of a partner's treatment of us here
+                            # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
+                                print("Gonna update my UV!", self.update_value)
+                                self.update_value = self.update_value + self.change_update_value(current_partner)
 
-                        # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
-                            print("I updated it!", self.update_value)
+                            # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
+                                # print("I updated it!", self.update_value)
 
-                        self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
+                            self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
 
-                    # First, check if we have a case file on them in each memory slot
-                    if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
-                        self.partner_moves[partner_ID] = []
-                        # print("partner moves dict:", self.partner_moves)
-                        self.partner_moves[partner_ID].append(partner_move)
-                        # print("partner moves dict2:", self.partner_moves)
-                    else:
-                        self.partner_moves[partner_ID].append(partner_move)
-                        # print("My partner's moves have been:", self.partner_moves)
-                        """ We should repeat the above process for the other memory fields too, like 
-                        partner's gathered utility """
+                        # First, check if we have a case file on them in each memory slot
+                        if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
+                            self.partner_moves[partner_ID] = []
+                            # print("partner moves dict:", self.partner_moves)
+                            self.partner_moves[partner_ID].append(partner_move)
+                            # print("partner moves dict2:", self.partner_moves)
+                        else:
+                            self.partner_moves[partner_ID].append(partner_move)
+                            # print("My partner's moves have been:", self.partner_moves)
+                            """ We should repeat the above process for the other memory fields too, like 
+                            partner's gathered utility """
 
-                    if partner_ID not in self.partner_IDs:
-                        self.partner_IDs.append(partner_ID)
+                        if partner_ID not in self.partner_IDs:
+                            self.partner_IDs.append(partner_ID)
 
     def increment_score(self, payoffs):
         total_utility = 0
