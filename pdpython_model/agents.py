@@ -22,7 +22,7 @@ class PDAgent(Agent):
                  pick_strat="RDISTRO",
                  strategy=None,
                  starting_move=None,
-                 checkerboard=True,
+                 checkerboard=False,
                  lineplace=False,
                  ):
         super().__init__(pos, model)
@@ -42,8 +42,8 @@ class PDAgent(Agent):
         self.lineplace = lineplace
 
         self.update_values = {}
-        self.update_value = 0.02
-        self.gamma = 0.02  # uv we manipulate
+        self.update_value = 0.015
+        self.gamma = 0.015  # uv we manipulate
         self.delta = 3  # max memory size
         self.init_uv = self.gamma
 
@@ -143,7 +143,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO": # Random Distribution of the two selected strategies
-            choices = ["VPP", "RANDOM"]
+            choices = ["VPP", "TFT"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)

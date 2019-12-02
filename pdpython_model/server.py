@@ -122,7 +122,7 @@ class StepCountDisplay(TextElement):
         return "Step Count: " + str(model.step_count)
 
 
-canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
+canvas_element = CanvasGrid(gen_Model_Portrayal, 4, 4, 500, 500)
 step_element = StepCountDisplay()
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])

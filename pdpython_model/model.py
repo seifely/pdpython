@@ -16,7 +16,7 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=8, width=8,
+    def __init__(self, height=4, width=4,
                  number_of_agents=2,
                  schedule_type="Simultaneous",
                  rounds=100,
@@ -45,7 +45,7 @@ class PDModel(Model):
         self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
         self.randspawn = randspawn
-        self.exp_n = 'base2_random_0-02_gamma_no_5'
+        self.exp_n = 'small_tft_0-015_gamma_no_10'
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
         if not self.simplified_payoffs:
