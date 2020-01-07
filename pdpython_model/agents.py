@@ -64,6 +64,8 @@ class PDAgent(Agent):
         self.partner_latest_move = {}  # this is a popped list
         self.partner_scores = {}
         self.per_partner_utility = {}
+        self.per_partner_strategies = {}
+        self.similar_partners = 0
         self.outcome_list = {}
         self.itermove_result = {}
         self.common_move = ""
@@ -449,40 +451,40 @@ class PDAgent(Agent):
 
         numberC = partner_behaviour.count('C')
         numberD = partner_behaviour.count('D')
-        print("Number of C is", numberC)
-        print("Number of D is", numberD)
+        #print("Number of C is", numberC)
+        #print("Number of D is", numberD)
         #
         #
         #
         #
 
-        print("My partner did:", partner_behaviour)
+        #print("My partner did:", partner_behaviour)
         if partner_behaviour == ['C', 'D', 'C']:  # Higher Value to Break Potential Cycles
-            print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
+            #print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
             return gamma * 3
 
         elif partner_behaviour == ['D', 'C', 'D']:  # Higher Value to Break Potential Cycles
-            print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
+            #print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
             return gamma * 3
 
         elif partner_behaviour == ['C', 'C', 'D']:  # Low Confidence due to New Behaviour
-            print("I used behavioural rule 2, and I'm gonna return update value", gamma)
+            #print("I used behavioural rule 2, and I'm gonna return update value", gamma)
             return gamma
 
         elif partner_behaviour == ['D', 'D', 'C']:  # Low Confidence due to New Behaviour
-            print("I used behavioural rule 2, and I'm gonna return update value", gamma)
+            #print("I used behavioural rule 2, and I'm gonna return update value", gamma)
             return gamma
 
         elif partner_behaviour == ['C', 'D', 'D']:  # Gaining Confidence/Trust
-            print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
+            #print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
             return gamma * 2
 
         elif partner_behaviour == ['D', 'C', 'C']:  # Gaining Confidence/Trust
-            print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
+            #print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
             return gamma * 2
 
         elif numberC or numberD == self.delta:  # High Value due to High Confidence
-            print("I used behavioural rule 4, and I'm gonna return update value", gamma * 3)
+            #print("I used behavioural rule 4, and I'm gonna return update value", gamma * 3)
             return gamma * 3
         #
         # elif not consistency:
@@ -530,6 +532,9 @@ class PDAgent(Agent):
 
                     if self.per_partner_utility.get(partner_ID) is None:
                         self.per_partner_utility[partner_ID] = 0
+
+                    if self.per_partner_strategies.get(partner_ID) is None:
+                        self.per_partner_strategies[partner_ID] = partner_strategy
 
                     if self.update_values.get(partner_ID) is None:  # add in default update value per partner
                         self.update_values[partner_ID] = 0.01  # this has to happen before change update value occurs!!
@@ -644,6 +649,10 @@ class PDAgent(Agent):
         # and also time each agent's step to create a total time thingybob
 
     def output_data_to_file(self, outcomes):
+
+            for m in self.per_partner_strategies:
+                if self.per_partner_strategies[m] == self.strategy:
+                    self.similar_partners += 1
 
             prob_list = []
             util_list = []
@@ -785,7 +794,7 @@ class PDAgent(Agent):
                                   'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
                                   'p4_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID, 'u4_%d' % self.ID,
                                   'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID,
-                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID]
+                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID]
                 #     'p1', 'p2', 'p3', 'p4'
                 else:
                     fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID, 'move_%d' % self.ID,
@@ -793,7 +802,7 @@ class PDAgent(Agent):
                                   'number_defect_%d' % self.ID,
                                   'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
                                   'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID,
-                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID]
+                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID]
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 # moves = []
@@ -815,7 +824,7 @@ class PDAgent(Agent):
                          'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
                          'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4,
                          'uv_%d' % self.ID: self.update_value, 'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c,
-                         'mutC_%d' % self.ID: self.mutual_c_outcome})
+                         'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners})
                 #
                 else:
                     writer.writerow(
@@ -825,7 +834,8 @@ class PDAgent(Agent):
                          'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'u1_%d' % self.ID: utility_partner_1,
                          'u2': utility_partner_2, 'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
                          'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value,
-                         'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c, 'mutC_%d' % self.ID: self.mutual_c_outcome})
+                         'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c, 'mutC_%d' % self.ID: self.mutual_c_outcome,
+                         'simP_%d' % self.ID: self.similar_partners})
 
     def reset_values(self):
         self.number_of_d = 0
