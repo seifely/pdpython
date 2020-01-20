@@ -122,12 +122,12 @@ class StepCountDisplay(TextElement):
         return "Step Count: " + str(model.step_count)
 
 
-canvas_element = CanvasGrid(gen_Model_Portrayal, 4, 4, 500, 500)
+canvas_element = CanvasGrid(gen_Model_Portrayal, 2, 2, 500, 500)
 step_element = StepCountDisplay()
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
-model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 16, 2, 64, 1),
+model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 4, 2, 64, 1),
                 "rounds": UserSettableParameter('slider', 'Number of Rounds', 250,1,500,10),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', True),
                 "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),

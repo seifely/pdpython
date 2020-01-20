@@ -109,7 +109,7 @@ class PDAgent(Agent):
 
     def set_defaults(self, ids):
         for i in ids:
-            self.ppD_partner[i] = 0.5
+            self.ppD_partner[i] = 0.1
 
     # def pattern_detector(self, input_list):
     #     """ This isn't learning, it's a small, imprecise detector for history of consistency in behaviour.
@@ -145,7 +145,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO": # Random Distribution of the two selected strategies
-            choices = ["VPP", "TFT"]
+            choices = ["VPP", "WSLS"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
