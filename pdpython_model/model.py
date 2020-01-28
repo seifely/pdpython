@@ -45,11 +45,7 @@ class PDModel(Model):
         self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
         self.randspawn = randspawn
-<<<<<<< HEAD
-        self.exp_n = 'mem3_tft_0-02_gamma_no_25'
-=======
         self.exp_n = 'scale2_wsls_8x8_no_25'
->>>>>>> cooperative_bias
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
         if not self.simplified_payoffs:
@@ -173,4 +169,3 @@ class PDModel(Model):
     def run_model(self, rounds=200):
         for i in range(self.rounds):
             self.step()
-

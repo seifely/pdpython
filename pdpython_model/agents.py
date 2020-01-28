@@ -1008,4 +1008,3 @@ class PDAgent(Agent):
             self.score += round_payoffs
             # print("My total overall score is:", self.score)
             return
-        
