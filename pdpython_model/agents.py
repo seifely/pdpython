@@ -35,8 +35,8 @@ class PDAgent(Agent):
         self.memory_sys = memory_sys
 
         self.update_values = {}
-        self.update_value = 0.02
-        self.gamma = 0.02  # uv we manipulate
+        self.update_value = 0.015
+        self.gamma = 0.015  # uv we manipulate
         self.delta = 3  # max memory size
         self.init_uv = self.gamma
 
