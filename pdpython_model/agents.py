@@ -12,15 +12,12 @@ from math import ceil
     VPP - Variable Personal Probability. Agent changes own likelihood that it will defect in response to defection.
     ANGEL - Always co-operate.
     DEVIL - Always defect.
-    
+
     TFT - The classic Tit for Tat strategy.
     WSLS - Win Stay Lose Switch """
 
+
 class PDAgent(Agent):
-<<<<<<< HEAD
-    def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
-                 memory_sys=True):
-=======
     def __init__(self, pos, model,
                  stepcount=0,
                  pick_strat="RDISTRO",
@@ -29,7 +26,6 @@ class PDAgent(Agent):
                  checkerboard=False,
                  lineplace=False,
                  ):
->>>>>>> cooperative_bias
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
             are to spawn along a distribution, set number of strategy types, or with
@@ -43,12 +39,8 @@ class PDAgent(Agent):
         self.filename = ('%s agent %d.csv' % (self.model.exp_n, self.ID), "a")
         self.previous_moves = []
         self.pickstrat = pick_strat
-<<<<<<< HEAD
-        self.memory_sys = memory_sys
-=======
         self.checkerboard = checkerboard
         self.lineplace = lineplace
->>>>>>> cooperative_bias
 
         self.update_values = {}
         self.update_value = 0.015
@@ -153,24 +145,24 @@ class PDAgent(Agent):
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
 
-        elif self.pickstrat == "RDISTRO": # Random Distribution of the two selected strategies
+        elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
             choices = ["VPP", "WSLS"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
                     return str(strat)
                 elif self.lineplace:
-                        if len(choices) == 2:
-                            if (self.ID % 2) == 0:
-                                strat = choices[0]
-                                return str(strat)
-                            else:
-                                strat = choices[1]
-                                return str(strat)
-                        elif len(choices) == 3:
-                            # make choices into a popped queue, take the front most and then add it in at the back after
-                            # choosing
-                            return
+                    if len(choices) == 2:
+                        if (self.ID % 2) == 0:
+                            strat = choices[0]
+                            return str(strat)
+                        else:
+                            strat = choices[1]
+                            return str(strat)
+                    elif len(choices) == 3:
+                        # make choices into a popped queue, take the front most and then add it in at the back after
+                        # choosing
+                        return
             elif self.checkerboard:
                 print("My ID is...", self.ID)
                 if len(choices) == 2:
@@ -243,7 +235,6 @@ class PDAgent(Agent):
                     #             strat = choices[0]
                     #             return str(strat)
 
-
     def change_strategy(self):
         return
 
@@ -315,7 +306,7 @@ class PDAgent(Agent):
                 # print("Cooperate is best")
                 self.number_of_c += 1
                 return "C"
-            elif highest_ev== 2:
+            elif highest_ev == 2:
                 # print("Defect is best")
                 self.number_of_d += 1
                 return "D"
@@ -460,40 +451,40 @@ class PDAgent(Agent):
 
         numberC = partner_behaviour.count('C')
         numberD = partner_behaviour.count('D')
-        #print("Number of C is", numberC)
-        #print("Number of D is", numberD)
+        # print("Number of C is", numberC)
+        # print("Number of D is", numberD)
         #
         #
         #
         #
 
-        #print("My partner did:", partner_behaviour)
+        # print("My partner did:", partner_behaviour)
         if partner_behaviour == ['C', 'D', 'C']:  # Higher Value to Break Potential Cycles
-            #print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
+            # print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
             return gamma * 3
 
         elif partner_behaviour == ['D', 'C', 'D']:  # Higher Value to Break Potential Cycles
-            #print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
+            # print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
             return gamma * 3
 
         elif partner_behaviour == ['C', 'C', 'D']:  # Low Confidence due to New Behaviour
-            #print("I used behavioural rule 2, and I'm gonna return update value", gamma)
+            # print("I used behavioural rule 2, and I'm gonna return update value", gamma)
             return gamma
 
         elif partner_behaviour == ['D', 'D', 'C']:  # Low Confidence due to New Behaviour
-            #print("I used behavioural rule 2, and I'm gonna return update value", gamma)
+            # print("I used behavioural rule 2, and I'm gonna return update value", gamma)
             return gamma
 
         elif partner_behaviour == ['C', 'D', 'D']:  # Gaining Confidence/Trust
-            #print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
+            # print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
             return gamma * 2
 
         elif partner_behaviour == ['D', 'C', 'C']:  # Gaining Confidence/Trust
-            #print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
+            # print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
             return gamma * 2
 
         elif numberC or numberD == self.delta:  # High Value due to High Confidence
-            #print("I used behavioural rule 4, and I'm gonna return update value", gamma * 3)
+            # print("I used behavioural rule 4, and I'm gonna return update value", gamma * 3)
             return gamma * 3
         #
         # elif not consistency:
@@ -518,7 +509,6 @@ class PDAgent(Agent):
                 # print("This cell", this_cell)
                 if self.stepCount == 2:
                     self.n_partners += 1
-
 
                 if len(this_cell) > 0:
                     partner = [obj for obj in this_cell
@@ -556,45 +546,6 @@ class PDAgent(Agent):
                     """
                     current_uv = self.update_value
 
-<<<<<<< HEAD
-                    if self.memory_sys:
-                        if self.working_memory.get(partner_ID) is None:
-                            self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
-                        else:
-                            current_partner = self.working_memory.pop(partner_ID)
-                            # first, check if it has more than three values
-                            if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
-                                current_partner.append(partner_move)
-                            elif len(current_partner) == self.delta:
-                                current_partner.pop(0)
-                                current_partner.append(partner_move)  # we have the updated move list for that partner here
-                                current_uv = self.update_values[partner_ID]
-
-                            # for now, let's add the evaluation of a partner's treatment of us here
-                            # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                                #print("Gonna update my UV!", self.update_value)
-                                self.update_value = self.update_value + self.change_update_value(current_partner)
-
-                            # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
-                                # print("I updated it!", self.update_value)
-
-                            self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
-
-                        # First, check if we have a case file on them in each memory slot
-                        if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
-                            self.partner_moves[partner_ID] = []
-                            # print("partner moves dict:", self.partner_moves)
-                            self.partner_moves[partner_ID].append(partner_move)
-                            # print("partner moves dict2:", self.partner_moves)
-                        else:
-                            self.partner_moves[partner_ID].append(partner_move)
-                            # print("My partner's moves have been:", self.partner_moves)
-                            """ We should repeat the above process for the other memory fields too, like 
-                            partner's gathered utility """
-
-                        if partner_ID not in self.partner_IDs:
-                            self.partner_IDs.append(partner_ID)
-=======
                     if self.working_memory.get(partner_ID) is None:
                         self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
                     else:
@@ -606,9 +557,9 @@ class PDAgent(Agent):
                             current_partner.pop(0)
                             current_partner.append(partner_move)  # we have the updated move list for that partner here
                             current_uv = self.update_values[partner_ID]
-                                             # for now, let's add the evaluation of a partner's treatment of us here
-                        # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                        #     print("Gonna update my UV!", self.update_value)
+                            # for now, let's add the evaluation of a partner's treatment of us here
+                            # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
+                            #     print("Gonna update my UV!", self.update_value)
                             self.update_value = self.update_value + self.change_update_value(current_partner)
 
                         # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
@@ -630,7 +581,6 @@ class PDAgent(Agent):
 
                     if partner_ID not in self.partner_IDs:
                         self.partner_IDs.append(partner_ID)
->>>>>>> cooperative_bias
 
     def increment_score(self, payoffs):
         total_utility = 0
@@ -641,7 +591,7 @@ class PDAgent(Agent):
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
 
-            if outcome == ['C','C']:
+            if outcome == ['C', 'C']:
                 self.mutual_c_outcome += 1
 
             outcome_listicle[i] = outcome
@@ -675,7 +625,8 @@ class PDAgent(Agent):
             total_utility += outcome_payoff
             if self.printing:
                 print("I am agent", self.ID, " I chose", my_move, " my partner is:", i, " they picked ",
-                    this_partner_move, " so my payoff is ", outcome_payoff, " The p I will defect is now,", self.ppD_partner)
+                      this_partner_move, " so my payoff is ", outcome_payoff, " The p I will defect is now,",
+                      self.ppD_partner)
 
         # self.score = self.score + total_utility
         self.outcome_list = outcome_listicle
@@ -699,196 +650,208 @@ class PDAgent(Agent):
 
     def output_data_to_file(self, outcomes):
 
-            for m in self.per_partner_strategies:
-                if self.per_partner_strategies[m] == self.strategy:
-                    self.similar_partners += 1
+        for m in self.per_partner_strategies:
+            if self.per_partner_strategies[m] == self.strategy:
+                self.similar_partners += 1
 
-            prob_list = []
-            util_list = []
-            move_list = []
+        prob_list = []
+        util_list = []
+        move_list = []
 
-            for i in self.ppD_partner:
-                prob_list.append(self.ppD_partner[i])
+        for i in self.ppD_partner:
+            prob_list.append(self.ppD_partner[i])
 
+        ppd_partner_1 = 'None'
+        ppd_partner_2 = 'None'
+        ppd_partner_3 = 'None'
+        ppd_partner_4 = 'None'
+
+        if len(prob_list) == 0:
             ppd_partner_1 = 'None'
             ppd_partner_2 = 'None'
             ppd_partner_3 = 'None'
             ppd_partner_4 = 'None'
+        elif len(prob_list) == 1:
+            ppd_partner_1 = prob_list[0]
+            ppd_partner_2 = 'None'
+            ppd_partner_3 = 'None'
+            ppd_partner_4 = 'None'
+        elif len(prob_list) == 2:
+            ppd_partner_1 = prob_list[0]
+            ppd_partner_2 = prob_list[1]
+            ppd_partner_3 = 'None'
+            ppd_partner_4 = 'None'
+        elif len(prob_list) == 3:
+            ppd_partner_1 = prob_list[0]
+            ppd_partner_2 = prob_list[1]
+            ppd_partner_3 = prob_list[2]
+            ppd_partner_4 = 'None'
+        elif len(prob_list) == 4:
+            ppd_partner_1 = prob_list[0]
+            ppd_partner_2 = prob_list[1]
+            ppd_partner_3 = prob_list[2]
+            ppd_partner_4 = prob_list[3]
 
-            if len(prob_list) == 0:
-                ppd_partner_1 = 'None'
-                ppd_partner_2 = 'None'
-                ppd_partner_3 = 'None'
-                ppd_partner_4 = 'None'
-            elif len(prob_list) == 1:
-                ppd_partner_1 = prob_list[0]
-                ppd_partner_2 = 'None'
-                ppd_partner_3 = 'None'
-                ppd_partner_4 = 'None'
-            elif len(prob_list) == 2:
-                ppd_partner_1 = prob_list[0]
-                ppd_partner_2 = prob_list[1]
-                ppd_partner_3 = 'None'
-                ppd_partner_4 = 'None'
-            elif len(prob_list) == 3:
-                ppd_partner_1 = prob_list[0]
-                ppd_partner_2 = prob_list[1]
-                ppd_partner_3 = prob_list[2]
-                ppd_partner_4 = 'None'
-            elif len(prob_list) == 4:
-                ppd_partner_1 = prob_list[0]
-                ppd_partner_2 = prob_list[1]
-                ppd_partner_3 = prob_list[2]
-                ppd_partner_4 = prob_list[3]
+        for i in self.per_partner_utility:
+            util_list.append(self.per_partner_utility[i])
 
-            for i in self.per_partner_utility:
-                util_list.append(self.per_partner_utility[i])
+        utility_partner_1 = 'None'
+        utility_partner_2 = 'None'
+        utility_partner_3 = 'None'
+        utility_partner_4 = 'None'
 
+        if len(util_list) == 0:
             utility_partner_1 = 'None'
             utility_partner_2 = 'None'
             utility_partner_3 = 'None'
             utility_partner_4 = 'None'
+        elif len(util_list) == 1:
+            utility_partner_1 = util_list[0]
+            utility_partner_2 = 'None'
+            utility_partner_3 = 'None'
+            utility_partner_4 = 'None'
+        elif len(util_list) == 2:
+            utility_partner_1 = util_list[0]
+            utility_partner_2 = util_list[1]
+            utility_partner_3 = 'None'
+            utility_partner_4 = 'None'
+        elif len(util_list) == 3:
+            utility_partner_1 = util_list[0]
+            utility_partner_2 = util_list[1]
+            utility_partner_3 = util_list[2]
+            utility_partner_4 = 'None'
+        elif len(util_list) == 4:
+            utility_partner_1 = util_list[0]
+            utility_partner_2 = util_list[1]
+            utility_partner_3 = util_list[2]
+            utility_partner_4 = util_list[3]
 
-            if len(util_list) == 0:
-                utility_partner_1 = 'None'
-                utility_partner_2 = 'None'
-                utility_partner_3 = 'None'
-                utility_partner_4 = 'None'
-            elif len(util_list) == 1:
-                utility_partner_1 = util_list[0]
-                utility_partner_2 = 'None'
-                utility_partner_3 = 'None'
-                utility_partner_4 = 'None'
-            elif len(util_list) == 2:
-                utility_partner_1 = util_list[0]
-                utility_partner_2 = util_list[1]
-                utility_partner_3 = 'None'
-                utility_partner_4 = 'None'
-            elif len(util_list) == 3:
-                utility_partner_1 = util_list[0]
-                utility_partner_2 = util_list[1]
-                utility_partner_3 = util_list[2]
-                utility_partner_4 = 'None'
-            elif len(util_list) == 4:
-                utility_partner_1 = util_list[0]
-                utility_partner_2 = util_list[1]
-                utility_partner_3 = util_list[2]
-                utility_partner_4 = util_list[3]
+        for i in self.itermove_result:  # This encoding is per move type, allows graphing trends in move selection
+            if self.itermove_result[i] == 'C':
+                move_list.append(1)
+                print()
+            elif self.itermove_result[i] == 'D':
+                move_list.append(2)
 
-            for i in self.itermove_result:  # This encoding is per move type, allows graphing trends in move selection
-                if self.itermove_result[i] == 'C':
-                    move_list.append(1)
-                    print()
-                elif self.itermove_result[i] == 'D':
-                    move_list.append(2)
+        move_partner_1 = 'None'
+        move_partner_2 = 'None'
+        move_partner_3 = 'None'
+        move_partner_4 = 'None'
 
+        if len(move_list) == 0:
             move_partner_1 = 'None'
             move_partner_2 = 'None'
             move_partner_3 = 'None'
             move_partner_4 = 'None'
+        elif len(move_list) == 1:
+            move_partner_1 = move_list[0]
+            move_partner_2 = 'None'
+            move_partner_3 = 'None'
+            move_partner_4 = 'None'
+        elif len(move_list) == 2:
+            move_partner_1 = move_list[0]
+            move_partner_2 = move_list[1]
+            move_partner_3 = 'None'
+            move_partner_4 = 'None'
+        elif len(move_list) == 3:
+            move_partner_1 = move_list[0]
+            move_partner_2 = move_list[1]
+            move_partner_3 = move_list[2]
+            move_partner_4 = 'None'
+        elif len(move_list) == 4:
+            move_partner_1 = move_list[0]
+            move_partner_2 = move_list[1]
+            move_partner_3 = move_list[2]
+            move_partner_4 = move_list[3]
 
-            if len(move_list) == 0:
-                move_partner_1 = 'None'
-                move_partner_2 = 'None'
-                move_partner_3 = 'None'
-                move_partner_4 = 'None'
-            elif len(move_list) == 1:
-                move_partner_1 = move_list[0]
-                move_partner_2 = 'None'
-                move_partner_3 = 'None'
-                move_partner_4 = 'None'
-            elif len(move_list) == 2:
-                move_partner_1 = move_list[0]
-                move_partner_2 = move_list[1]
-                move_partner_3 = 'None'
-                move_partner_4 = 'None'
-            elif len(move_list) == 3:
-                move_partner_1 = move_list[0]
-                move_partner_2 = move_list[1]
-                move_partner_3 = move_list[2]
-                move_partner_4 = 'None'
-            elif len(move_list) == 4:
-                move_partner_1 = move_list[0]
-                move_partner_2 = move_list[1]
-                move_partner_3 = move_list[2]
-                move_partner_4 = move_list[3]
+        strategy_code = 'None'
 
-            strategy_code = 'None'
+        if self.strategy == 'RANDOM':
+            strategy_code = 0
+        elif self.strategy == 'ANGEL':
+            strategy_code = 1
+        elif self.strategy == 'DEVIL':
+            strategy_code = 2
+        elif self.strategy == 'EV':
+            strategy_code = 3
+        elif self.strategy == 'VEV':
+            strategy_code = 4
+        elif self.strategy == 'TFT':
+            strategy_code = 5
+        elif self.strategy == 'VPP':
+            strategy_code = 6
+        elif self.strategy == 'WSLS':
+            strategy_code = 7
 
-            if self.strategy == 'RANDOM':
-                strategy_code = 0
-            elif self.strategy == 'ANGEL':
-                strategy_code = 1
-            elif self.strategy == 'DEVIL':
-                strategy_code = 2
-            elif self.strategy == 'EV':
-                strategy_code = 3
-            elif self.strategy == 'VEV':
-                strategy_code = 4
-            elif self.strategy == 'TFT':
-                strategy_code = 5
-            elif self.strategy == 'VPP':
-                strategy_code = 6
-            elif self.strategy == 'WSLS':
-                strategy_code = 7
+        """ The above will error catch for when agents don't have those values, and will still let us print 
+            to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
 
-            """ The above will error catch for when agents don't have those values, and will still let us print 
-                to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
+        with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+            if self.strategy == "VEV" or "RANDOM":
+                fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
+                              'move_%d' % self.ID,
+                              'probabilities_%d' % self.ID, 'utility_%d' % self.ID, 'common_move_%d' % self.ID,
+                              'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
+                              'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
+                              'p4_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
+                              'u4_%d' % self.ID,
+                              'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID,
+                              'uv_%d' % self.ID,
+                              'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID]
+            #     'p1', 'p2', 'p3', 'p4'
+            else:
+                fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
+                              'move_%d' % self.ID,
+                              'utility_%d' % self.ID, 'common_move_%d' % self.ID, 'number_coop_%d' % self.ID,
+                              'number_defect_%d' % self.ID,
+                              'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
+                              'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID,
+                              'm4_%d' % self.ID, 'uv_%d' % self.ID,
+                              'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-                if self.strategy == "VEV" or "RANDOM":
-                    fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID, 'move_%d' % self.ID,
-                                  'probabilities_%d' % self.ID, 'utility_%d' % self.ID, 'common_move_%d' % self.ID,
-                                  'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
-                                  'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
-                                  'p4_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID, 'u4_%d' % self.ID,
-                                  'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID,
-                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID]
-                #     'p1', 'p2', 'p3', 'p4'
-                else:
-                    fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID, 'move_%d' % self.ID,
-                                  'utility_%d' % self.ID, 'common_move_%d' % self.ID, 'number_coop_%d' % self.ID,
-                                  'number_defect_%d' % self.ID,
-                                  'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
-                                  'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID, 'uv_%d' % self.ID,
-                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID]
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            # moves = []
+            # for i in self.move:
+            #     moves.append(self.move[i])
 
-                # moves = []
-                # for i in self.move:
-                #     moves.append(self.move[i])
+            if self.stepCount == 1:
+                writer.writeheader()
 
-                if self.stepCount == 1:
-                    writer.writeheader()
-
-                if self.strategy == "VEV" or "RANDOM":
-                    writer.writerow(
-                        {'stepcount_%d' % self.ID: self.stepCount, 'strategy_%d' % self.ID: self.strategy, 'strat code_%d' % self.ID: strategy_code,
-                         'move_%d' % self.ID: self.itermove_result, 'probabilities_%d' % self.ID: self.ppD_partner,
-                         'utility_%d' % self.ID: self.score,
-                         'common_move_%d' % self.ID: self.common_move, 'number_coop_%d' % self.ID: self.number_of_c,
-                         'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'p1_%d' % self.ID: ppd_partner_1,
-                        'p2_%d' % self.ID: ppd_partner_2, 'p3_%d' % self.ID: ppd_partner_3, 'p4_%d' % self.ID: ppd_partner_4,
-                         'u1_%d' % self.ID: utility_partner_1, 'u2_%d' % self.ID: utility_partner_2,
-                         'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
-                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4,
-                         'uv_%d' % self.ID: self.update_value, 'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c,
-                         'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners})
-                #
-                else:
-                    writer.writerow(
-                        {'stepcount_%d' % self.ID: self.stepCount, 'strategy_%d' % self.ID: self.strategy, 'strat code_%d' % self.ID: strategy_code,
-                         'move_%d' % self.ID: self.itermove_result, 'utility_%d' % self.ID: self.score,
-                         'common_move_%d' % self.ID: self.common_move, 'number_coop_%d' % self.ID: self.number_of_c,
-                         'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'u1_%d' % self.ID: utility_partner_1,
-                         'u2': utility_partner_2, 'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
-                         'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value,
-<<<<<<< HEAD
-                         'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c, 'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners})
-=======
-                         'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c, 'mutC_%d' % self.ID: self.mutual_c_outcome,
-                         'simP_%d' % self.ID: self.similar_partners})
->>>>>>> cooperative_bias
+            if self.strategy == "VEV" or "RANDOM":
+                writer.writerow(
+                    {'stepcount_%d' % self.ID: self.stepCount, 'strategy_%d' % self.ID: self.strategy,
+                     'strat code_%d' % self.ID: strategy_code,
+                     'move_%d' % self.ID: self.itermove_result, 'probabilities_%d' % self.ID: self.ppD_partner,
+                     'utility_%d' % self.ID: self.score,
+                     'common_move_%d' % self.ID: self.common_move, 'number_coop_%d' % self.ID: self.number_of_c,
+                     'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes,
+                     'p1_%d' % self.ID: ppd_partner_1,
+                     'p2_%d' % self.ID: ppd_partner_2, 'p3_%d' % self.ID: ppd_partner_3,
+                     'p4_%d' % self.ID: ppd_partner_4,
+                     'u1_%d' % self.ID: utility_partner_1, 'u2_%d' % self.ID: utility_partner_2,
+                     'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4,
+                     'm1_%d' % self.ID: move_partner_1,
+                     'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3,
+                     'm4_%d' % self.ID: move_partner_4,
+                     'uv_%d' % self.ID: self.update_value, 'wm_%d' % self.ID: self.working_memory,
+                     'nc_%d' % self.ID: self.number_of_c,
+                     'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners})
+            #
+            else:
+                writer.writerow(
+                    {'stepcount_%d' % self.ID: self.stepCount, 'strategy_%d' % self.ID: self.strategy,
+                     'strat code_%d' % self.ID: strategy_code,
+                     'move_%d' % self.ID: self.itermove_result, 'utility_%d' % self.ID: self.score,
+                     'common_move_%d' % self.ID: self.common_move, 'number_coop_%d' % self.ID: self.number_of_c,
+                     'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes,
+                     'u1_%d' % self.ID: utility_partner_1,
+                     'u2': utility_partner_2, 'u3_%d' % self.ID: utility_partner_3,
+                     'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
+                     'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3,
+                     'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value,
+                     'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c,
+                     'mutC_%d' % self.ID: self.mutual_c_outcome,
+                     'simP_%d' % self.ID: self.similar_partners})
 
     def reset_values(self):
         self.number_of_d = 0
@@ -1045,3 +1008,4 @@ class PDAgent(Agent):
             self.score += round_payoffs
             # print("My total overall score is:", self.score)
             return
+        
