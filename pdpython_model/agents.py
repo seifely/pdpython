@@ -17,8 +17,19 @@ from math import ceil
     WSLS - Win Stay Lose Switch """
 
 class PDAgent(Agent):
+<<<<<<< HEAD
     def __init__(self, pos, model, stepcount=0, pick_strat="RDISTRO", strategy=None, starting_move=None,
                  memory_sys=True):
+=======
+    def __init__(self, pos, model,
+                 stepcount=0,
+                 pick_strat="RDISTRO",
+                 strategy=None,
+                 starting_move=None,
+                 checkerboard=False,
+                 lineplace=False,
+                 ):
+>>>>>>> cooperative_bias
         super().__init__(pos, model)
         """ To set a heterogeneous strategy for all agents to follow, use strategy. If agents 
             are to spawn along a distribution, set number of strategy types, or with
@@ -32,7 +43,12 @@ class PDAgent(Agent):
         self.filename = ('%s agent %d.csv' % (self.model.exp_n, self.ID), "a")
         self.previous_moves = []
         self.pickstrat = pick_strat
+<<<<<<< HEAD
         self.memory_sys = memory_sys
+=======
+        self.checkerboard = checkerboard
+        self.lineplace = lineplace
+>>>>>>> cooperative_bias
 
         self.update_values = {}
         self.update_value = 0.015
@@ -102,7 +118,7 @@ class PDAgent(Agent):
 
     def set_defaults(self, ids):
         for i in ids:
-            self.ppD_partner[i] = 0.5
+            self.ppD_partner[i] = 0.1
 
     # def pattern_detector(self, input_list):
     #     """ This isn't learning, it's a small, imprecise detector for history of consistency in behaviour.
@@ -137,10 +153,96 @@ class PDAgent(Agent):
             """ This is for having x agents start on y strategy and the remaining p agents
                 start on q strategy """
 
-        elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "TFT"]
-            strat = random.choice(choices)
-            return str(strat)
+        elif self.pickstrat == "RDISTRO": # Random Distribution of the two selected strategies
+            choices = ["VPP", "WSLS"]
+            if not self.checkerboard:
+                if not self.lineplace:
+                    strat = random.choice(choices)
+                    return str(strat)
+                elif self.lineplace:
+                        if len(choices) == 2:
+                            if (self.ID % 2) == 0:
+                                strat = choices[0]
+                                return str(strat)
+                            else:
+                                strat = choices[1]
+                                return str(strat)
+                        elif len(choices) == 3:
+                            # make choices into a popped queue, take the front most and then add it in at the back after
+                            # choosing
+                            return
+            elif self.checkerboard:
+                print("My ID is...", self.ID)
+                if len(choices) == 2:
+                    check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
+                               42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
+                    check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
+                               43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
+                    if self.ID in check_a:
+                        strat = choices[0]
+                        return str(strat)
+                    elif self.ID in check_b:
+                        strat = choices[1]
+                        return str(strat)
+
+                    # if (self.ID % 2) == 0:
+                    #     if self.ID >= 1 and self.ID < 9:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #     elif self.ID >= 9 and self.ID < 17:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #     elif self.ID >= 17 and self.ID < 25:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #     elif self.ID >= 25 and self.ID < 33:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #     elif self.ID >= 33 and self.ID < 41:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #     elif self.ID >= 41 and self.ID < 49:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #     elif self.ID >= 49 and self.ID < 57:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[0]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #     elif self.ID >= 57:
+                    #         if (self.ID % 2) == 0:
+                    #             strat = choices[1]
+                    #             return str(strat)
+                    #         else:
+                    #             strat = choices[0]
+                    #             return str(strat)
+
 
     def change_strategy(self):
         return
@@ -440,6 +542,9 @@ class PDAgent(Agent):
                     if self.per_partner_utility.get(partner_ID) is None:
                         self.per_partner_utility[partner_ID] = 0
 
+                    if self.per_partner_strategies.get(partner_ID) is None:
+                        self.per_partner_strategies[partner_ID] = partner_strategy
+
                     if self.update_values.get(partner_ID) is None:  # add in default update value per partner
                         self.update_values[partner_ID] = 0.01  # this has to happen before change update value occurs!!
 
@@ -451,6 +556,7 @@ class PDAgent(Agent):
                     """
                     current_uv = self.update_value
 
+<<<<<<< HEAD
                     if self.memory_sys:
                         if self.working_memory.get(partner_ID) is None:
                             self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
@@ -488,6 +594,43 @@ class PDAgent(Agent):
 
                         if partner_ID not in self.partner_IDs:
                             self.partner_IDs.append(partner_ID)
+=======
+                    if self.working_memory.get(partner_ID) is None:
+                        self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
+                    else:
+                        current_partner = self.working_memory.pop(partner_ID)
+                        # first, check if it has more than three values
+                        if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
+                            current_partner.append(partner_move)
+                        elif len(current_partner) == self.delta:
+                            current_partner.pop(0)
+                            current_partner.append(partner_move)  # we have the updated move list for that partner here
+                            current_uv = self.update_values[partner_ID]
+                                             # for now, let's add the evaluation of a partner's treatment of us here
+                        # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
+                        #     print("Gonna update my UV!", self.update_value)
+                            self.update_value = self.update_value + self.change_update_value(current_partner)
+
+                        # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
+                        #     print("I updated it!", self.update_value)
+
+                        self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
+
+                    # First, check if we have a case file on them in each memory slot
+                    if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
+                        self.partner_moves[partner_ID] = []
+                        # print("partner moves dict:", self.partner_moves)
+                        self.partner_moves[partner_ID].append(partner_move)
+                        # print("partner moves dict2:", self.partner_moves)
+                    else:
+                        self.partner_moves[partner_ID].append(partner_move)
+                        # print("My partner's moves have been:", self.partner_moves)
+                        """ We should repeat the above process for the other memory fields too, like 
+                        partner's gathered utility """
+
+                    if partner_ID not in self.partner_IDs:
+                        self.partner_IDs.append(partner_ID)
+>>>>>>> cooperative_bias
 
     def increment_score(self, payoffs):
         total_utility = 0
@@ -740,7 +883,12 @@ class PDAgent(Agent):
                          'number_defect_%d' % self.ID: self.number_of_d, 'outcomes_%d' % self.ID: outcomes, 'u1_%d' % self.ID: utility_partner_1,
                          'u2': utility_partner_2, 'u3_%d' % self.ID: utility_partner_3, 'u4_%d' % self.ID: utility_partner_4, 'm1_%d' % self.ID: move_partner_1,
                          'm2_%d' % self.ID: move_partner_2, 'm3_%d' % self.ID: move_partner_3, 'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value,
+<<<<<<< HEAD
                          'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c, 'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners})
+=======
+                         'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c, 'mutC_%d' % self.ID: self.mutual_c_outcome,
+                         'simP_%d' % self.ID: self.similar_partners})
+>>>>>>> cooperative_bias
 
     def reset_values(self):
         self.number_of_d = 0
