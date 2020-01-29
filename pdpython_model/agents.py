@@ -57,7 +57,6 @@ class PDAgent(Agent):
             self.move = self.random.choice(["C", "D"])
 
         self.payoffs = self.model.payoffs
-        # pull in the payoff matrix (same for all agents IF WE ASSUME ALL AGENTS HAVE EQUAL PAYOFFS)
 
         # ------------------------ LOCAL MEMORY --------------------------
         self.partner_IDs = []
@@ -112,27 +111,6 @@ class PDAgent(Agent):
         for i in ids:
             self.ppD_partner[i] = 0.1
 
-    # def pattern_detector(self, input_list):
-    #     """ This isn't learning, it's a small, imprecise detector for history of consistency in behaviour.
-    #         It returns true if, in over half the instances of the memory list, point-to-point repeated behaviour was
-    #         detected over two rounds. ONLY USEFUL FOR SMALL MEMORIES. """
-    #     list_len = len(input_list)
-    #     repeated_behaviour = 0
-    #     non_repeated_behaviour = 0
-    #
-    #     for i in input_list:
-    #         if i != 0:
-    #             if input_list[i] != input_list[i - 1]:
-    #                 non_repeated_behaviour += 1
-    #             else:
-    #                 repeated_behaviour += 1
-    #
-    #     if repeated_behaviour >= ceil(list_len/2):
-    #         # some behavioural consistency
-    #         return True
-    #     else:
-    #         return False
-
     def pick_strategy(self):
         """ This is an initial strategy selector for agents """
 
@@ -176,64 +154,6 @@ class PDAgent(Agent):
                     elif self.ID in check_b:
                         strat = choices[1]
                         return str(strat)
-
-                    # if (self.ID % 2) == 0:
-                    #     if self.ID >= 1 and self.ID < 9:
-                    #         if (self.ID % 2) == 0:
-                    #             strat = choices[0]
-                    #             return str(strat)
-                    #         else:
-                    #             strat = choices[1]
-                    #             return str(strat)
-                    #     elif self.ID >= 9 and self.ID < 17:
-                    #         if (self.ID % 2) == 0:
-                    #             strat = choices[1]
-                    #             return str(strat)
-                    #         else:
-                    #             strat = choices[0]
-                    #             return str(strat)
-                    #     elif self.ID >= 17 and self.ID < 25:
-                    #         if (self.ID % 2) == 0:
-                    #             strat = choices[0]
-                    #             return str(strat)
-                    #         else:
-                    #             strat = choices[1]
-                    #             return str(strat)
-                    #     elif self.ID >= 25 and self.ID < 33:
-                    #         if (self.ID % 2) == 0:
-                    #             strat = choices[1]
-                    #             return str(strat)
-                    #         else:
-                    #             strat = choices[0]
-                    #             return str(strat)
-                    #     elif self.ID >= 33 and self.ID < 41:
-                    #         if (self.ID % 2) == 0:
-                    #             strat = choices[0]
-                    #             return str(strat)
-                    #         else:
-                    #             strat = choices[1]
-                    #             return str(strat)
-                    #     elif self.ID >= 41 and self.ID < 49:
-                    #         if (self.ID % 2) == 0:
-                    #             strat = choices[1]
-                    #             return str(strat)
-                    #         else:
-                    #             strat = choices[0]
-                    #             return str(strat)
-                    #     elif self.ID >= 49 and self.ID < 57:
-                    #         if (self.ID % 2) == 0:
-                    #             strat = choices[0]
-                    #             return str(strat)
-                    #         else:
-                    #             strat = choices[1]
-                    #             return str(strat)
-                    #     elif self.ID >= 57:
-                    #         if (self.ID % 2) == 0:
-                    #             strat = choices[1]
-                    #             return str(strat)
-                    #         else:
-                    #             strat = choices[0]
-                    #             return str(strat)
 
     def change_strategy(self):
         return
@@ -451,12 +371,6 @@ class PDAgent(Agent):
 
         numberC = partner_behaviour.count('C')
         numberD = partner_behaviour.count('D')
-        # print("Number of C is", numberC)
-        # print("Number of D is", numberD)
-        #
-        #
-        #
-        #
 
         # print("My partner did:", partner_behaviour)
         if partner_behaviour == ['C', 'D', 'C']:  # Higher Value to Break Potential Cycles
@@ -890,6 +804,7 @@ class PDAgent(Agent):
             self.common_move = commonest_move[:1]
 
     def step(self):
+        self.reset_values()
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
         if self.stepCount == 1:
             # self.strategy = self.pick_strategy()
@@ -995,10 +910,11 @@ class PDAgent(Agent):
         self.check_partner()  # Update Knowledge
         round_payoffs = self.increment_score(self.payoffs)
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
+
         self.output_data_to_model()
         if self.model.collect_data:
             self.output_data_to_file(self.outcome_list)
-        self.reset_values()
+
 
         self.stepCount += 1
 
