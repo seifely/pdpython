@@ -171,6 +171,7 @@ model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of A
                 "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),
                 "b": UserSettableParameter('number', 'Simplified Payoffs: Benefit of Co-op', value=4),
                 "c": UserSettableParameter('number', 'Simplified Payoffs: Cost of Co-op', value=1),
+
                 }
 
 chart_element = ChartModule([{"Label": "Cooperations", "Color": RICH_COLOR},

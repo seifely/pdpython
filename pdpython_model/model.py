@@ -170,8 +170,10 @@ def get_wsls_cooperations(model):
 
 def track_params(model):
     return (model.number_of_agents,
-            model.rich_threshold,
-            model.reserve_percent)
+            model.gamma,
+            #model.learning_rate
+            model.init_ppD,
+            )
 
 
 class PDModel(Model):
@@ -193,7 +195,10 @@ class PDModel(Model):
                  DC=2,
                  simplified_payoffs=False,
                  b=0,
-                 c=0,):
+                 c=0,
+                 learning_rate = 1,
+                 gamma = 0.015,
+                 init_ppD = 0.1):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -206,6 +211,9 @@ class PDModel(Model):
         self.DC = DC
         self.b = b
         self.c = c
+        self.gamma = gamma
+        self.init_ppD = init_ppD
+        self.learning_rate = learning_rate
         self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
         self.randspawn = randspawn

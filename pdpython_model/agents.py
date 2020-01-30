@@ -20,7 +20,7 @@ from math import ceil
 class PDAgent(Agent):
     def __init__(self, pos, model,
                  stepcount=0,
-                 pick_strat="RDISTRO",
+                 pick_strat="RANDOM",
                  strategy=None,
                  starting_move=None,
                  checkerboard=False,
@@ -43,10 +43,11 @@ class PDAgent(Agent):
         self.lineplace = lineplace
 
         self.update_values = {}
-        self.update_value = 0.015
-        self.gamma = 0.015  # uv we manipulate
+        self.update_value = 0.015  # this is the value that will change each turn
+        self.gamma = 0.015  # uv we manipulate, stays static
         self.delta = 3  # max memory size
-        self.init_uv = self.gamma
+        self.init_uv = self.model.gamma
+        self.init_ppD = model.init_ppD
 
         self.move = None
         self.next_move = None
@@ -109,7 +110,7 @@ class PDAgent(Agent):
 
     def set_defaults(self, ids):
         for i in ids:
-            self.ppD_partner[i] = 0.1
+            self.ppD_partner[i] = self.model.init_ppD
 
     def pick_strategy(self):
         """ This is an initial strategy selector for agents """
@@ -124,7 +125,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "TFT"]
+            choices = ["VPP", "VPP"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
@@ -450,7 +451,7 @@ class PDAgent(Agent):
                         self.per_partner_strategies[partner_ID] = partner_strategy
 
                     if self.update_values.get(partner_ID) is None:  # add in default update value per partner
-                        self.update_values[partner_ID] = 0.01  # this has to happen before change update value occurs!!
+                        self.update_values[partner_ID] = self.init_uv  # this has to happen before change update value occurs!!
 
                     """ Below is the code for adding to and/or updating self.working_memory.
                      if WM does not have a key for current partner's ID in it, we open one
