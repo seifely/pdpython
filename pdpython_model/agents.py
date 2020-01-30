@@ -124,7 +124,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "WSLS"]
+            choices = ["VPP", "TFT"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)

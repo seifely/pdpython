@@ -54,13 +54,124 @@ def get_defectors(model):
 
     return D_count
 
-def strategy_performances(model):
+def get_tft_performance(model):
+    """ For acquiring the sum total performance of a strategy"""
+
     # get the list of agent
     strategy = [a.strategy for a in model.schedule.agents]
     # get the list of agent performances
     scores = [a.score for a in model.schedule.agents]
     # for each in that list, when strategy = x y z, sum their number to a value
-    return
+    agent_scores = []
+    for i in strategy:
+            if i == "TFT":
+                indices = strategy.index(i)
+                agent = scores[indices]
+                agent_scores.append(agent)
+
+    if sum(agent_scores) != 0:
+        print("tft scored", sum(agent_scores))
+    return sum(agent_scores)
+
+def get_tft_cooperations(model):
+    """ For acquiring the sum total cooperations of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    coops = [a.number_of_c for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_coops = []
+    for i in strategy:
+            if i == "TFT":
+                indices = strategy.index(i)
+                agent = coops[indices]
+                agent_coops.append(agent)
+
+    if sum(agent_coops) != 0:
+        print("tft cooped", sum(agent_coops))
+    return sum(agent_coops)
+
+def get_vpp_performance(model):
+    """ For acquiring the sum total performance of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    scores = [a.score for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_scores = []
+    for i in strategy:
+            if i == "VPP":
+                indices = strategy.index(i)
+                agent = scores[indices]
+                agent_scores.append(agent)
+
+    if sum(agent_scores) != 0:
+        print("vpp scored", sum(agent_scores))
+    return sum(agent_scores)
+
+def get_vpp_cooperations(model):
+    """ For acquiring the sum total cooperations of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    coops = [a.number_of_c for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_coops = []
+    for i in strategy:
+            if i == "VPP":
+                indices = strategy.index(i)
+                agent = coops[indices]
+                agent_coops.append(agent)
+
+    if sum(agent_coops) != 0:
+        print("vpp cooped", sum(agent_coops))
+    return sum(agent_coops)
+
+def get_wsls_performance(model):
+    """ For acquiring the sum total performance of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    scores = [a.score for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_scores = []
+    for i in strategy:
+            if i == "WSLS":
+                indices = strategy.index(i)
+                agent = scores[indices]
+                agent_scores.append(agent)
+
+    if sum(agent_scores) != 0:
+        print("wsls scored", sum(agent_scores))
+    return sum(agent_scores)
+
+def get_wsls_cooperations(model):
+    """ For acquiring the sum total cooperations of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    coops = [a.number_of_c for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_coops = []
+    for i in strategy:
+            if i == "WSLS":
+                indices = strategy.index(i)
+                agent = coops[indices]
+                agent_coops.append(agent)
+
+    if sum(agent_coops) != 0:
+        print("wsls cooped", sum(agent_coops))
+    return sum(agent_coops)
+
+def track_params(model):
+    return (model.number_of_agents,
+            model.rich_threshold,
+            model.reserve_percent)
 
 
 class PDModel(Model):
@@ -126,13 +237,6 @@ class PDModel(Model):
         self.agentIDs = list(range(1, (number_of_agents + 1)))
 
 
-
-        # self.datacollector = DataCollector({
-        #     "Cooperating_Agents":
-        #         lambda m: len([a for a in m.schedule.agents if a.common_move == "C"])
-        # })
-        # self.cooperating_agents = lambda m: len([a for a in m.schedule.agents if a.common_move == "C"])
-
         # ----- Storage -----
         self.agents_cooperating = 0
         self.agents_defecting = 0
@@ -147,6 +251,13 @@ class PDModel(Model):
             "Defections": get_num_defect_agents,
             "Cooperators": get_cooperators,
             "Defectors": get_defectors,
+            "TFT Performance": get_tft_performance,
+            "TFT Cooperations": get_tft_cooperations,
+            "VPP Performance": get_vpp_performance,
+            "VPP Cooperations": get_vpp_cooperations,
+            "WSLS Performance": get_wsls_performance,
+            "WSLS Cooperations": get_wsls_cooperations,
+            "Model Params": track_params,
             },
             agent_reporters={
                  "Cooperations": lambda x: x.number_of_c,
