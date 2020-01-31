@@ -36,7 +36,7 @@ def get_cooperators(model):
     for i in agent_behav_types:
         current_agent = i
 
-        if current_agent == "C":
+        if current_agent == ['C']:
             C_count += 1
 
     return C_count
@@ -49,7 +49,7 @@ def get_defectors(model):
     for i in agent_behav_types:
         current_agent = i
 
-        if current_agent == "D":
+        if current_agent == ['D']:
             D_count += 1
 
     return D_count
@@ -231,7 +231,7 @@ class PDModel(Model):
             # filenumber = filenumber[3:]
             filenumber = int(filenumber)
             self.iteration_n = filenumber
-            self.new_filenumber = [filenumber - 1]
+            self.new_filenumber = [filenumber + 1]
 
         with open('filename_number.csv', 'w') as f:
             # Overwrite the old file with the modified rows

@@ -38,7 +38,7 @@ def get_cooperators(model):
     for i in agent_behav_types:
         current_agent = i
 
-        if current_agent == "C":
+        if current_agent == ['C']:
             C_count += 1
 
     return C_count
@@ -50,8 +50,8 @@ def get_defectors(model):
     agent_behav_types = [a.common_move for a in model.schedule.agents]
     for i in agent_behav_types:
         current_agent = i
-
-        if current_agent == "D":
+        print(current_agent)
+        if current_agent == ['D']:
             D_count += 1
 
     return D_count
@@ -235,7 +235,7 @@ class PDModel(Model):
             # filenumber = filenumber[3:]
             filenumber = int(filenumber)
             self.iteration_n = filenumber
-            self.new_filenumber = [filenumber - 1]
+            self.new_filenumber = [filenumber + 1]
 
         with open('filename_number.csv', 'w') as f:
             # Overwrite the old file with the modified rows
@@ -382,11 +382,12 @@ br_params = {"number_of_agents": [64],
             "gamma": [0.001, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.1]}
+            "init_ppD": [0.1, #0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09
+                         ]}
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=2,
+                 iterations=1,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
