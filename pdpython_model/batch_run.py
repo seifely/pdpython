@@ -50,7 +50,6 @@ def get_defectors(model):
     agent_behav_types = [a.common_move for a in model.schedule.agents]
     for i in agent_behav_types:
         current_agent = i
-        print(current_agent)
         if current_agent == ['D']:
             D_count += 1
 
