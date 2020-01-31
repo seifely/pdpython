@@ -217,7 +217,31 @@ class PDModel(Model):
         self.simplified_payoffs = simplified_payoffs
         self.rounds = rounds
         self.randspawn = randspawn
-        self.exp_n = 'scale2_wsls_8x8_no_25'
+        self.iteration_n = 0
+        self.new_filenumber = 0
+
+        with open('filename_number.csv', 'r') as f:
+            reader = csv.reader(f)  # pass the file to our csv reader
+            rows = []
+            for row in reader:
+                rows.append(row)
+
+            filenumber = rows[0]
+            filenumber = filenumber[0]
+            # filenumber = filenumber[3:]
+            filenumber = int(filenumber)
+            self.iteration_n = filenumber
+            self.new_filenumber = [filenumber - 1]
+
+        with open('filename_number.csv', 'w') as f:
+            # Overwrite the old file with the modified rows
+            writer = csv.writer(f)
+            writer.writerow(self.new_filenumber)
+
+        # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
+        concatenator = ('scale2_wsls_8x8_no_25_%s' % (self.iteration_n), "a")
+        self.exp_n = concatenator[0]
+
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
         self.schedule_type = schedule_type
         if not self.simplified_payoffs:

@@ -20,7 +20,7 @@ from math import ceil
 class PDAgent(Agent):
     def __init__(self, pos, model,
                  stepcount=0,
-                 pick_strat="RANDOM",
+                 pick_strat="RDISTRO",
                  strategy=None,
                  starting_move=None,
                  checkerboard=False,
@@ -125,7 +125,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "VPP"]
+            choices = ["VPP", "WSLS", "TFT"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
