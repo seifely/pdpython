@@ -323,6 +323,22 @@ class PDModel(Model):
         #         writer.writeheader()
         #     writer.writerow({'stepcount': self.step_count, 'agent_strategy': self.agent_list})
 
+    def get_memory_states(self, behaviours):
+        """ Get a list of all possible states given n behaviour options and
+            r spaces in the agent's memory - CURRENTLY: 7
+            I'm using this method which may be inefficient because I couldn't find
+            an in-built function for permutations of r>n where order is important
+            and repetition is allowed... """
+        options = behaviours
+        permutations = []
+        for i1 in options:
+            for i2 in options:
+                for i3 in options:
+                    for i4 in options:
+                        for i5 in options:
+                            for i6 in options:
+                                for i7 in options:
+                                    permutations.append([i1, i2, i3, i4, i5, i6, i7])
 
 
     def reset_values(self):

@@ -3,6 +3,7 @@ import random
 import csv
 import time
 from math import ceil
+import itertools
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
