@@ -160,7 +160,7 @@ step_element = StepCountDisplay()
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
 model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 64, 2, 64, 1),
-                "rounds": UserSettableParameter('slider', 'Number of Rounds', 250,1,500,10),
+                "rounds": UserSettableParameter('slider', 'Number of Rounds', 2000,1,3000,10),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', False),
                 "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),
                 "CC": UserSettableParameter('number', 'Payoff for C-C (Default: 3)', value=1.5),

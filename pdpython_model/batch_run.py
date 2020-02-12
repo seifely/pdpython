@@ -186,7 +186,7 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=64,
                  schedule_type="Simultaneous",
-                 rounds=250,
+                 rounds=2000,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=True,
@@ -371,7 +371,7 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=200):
+    def run_model(self, rounds=2000):
         for i in range(self.rounds):
             self.step()
 
@@ -387,7 +387,7 @@ br_params = {"number_of_agents": [64],
 br = BatchRunner(PDModel,
                  br_params,
                  iterations=1,
-                 max_steps=250,
+                 max_steps=2000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

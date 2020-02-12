@@ -185,7 +185,7 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=64,
                  schedule_type="Simultaneous",
-                 rounds=250,
+                 rounds=2000,
                  collect_data=False,
                  agent_printing=False,
                  randspawn=True,
@@ -296,6 +296,7 @@ class PDModel(Model):
                  "Defections": lambda x: x.number_of_d
                 })
 
+        self.get_memory_states(['C', 'D'])
         self.make_agents()
         self.running = True
         self.datacollector.collect(self)
@@ -340,6 +341,12 @@ class PDModel(Model):
                                 for i7 in options:
                                     permutations.append([i1, i2, i3, i4, i5, i6, i7])
 
+        return permutations
+
+
+    def get_state_values(self, states):
+
+        return # hopefully a P matrix of reward values
 
     def reset_values(self):
         # self.agents_defecting = 0
@@ -383,6 +390,6 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=200):
+    def run_model(self, rounds=2000):
         for i in range(self.rounds):
             self.step()
