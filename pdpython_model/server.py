@@ -6,9 +6,9 @@ from pdpython_model.agents import PDAgent
 from pdpython_model.model import PDModel
 
 # Green
-RICH_COLOR = "#007f7f"
+C_COLOR = "#007f7f"
 # Red
-POOR_COLOR = "#ce0e2d"
+D_COLOR = "#ce0e2d"
 # Blue
 MID_COLOR = "#ffc0cb"
 
@@ -35,9 +35,9 @@ def gen_Model_Portrayal(agent):
 
         # set agent color based on savings and loans
         if agent.common_move == ["C"]:
-            color = RICH_COLOR
+            color = C_COLOR
         if agent.common_move == ["D"]:
-            color = POOR_COLOR
+            color = D_COLOR
         if agent.common_move == ["Eq"]:
             color = MID_COLOR
 
@@ -174,8 +174,8 @@ model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of A
 
                 }
 
-chart_element = ChartModule([{"Label": "Cooperations", "Color": RICH_COLOR},
-                             {"Label": "Defections", "Color": POOR_COLOR}])
+chart_element = ChartModule([{"Label": "Cooperations", "Color": C_COLOR},
+                             {"Label": "Defections", "Color": D_COLOR}])
 
 server = ModularServer(PDModel, [canvas_element, step_element, chart_element], "Prisoner's Dilemma Simulation", model_params)
 server.port = 8521

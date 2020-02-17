@@ -333,6 +333,14 @@ class PDAgent(Agent):
                 self.wsls_failed = False
                 return my_move
 
+
+        elif strategy == "iWSLS":
+            """ This strategy picks C in the first turn, and then changes its move only if it 'loses'. 
+                            - this is as alternative implementation of the previous WSLS strategy to 
+                             check if it was performing as the lit suggests."""
+
+            
+
         elif strategy == "VPP":
             ppD = self.ppD_partner[id]
             ppC = 1 - self.ppD_partner[id]
