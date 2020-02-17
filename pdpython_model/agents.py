@@ -129,7 +129,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "WSLS", "TFT"]
+            choices = ["TFT", "WSLS", "iWSLS"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
@@ -352,8 +352,22 @@ class PDAgent(Agent):
                 self.number_of_c += 1
                 return "C"
 
-            aspiration_level = 0
-            return
+            my_move = self.itermove_result[id]
+            this_partner_move = self.partner_latest_move[id]
+            # outcome = [my_move, this_partner_move]
+
+            payoffs = self.payoffs
+            outcome_payoff = payoffs[my_move, this_partner_move]
+
+            aspiration_level = 1
+
+            if outcome_payoff >= aspiration_level:
+                if my_move == "C":
+                    return "D"
+                if my_move == "D":
+                    return "C"
+            else:
+                return my_move
 
         elif strategy == "VPP":
             ppD = self.ppD_partner[id]
@@ -443,7 +457,7 @@ class PDAgent(Agent):
 
         """" Now need to decide what the boundaries are for changing update value 
             based on this state value that is returned... """
-        return 3
+        # RESUME WORK HERE and
 
 
         # elif not consistency:
@@ -504,27 +518,27 @@ class PDAgent(Agent):
                      after it is updated and checked, we send it back to working memory
                     """
                     current_uv = self.update_value
+                    if self.strategy == "VPP":
+                        if self.working_memory.get(partner_ID) is None:
+                            self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
+                        else:
+                            current_partner = self.working_memory.pop(partner_ID)
+                            # first, check if it has more than three values
+                            if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
+                                current_partner.append(partner_move)
+                            elif len(current_partner) == self.delta:
+                                current_partner.pop(0)
+                                current_partner.append(partner_move)  # we have the updated move list for that partner here
+                                current_uv = self.update_values[partner_ID]
+                                # for now, let's add the evaluation of a partner's treatment of us here
+                                # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
+                                #     print("Gonna update my UV!", self.update_value)
+                                self.update_value = self.update_value + self.change_update_value(current_partner)
 
-                    if self.working_memory.get(partner_ID) is None:
-                        self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
-                    else:
-                        current_partner = self.working_memory.pop(partner_ID)
-                        # first, check if it has more than three values
-                        if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
-                            current_partner.append(partner_move)
-                        elif len(current_partner) == self.delta:
-                            current_partner.pop(0)
-                            current_partner.append(partner_move)  # we have the updated move list for that partner here
-                            current_uv = self.update_values[partner_ID]
-                            # for now, let's add the evaluation of a partner's treatment of us here
-                            # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                            #     print("Gonna update my UV!", self.update_value)
-                            self.update_value = self.update_value + self.change_update_value(current_partner)
+                            # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
+                            #     print("I updated it!", self.update_value)
 
-                        # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
-                        #     print("I updated it!", self.update_value)
-
-                        self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
+                            self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
 
                     # First, check if we have a case file on them in each memory slot
                     if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
