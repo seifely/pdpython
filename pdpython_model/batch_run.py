@@ -300,6 +300,8 @@ class PDModel(Model):
                  "Defections": lambda x: x.number_of_d
                 })
 
+        self.memory_states = self.get_memory_states(['C', 'D'])
+        self.state_values = self.state_evaluation(self.memory_states)
         self.make_agents()
         self.running = True
         self.datacollector.collect(self)
@@ -327,7 +329,78 @@ class PDModel(Model):
         #         writer.writeheader()
         #     writer.writerow({'stepcount': self.step_count, 'agent_strategy': self.agent_list})
 
+    def get_memory_states(self, behaviours):
+        """ Get a list of all possible states given n behaviour options and
+            r spaces in the agent's memory - CURRENTLY: 7  """
+        options = behaviours
+        permutations = []
+        for i1 in options:
+            for i2 in options:
+                for i3 in options:
+                    for i4 in options:
+                        for i5 in options:
+                            for i6 in options:
+                                for i7 in options:
+                                    permutations.append([i1, i2, i3, i4, i5, i6, i7])
 
+        # to generate the < step 7 states
+        initial_state1 = [0, 0, 0, 0, 0, 0]
+        initial_state2 = [0, 0, 0, 0, 0]
+        initial_state3 = [0, 0, 0, 0]
+        initial_state4 = [0, 0, 0]
+        initial_state5 = [0, 0]
+        initial_state6 = [0]
+
+        for ii1 in options:
+            new = initial_state1 + [ii1]
+            permutations.append(new)
+        for ii2 in options:
+            for iii2 in options:
+                new = initial_state2 + [ii2] + [iii2]
+                permutations.append(new)
+        for ii3 in options:
+            for iii3 in options:
+                for iiii3 in options:
+                    new = initial_state3 + [ii3] + [iii3] + [iiii3]
+                    permutations.append(new)
+        for ii4 in options:
+            for iii4 in options:
+                for iiii4 in options:
+                    for iiiii4 in options:
+                        new = initial_state4 + [ii4] + [iii4] + [iiii4] + [iiiii4]
+                        permutations.append(new)
+        for ii5 in options:
+            for iii5 in options:
+                for iiii5 in options:
+                    for iiiii5 in options:
+                        for iiiiii5 in options:
+                            new = initial_state5 + [ii5] + [iii5] + [iiii5] + [iiiii5] + [iiiiii5]
+                            permutations.append(new)
+        for ii6 in options:
+            for iii6 in options:
+                for iiii6 in options:
+                    for iiiii6 in options:
+                        for iiiiii6 in options:
+                            for iiiiiii6 in options:
+                                new = initial_state6 + [ii6] + [iii6] + [iiii6] + [iiiii6] + [iiiiii6] + [iiiiiii6]
+                                permutations.append(new)
+        return permutations
+
+    def state_evaluation(self, state_list):
+        state_value = []
+        for i in state_list:
+            current_value = 0
+            for j in range(len(i)):
+                item = i[j]
+                # print("Array", i, "Index", j, "Item", item)
+                if item == 'C':
+                    current_value = current_value + (1 * j)  # Slight bias towards cooperation
+                if item == 'D':
+                    current_value = current_value - (1 * j)
+                if item == 0:
+                    current_value = current_value
+            state_value.append(current_value)
+        return state_value
 
     def reset_values(self):
         # self.agents_defecting = 0

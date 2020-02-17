@@ -73,6 +73,7 @@ class PDAgent(Agent):
         self.common_move = ""
         self.last_round = False
         self.wsls_failed = False
+        self.proportional_score = 0
 
         self.average_payoff = 0  # should this be across partners or between them?
 
@@ -161,6 +162,14 @@ class PDAgent(Agent):
 
     def change_strategy(self):
         return
+
+    def compare_score(self):
+        """ Compares own score to current highest agent score in network for visualisation purposes"""
+        if self.stepCount > 1:
+            highscore = self.model.highest_score
+            myscore = self.score
+            # what percentage is my score of the highest score?
+            self.proportional_score = ((myscore / highscore) * 100)
 
     def iter_pick_move(self, strategy, payoffs):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
@@ -339,7 +348,12 @@ class PDAgent(Agent):
                             - this is as alternative implementation of the previous WSLS strategy to 
                              check if it was performing as the lit suggests."""
 
-            
+            if self.stepCount == 1:
+                self.number_of_c += 1
+                return "C"
+
+            aspiration_level = 0
+            return
 
         elif strategy == "VPP":
             ppD = self.ppD_partner[id]
@@ -429,6 +443,7 @@ class PDAgent(Agent):
 
         """" Now need to decide what the boundaries are for changing update value 
             based on this state value that is returned... """
+        return 3
 
 
         # elif not consistency:
@@ -940,6 +955,7 @@ class PDAgent(Agent):
         self.check_partner()  # Update Knowledge
         round_payoffs = self.increment_score(self.payoffs)
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
+        self.compare_score()
 
         self.output_data_to_model()
         if self.model.collect_data:

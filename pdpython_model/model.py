@@ -187,6 +187,7 @@ class PDModel(Model):
                  schedule_type="Simultaneous",
                  rounds=2000,
                  collect_data=False,
+                 #score_vis=False,
                  agent_printing=False,
                  randspawn=True,
                  DD=1,
@@ -219,6 +220,7 @@ class PDModel(Model):
         self.randspawn = randspawn
         self.iteration_n = 0
         self.new_filenumber = 0
+
 
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader
@@ -268,7 +270,6 @@ class PDModel(Model):
 
         self.agentIDs = list(range(1, (number_of_agents + 1)))
 
-
         # ----- Storage -----
         self.agents_cooperating = 0
         self.agents_defecting = 0
@@ -276,7 +277,7 @@ class PDModel(Model):
         self.number_of_coops = 0
         self.coops_utility = 0
         self.defects_utility = 0
-
+        self.highest_score = 0
 
         self.datacollector = DataCollector(model_reporters={
             "Cooperations": get_num_coop_agents,
@@ -301,8 +302,6 @@ class PDModel(Model):
         self.make_agents()
         self.running = True
         self.datacollector.collect(self)
-
-
 
     def output_data(self, steptime):
         with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
@@ -398,6 +397,10 @@ class PDModel(Model):
             state_value.append(current_value)
         return state_value
 
+    def get_highest_score(self):
+        scores = [a.score for a in self.schedule.agents]
+        self.highest_score = max(scores)
+
     def reset_values(self):
         # self.agents_defecting = 0
         # self.agents_cooperating = 0
@@ -435,6 +438,7 @@ class PDModel(Model):
         if self.collect_data:
             self.output_data(steptime)
         self.datacollector.collect(self)
+        self.get_highest_score()
         self.reset_values()
 
         # if self.step_count >= self.rounds:

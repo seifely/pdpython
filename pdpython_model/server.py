@@ -12,37 +12,95 @@ D_COLOR = "#ce0e2d"
 # Blue
 MID_COLOR = "#ffc0cb"
 
+# OR, COLORS FOR SCORE VISUALISATION:
+
+HIGHEST_COL = "#083E33"
+
+TOP_COL = "#0B5345"
+
+HIGH_MID = "#117A65"
+
+LOW_MID = "#16A085"
+
+LOWEST_COL = "#73C6B6"
+
+REST_COL = "#E8F8F5"
+
+score_vis = True
+
 def gen_Model_Portrayal(agent):
     if agent is None:
         return
 
     portrayal = {}
 
-    if type(agent) is PDAgent:
-        portrayal = {"Shape": "circle",
-                     "scale": 1,
-                     # "Color": "white",
-                     "Filled": "true",
-                     "Layer": 1,
-                     "r": 0.75,
-                     "text": [agent.strategy, agent.score],
-                     "text_color": "black",
-                     "scale": 1
-                     }
+    if not score_vis:
 
-        color = MID_COLOR
+        if type(agent) is PDAgent:
+            portrayal = {"Shape": "circle",
+                         "scale": 1,
+                         # "Color": "white",
+                         "Filled": "true",
+                         "Layer": 1,
+                         "r": 0.75,
+                         "text": [agent.strategy, agent.score],
+                         #"text_color": "black",
+                         "scale": 1
+                         }
 
-
-        # set agent color based on savings and loans
-        if agent.common_move == ["C"]:
-            color = C_COLOR
-        if agent.common_move == ["D"]:
-            color = D_COLOR
-        if agent.common_move == ["Eq"]:
             color = MID_COLOR
+            text_color = "black"
 
-        portrayal["Color"] = color
+            # set agent color based on cooperation level
+            if agent.common_move == ["C"]:
+                color = C_COLOR
+            if agent.common_move == ["D"]:
+                color = D_COLOR
+            if agent.common_move == ["Eq"]:
+                color = MID_COLOR
 
+            portrayal["Color"] = color
+            portrayal["text_color"] = text_color
+
+    elif score_vis:
+
+        if type(agent) is PDAgent:
+            portrayal = {"Shape": "circle",
+                         "scale": 1,
+                         # "Color": "white",
+                         "Filled": "true",
+                         "Layer": 1,
+                         "r": 0.75,
+                         "text": [agent.strategy, agent.score],
+                         #"text_color": "black",
+                         "scale": 1
+                         }
+
+            color = REST_COL
+            text_color = "black"
+
+            # set agent color based on proportional score
+            if agent.proportional_score == 100:
+                color = HIGHEST_COL
+                text_color = "white"
+            if agent.proportional_score <= 98 < 100:
+                color = TOP_COL
+                text_color = "black"
+            if agent.proportional_score <= 96 < 98:
+                color = HIGH_MID
+                text_color = "black"
+            if agent.proportional_score <= 94 < 96:
+                color = LOW_MID
+                text_color = "black"
+            if agent.proportional_score <= 90 < 94:
+                color = LOWEST_COL
+                text_color = "black"
+            if agent.proportional_score <= 0 < 90:
+                color = REST_COL
+                text_color = "black"
+
+            portrayal["Color"] = color
+            portrayal["text_color"] = text_color
 
 
         # if agent.strategy is None:
