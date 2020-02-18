@@ -242,7 +242,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('scale2_wsls_8x8_no_25_%s' % (self.iteration_n), "a")
+        concatenator = ('scale2_iwsls_8x8_no_25_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -280,7 +280,7 @@ class PDModel(Model):
         self.number_of_coops = 0
         self.coops_utility = 0
         self.defects_utility = 0
-
+        self.highest_score = 0
 
         self.datacollector = DataCollector(model_reporters={
             "Cooperations": get_num_coop_agents,
@@ -305,8 +305,6 @@ class PDModel(Model):
         self.make_agents()
         self.running = True
         self.datacollector.collect(self)
-
-
 
     def output_data(self, steptime):
         with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
@@ -402,6 +400,10 @@ class PDModel(Model):
             state_value.append(current_value)
         return state_value
 
+    def get_highest_score(self):
+        scores = [a.score for a in self.schedule.agents]
+        self.highest_score = max(scores)
+
     def reset_values(self):
         # self.agents_defecting = 0
         # self.agents_cooperating = 0
@@ -439,6 +441,7 @@ class PDModel(Model):
         if self.collect_data:
             self.output_data(steptime)
         self.datacollector.collect(self)
+        self.get_highest_score()
         self.reset_values()
 
         # if self.step_count >= self.rounds:
@@ -451,15 +454,15 @@ class PDModel(Model):
 
 # parameter lists for each parameter to be tested in batch run
 br_params = {"number_of_agents": [64],
-            "gamma": [0.001, #0.01, 0.015, 0.02
+            "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.1, #0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09
+            "init_ppD": [0.5, #0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09
                          ]}
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
+                 iterations=2,
                  max_steps=2000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
@@ -471,5 +474,6 @@ if __name__ == '__main__':
         if isinstance(br_df["Data Collector"][i], DataCollector):
             i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
             br_step_data = br_step_data.append(i_run_data, ignore_index=True)
-    br_step_data.to_csv("PDModel_Step_Data.csv")
+    br_step_data.to_csv("PDModel_Step_Data_%s.csv" % (str(random.randint(1,2000))))  # this might not be as useful for importing
+    # Current Solution: copy data to new folder when we make it
 

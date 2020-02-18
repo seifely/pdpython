@@ -129,7 +129,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["TFT", "WSLS", "iWSLS"]
+            choices = ["VPP", "WSLS"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
@@ -291,7 +291,7 @@ class PDAgent(Agent):
                     self.number_of_d += 1
                 return self.partner_latest_move[id]
 
-        elif strategy == "WSLS":
+        elif strategy == "iWSLS":
             """ This strategy picks C in the first turn, and then changes its move only if it 'loses' 
                 - e.g. if it gets pwned or if both defect. """
             # if it's turn one, cooperate
@@ -343,7 +343,7 @@ class PDAgent(Agent):
                 return my_move
 
 
-        elif strategy == "iWSLS":
+        elif strategy == "WSLS":
             """ This strategy picks C in the first turn, and then changes its move only if it 'loses'. 
                             - this is as alternative implementation of the previous WSLS strategy to 
                              check if it was performing as the lit suggests."""
