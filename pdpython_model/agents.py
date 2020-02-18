@@ -129,7 +129,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["VPP", "WSLS"]
+            choices = ["WSLS", "VPP"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
@@ -221,7 +221,7 @@ class PDAgent(Agent):
             the logic; 'I know they know defect is the best strategy usually, just as they know I know that'. """
             # Current set-up: We assume partner will defect
 
-            ppD = 0.2  # probability of partner's defection
+            ppD = 0.5  # probability of partner's defection
             ppC = 1 - ppD  # probability of partner's cooperation
 
             evCC = (payoffs["C", "C"] * ppC)
@@ -354,19 +354,28 @@ class PDAgent(Agent):
 
             my_move = self.itermove_result[id]
             this_partner_move = self.partner_latest_move[id]
-            # outcome = [my_move, this_partner_move]
+            outcome = [my_move, this_partner_move]
 
             payoffs = self.payoffs
             outcome_payoff = payoffs[my_move, this_partner_move]
 
             aspiration_level = 1
-
-            if outcome_payoff >= aspiration_level:
+            # print("My outcome was:", outcome)
+            # print("My outcome payoff last turn was:", outcome_payoff, "whilst my aspiration level is", aspiration_level)
+            if outcome_payoff <= aspiration_level:
+                # print("My outcome was worse than my aspiration, sO I'll switch")
                 if my_move == "C":
+                    self.number_of_d += 1
                     return "D"
                 if my_move == "D":
+                    self.number_of_c += 1
                     return "C"
             else:
+                # print("I'm doing good! I won't switch")
+                if my_move == "C":
+                    self.number_of_c += 1
+                if my_move == "D":
+                    self.number_of_d += 1
                 return my_move
 
         elif strategy == "VPP":
@@ -387,6 +396,17 @@ class PDAgent(Agent):
                 self.number_of_d += 1
                 # print("number_of_d increased by 1, is now", self.number_of_d)
             return choice[0]
+
+        elif strategy == "SWITCH":
+            if self.stepCount <= 100:
+                self.number_of_c += 1
+                return "C"
+            elif self.stepCount > 100 < 200:
+                self.number_of_d += 1
+                return "D"
+            else:
+                self.number_of_c += 1
+                return "C"
 
     def change_update_value(self, partner_behaviour):
         """ Produce a [new update value] VALUE BY WHICH TO ALTER THE CURRENT UV given the current uv and the
@@ -412,62 +432,75 @@ class PDAgent(Agent):
         numberC = partner_behaviour.count('C')
         numberD = partner_behaviour.count('D')
 
-        # print("My partner did:", partner_behaviour)
-        if partner_behaviour == ['C', 'D', 'C']:  # Higher Value to Break Potential Cycles
-            # print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
-            return gamma * 3
-
-        elif partner_behaviour == ['D', 'C', 'D']:  # Higher Value to Break Potential Cycles
-            # print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
-            return gamma * 3
-
-        elif partner_behaviour == ['C', 'C', 'D']:  # Low Confidence due to New Behaviour
-            # print("I used behavioural rule 2, and I'm gonna return update value", gamma)
-            return gamma
-
-        elif partner_behaviour == ['D', 'D', 'C']:  # Low Confidence due to New Behaviour
-            # print("I used behavioural rule 2, and I'm gonna return update value", gamma)
-            return gamma
-
-        elif partner_behaviour == ['C', 'D', 'D']:  # Gaining Confidence/Trust
-            # print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
-            return gamma * 2
-
-        elif partner_behaviour == ['D', 'C', 'C']:  # Gaining Confidence/Trust
-            # print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
-            return gamma * 2
-
-        elif numberC or numberD == self.delta:  # High Value due to High Confidence
-            # print("I used behavioural rule 4, and I'm gonna return update value", gamma * 3)
-            return gamma * 3
+        # # print("My partner did:", partner_behaviour)
+        # if partner_behaviour == ['C', 'D', 'C']:  # Higher Value to Break Potential Cycles
+        #     # print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
+        #     return gamma * 6
+        #
+        # elif partner_behaviour == ['D', 'C', 'D']:  # Higher Value to Break Potential Cycles
+        #     # print("I used behavioural rule 1, and I'm gonna return update value", gamma * 3)
+        #     return gamma * 6
+        #
+        # elif partner_behaviour == ['C', 'C', 'D']:  # Low Confidence due to New Behaviour
+        #     # print("I used behavioural rule 2, and I'm gonna return update value", gamma)
+        #     return gamma
+        #
+        # elif partner_behaviour == ['D', 'D', 'C']:  # Low Confidence due to New Behaviour
+        #     # print("I used behavioural rule 2, and I'm gonna return update value", gamma)
+        #     return gamma
+        #
+        # elif partner_behaviour == ['C', 'D', 'D']:  # Gaining Confidence/Trust
+        #     # print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
+        #     return gamma * 4
+        #
+        # elif partner_behaviour == ['D', 'C', 'C']:  # Gaining Confidence/Trust
+        #     # print("I used behavioural rule 3, and I'm gonna return update value", gamma * 2)
+        #     return gamma * 4
+        #
+        # elif numberC or numberD == self.delta:  # High Value due to High Confidence
+        #     # print("I used behavioural rule 4, and I'm gonna return update value", gamma * 3)
+        #     return gamma * 6
 
         """ Acquire our state, then compare it to the list of all possible states generated by the 
             model. """
 
-        # all_states = self.model.memory_states
-        # state_values = self.model.state_values
-        #
-        # index = 0
-        #
-        # for i in all_states:
-        #     if i == partner_behaviour:
-        #         index = all_states.index(i)
-        #
-        # state_value = state_values[index]
+        all_states = self.model.memory_states
+        state_values = self.model.state_values
 
-        """" Now need to decide what the boundaries are for changing update value 
+        index = 0
+
+        for i in all_states:
+            if i == partner_behaviour:
+                index = all_states.index(i)
+
+        state_value = state_values[index]
+
+        """" Now need to decide what the boundaries are for changing update value
             based on this state value that is returned... """
-        # RESUME WORK HERE and
+        # State values exist between values of 21 and -21, with a normal distribution of state values (i.e.
+        # there are lower numbers of SUPER GOOD and SUPER BAD states, and where the numbers of C and D equal
+        # out a bit there are more of those states). The value of middling states is zero and there is never more than
+        # 16 of those states in those categories
 
+        bound_a = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+        bound_b = [-6, -7, -8, -9, 6, 7, 8, 9]
+        bound_c = [-10, -11, -12, 10, 11, 12]
+        bound_d = [-13, -14, -15, 13, 14, 15]
+        bound_e = [-16, -17, -18, 16, 17, 18]
+        bound_f = [-19, -20, -21, 19, 20, 21]
 
-        # elif not consistency:
-        #     return gamma * 2
-
-        # we also need an emergency catch-all for up and down behaviour, to break us out of toxic loops
-        # this either needs to come from LONG TERM MEMORY or it needs to come here ??? figure this out after testing
-        # round one
-        # if new_uv = 0
-        #       new_uv = 0.001?
+        if state_value in bound_a:
+            return gamma * 1
+        if state_value in bound_b:
+            return gamma * 2
+        if state_value in bound_c:
+            return gamma * 3
+        if state_value in bound_d:
+            return gamma * 4
+        if state_value in bound_e:
+            return gamma * 5
+        if state_value in bound_f:
+            return gamma * 6
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -533,6 +566,7 @@ class PDAgent(Agent):
                                 # for now, let's add the evaluation of a partner's treatment of us here
                                 # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
                                 #     print("Gonna update my UV!", self.update_value)
+
                                 self.update_value = self.update_value + self.change_update_value(current_partner)
 
                             # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
@@ -587,9 +621,9 @@ class PDAgent(Agent):
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
                 elif self.ppD_partner[i] < 0:
-                    self.ppD_partner[i] = 0
+                    self.ppD_partner[i] = 0.01
                 elif self.ppD_partner[i] == 6.938893903907228e-17:
-                    self.ppD_partner[i] = 0
+                    self.ppD_partner[i] = 0.01
 
             outcome_payoff = payoffs[my_move, this_partner_move]
             current_partner_payoff = self.per_partner_utility[i]

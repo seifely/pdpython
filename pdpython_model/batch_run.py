@@ -242,7 +242,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('scale2_iwsls_8x8_no_25_%s' % (self.iteration_n), "a")
+        concatenator = ('statememory_iwsls_8x8_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -462,8 +462,8 @@ br_params = {"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=2,
-                 max_steps=2000,
+                 iterations=100,
+                 max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

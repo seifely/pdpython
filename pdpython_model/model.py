@@ -17,7 +17,7 @@ def get_num_coop_agents(model):
     agent_cooperations = [a.number_of_c for a in model.schedule.agents]
     # print("hey", agent_cooperations)
     agent_cooperations = np.sum(agent_cooperations)
-    # print("lol", agent_cooperations.item())
+    print("agent cooperations:", agent_cooperations.item())
     return agent_cooperations.item()
 
 def get_num_defect_agents(model):
@@ -26,7 +26,7 @@ def get_num_defect_agents(model):
     agent_defections = [a.number_of_d for a in model.schedule.agents]
     # print("hey", agent_defections)
     agent_defections = np.sum(agent_defections)
-    # print("lol", agent_defections.item())
+    print("agent defections:", agent_defections.item())
     return agent_defections.item()
 
 def get_cooperators(model):

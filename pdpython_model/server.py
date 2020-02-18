@@ -26,7 +26,7 @@ LOWEST_COL = "#73C6B6"
 
 REST_COL = "#E8F8F5"
 
-score_vis = True
+score_vis = False
 
 def gen_Model_Portrayal(agent):
     if agent is None:
