@@ -385,15 +385,23 @@ class PDModel(Model):
         state_value = []
         for i in state_list:
             current_value = 0
-            for j in range(len(i)):
-                item = i[j]
-                # print("Array", i, "Index", j, "Item", item)
-                if item == 'C':
-                    current_value = current_value + (1 * j)  # Slight bias towards cooperation
-                if item == 'D':
-                    current_value = current_value - (1 * j)
-                if item == 0:
-                    current_value = current_value
+
+            if i == ['C', 'D', 'C', 'D', 'C', 'D', 'C']:
+                current_value = 21
+            elif i == ['D', 'C', 'D', 'C', 'D', 'C', 'D']:
+                current_value = -21
+
+            else:
+                for j in range(len(i)):
+                    item = i[j]
+                    # print("Array", i, "Index", j, "Item", item)
+                    if item == 'C':
+                        current_value = current_value + (1 * j)  # Slight bias towards cooperation
+                    if item == 'D':
+                        current_value = current_value - (1 * j)
+                    if item == 0:
+                        current_value = current_value
+
             state_value.append(current_value)
         return state_value
 

@@ -129,7 +129,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the two selected strategies
-            choices = ["WSLS", "VPP"]
+            choices = ["LEARN", "VPP"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
@@ -408,6 +408,25 @@ class PDAgent(Agent):
                 self.number_of_c += 1
                 return "C"
 
+        elif strategy == "LEARN":
+            ppD = self.ppD_partner[id]
+            ppC = 1 - self.ppD_partner[id]
+
+            # Instead of using these values to calculate expected values/expected utilities, we use them to pick
+            # our own move. This is a stochastic move selection weighted to respond to our partner's moves
+
+            choices = ["C", "D"]
+            weights = [ppC, ppD]
+
+            choice = random.choices(population=choices, weights=weights, k=1)
+            if choice == ["C"]:
+                self.number_of_c += 1
+                # print("number_of_c increased by 1, is now", self.number_of_c)
+            elif choice == ["D"]:
+                self.number_of_d += 1
+                # print("number_of_d increased by 1, is now", self.number_of_d)
+            return choice[0]
+
     def change_update_value(self, partner_behaviour):
         """ Produce a [new update value] VALUE BY WHICH TO ALTER THE CURRENT UV given the current uv and the
         behaviour that partner has shown.
@@ -551,7 +570,7 @@ class PDAgent(Agent):
                      after it is updated and checked, we send it back to working memory
                     """
                     current_uv = self.update_value
-                    if self.strategy == "VPP":
+                    if self.strategy == "VPP" or "LEARN":
                         if self.working_memory.get(partner_ID) is None:
                             self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
                         else:
@@ -606,7 +625,7 @@ class PDAgent(Agent):
             # print("Outcome with partner %i was:" % i, outcome)
 
             # ------- Here is where we change variables based on the outcome -------
-            if self.strategy == "VEV" or "RANDOM" or "VPP":
+            if self.strategy == "VEV" or "RANDOM" or "VPP" or "LEARN":
                 if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
 
                     # if this_partner_move == "D":
@@ -621,9 +640,9 @@ class PDAgent(Agent):
                 if self.ppD_partner[i] > 1:
                     self.ppD_partner[i] = 1
                 elif self.ppD_partner[i] < 0:
-                    self.ppD_partner[i] = 0.01
+                    self.ppD_partner[i] = 0.001
                 elif self.ppD_partner[i] == 6.938893903907228e-17:
-                    self.ppD_partner[i] = 0.01
+                    self.ppD_partner[i] = 0.001
 
             outcome_payoff = payoffs[my_move, this_partner_move]
             current_partner_payoff = self.per_partner_utility[i]
@@ -789,6 +808,8 @@ class PDAgent(Agent):
             strategy_code = 6
         elif self.strategy == 'WSLS':
             strategy_code = 7
+        elif self.strategy == "LEARN":
+            strategy_code = 8
 
         """ The above will error catch for when agents don't have those values, and will still let us print 
             to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
