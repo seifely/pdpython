@@ -199,7 +199,7 @@ class PDModel(Model):
                  c=0,
                  learning_rate = 1,
                  gamma = 0.015,
-                 init_ppD = 0.1):
+                 init_ppD = 0.2):
 
         # ---------- Model Parameters --------
         self.height = height

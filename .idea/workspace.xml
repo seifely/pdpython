@@ -13,11 +13,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="402">
-              <caret line="131" column="29" selection-start-line="131" selection-start-column="29" selection-end-line="131" selection-end-column="29" />
+            <state relative-caret-position="306">
+              <caret line="77" column="26" selection-start-line="77" selection-start-column="26" selection-end-line="77" selection-end-column="26" />
               <folding>
                 <element signature="e#6561#6827#0" />
                 <element signature="e#6545#7738#0" />
+                <element signature="e#8564#9817#0" />
                 <element signature="e#11315#13385#0" />
                 <element signature="e#25050#25691#0" />
                 <element signature="e#25747#35252#0" />
@@ -31,8 +32,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="397" column="35" selection-start-line="397" selection-start-column="35" selection-end-line="397" selection-end-column="35" />
+            <state relative-caret-position="348">
+              <caret line="201" column="31" selection-start-line="201" selection-start-column="31" selection-end-line="201" selection-end-column="31" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -83,10 +84,10 @@
       <find>make_agen</find>
       <find>make_agents</find>
       <find>self.payoffs</find>
-      <find>ppD</find>
       <find>check_part</find>
       <find>if self.strategy</find>
       <find>if strategy</find>
+      <find>ppD</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -96,8 +97,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/pdpython_model/server.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/model.py" />
         <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/model.py" />
         <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
       </list>
     </option>
@@ -261,16 +262,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="397" column="35" selection-start-line="397" selection-start-column="35" selection-end-line="397" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="433">
@@ -281,13 +272,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="348">
+          <caret line="201" column="31" selection-start-line="201" selection-start-column="31" selection-end-line="201" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="402">
-          <caret line="131" column="29" selection-start-line="131" selection-start-column="29" selection-end-line="131" selection-end-column="29" />
+        <state relative-caret-position="306">
+          <caret line="77" column="26" selection-start-line="77" selection-start-column="26" selection-end-line="77" selection-end-column="26" />
           <folding>
             <element signature="e#6561#6827#0" />
             <element signature="e#6545#7738#0" />
+            <element signature="e#8564#9817#0" />
             <element signature="e#11315#13385#0" />
             <element signature="e#25050#25691#0" />
             <element signature="e#25747#35252#0" />

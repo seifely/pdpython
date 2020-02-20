@@ -73,6 +73,9 @@ class PDAgent(Agent):
         self.common_move = ""
         self.last_round = False
         self.wsls_failed = False
+
+        self.globalAvPayoff = 0
+        self.indivAvPayoff = {}
         self.proportional_score = 0
 
         self.average_payoff = 0  # should this be across partners or between them?
