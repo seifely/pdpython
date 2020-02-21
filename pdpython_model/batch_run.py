@@ -10,6 +10,7 @@ import time
 import csv
 import numpy as np
 import pandas as pd
+import statistics
 import sys
 
 
@@ -175,6 +176,15 @@ def track_params(model):
             #model.learning_rate
             model.init_ppD,
             )
+
+def get_average_payoffs(model):
+    # get the average payoff of all agents
+    average_payoffs = [a.globalAvPayoff for a in model.schedule.agents]
+    # get the average payoff of each strategy
+    # ???
+
+    # return these thingies
+    return statistics.mean(average_payoffs)
 
 
 class PDModel(Model):

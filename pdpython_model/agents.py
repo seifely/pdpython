@@ -4,6 +4,7 @@ import csv
 import time
 from math import ceil
 import itertools
+import statistics
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
@@ -63,6 +64,7 @@ class PDAgent(Agent):
         # ------------------------ LOCAL MEMORY --------------------------
         self.partner_IDs = []
         self.partner_moves = {}
+        self.per_partner_payoffs = {}  # this should be list of all prev payoffs from my partner, only used fr averaging
         self.partner_latest_move = {}  # this is a popped list
         self.partner_scores = {}
         self.per_partner_utility = {}
@@ -75,10 +77,11 @@ class PDAgent(Agent):
         self.wsls_failed = False
 
         self.globalAvPayoff = 0
+        self.globalHighPayoff = 0  # effectively the highscore
         self.indivAvPayoff = {}
-        self.proportional_score = 0
+        self.proportional_score = 0  # can't remember what I was using this for, maybe proportional to its prev payoff
 
-        self.average_payoff = 0  # should this be across partners or between them?
+        # self.average_payoff = 0  # should this be across partners or between them?
 
         self.working_memory = {}  # this is a popped list of size self.delta
 
@@ -560,6 +563,12 @@ class PDAgent(Agent):
                     if self.per_partner_utility.get(partner_ID) is None:
                         self.per_partner_utility[partner_ID] = 0
 
+                    if self.per_partner_payoffs.get(partner_ID) is None:
+                        self.per_partner_payoffs[partner_ID] = [0]
+
+                    if self.indivAvPayoff.get(partner_ID) is None:
+                        self.indivAvPayoff[partner_ID] = 0
+
                     if self.per_partner_strategies.get(partner_ID) is None:
                         self.per_partner_strategies[partner_ID] = partner_strategy
 
@@ -627,6 +636,10 @@ class PDAgent(Agent):
             outcome_payoff = payoffs[my_move, this_partner_move]
             # print("Outcome with partner %i was:" % i, outcome)
 
+            self.per_partner_payoffs[i].append(outcome_payoff)
+            self.indivAvPayoff[i] = statistics.mean(self.per_partner_payoffs[i])
+            # print("My individual average payoff for partner", i, "is ", self.indivAvPayoff[i])
+
             # ------- Here is where we change variables based on the outcome -------
             if self.strategy == "VEV" or "RANDOM" or "VPP" or "LEARN":
                 if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
@@ -659,6 +672,18 @@ class PDAgent(Agent):
 
         # self.score = self.score + total_utility
         self.outcome_list = outcome_listicle
+
+        """ Here, we want to increment the GLOBAL, across-partner average payoff for the round """
+        round_average = []
+        for j in self.indivAvPayoff:
+            item = self.indivAvPayoff[j]
+            round_average.append(item)
+        self.globalAvPayoff = statistics.mean(round_average)
+
+        if self.globalAvPayoff > self.globalHighPayoff:
+            self.globalHighPayoff = self.globalAvPayoff
+        # print("My round average was ", self.globalAvPayoff, "and my highscore is ", self.globalHighPayoff)
+
         return total_utility
 
     def output_data_to_model(self):
@@ -686,6 +711,41 @@ class PDAgent(Agent):
         prob_list = []
         util_list = []
         move_list = []
+        average_list = []
+
+        for i in self.indivAvPayoff:
+            average_list.append(self.indivAvPayoff[i])
+
+        avpay_partner_1 = 'None'
+        avpay_partner_2 = 'None'
+        avpay_partner_3 = 'None'
+        avpay_partner_4 = 'None'
+
+        if len(prob_list) == 0:
+            avpay_partner_1 = 'None'
+            avpay_partner_2 = 'None'
+            avpay_partner_3 = 'None'
+            avpay_partner_4 = 'None'
+        elif len(prob_list) == 1:
+            avpay_partner_1 = average_list[0]
+            avpay_partner_2 = 'None'
+            avpay_partner_3 = 'None'
+            avpay_partner_4 = 'None'
+        elif len(prob_list) == 2:
+            avpay_partner_1 = average_list[0]
+            avpay_partner_2 = average_list[1]
+            avpay_partner_3 = 'None'
+            avpay_partner_4 = 'None'
+        elif len(prob_list) == 3:
+            avpay_partner_1 = average_list[0]
+            avpay_partner_2 = average_list[1]
+            avpay_partner_3 = average_list[2]
+            avpay_partner_4 = 'None'
+        elif len(prob_list) == 4:
+            avpay_partner_1 = average_list[0]
+            avpay_partner_2 = average_list[1]
+            avpay_partner_3 = average_list[2]
+            avpay_partner_4 = average_list[3]
 
         for i in self.ppD_partner:
             prob_list.append(self.ppD_partner[i])
@@ -828,7 +888,9 @@ class PDAgent(Agent):
                               'u4_%d' % self.ID,
                               'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID,
                               'uv_%d' % self.ID,
-                              'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID]
+                              'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
+                              'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID,'avp4_%d' % self.ID,
+                              'globav_%d' % self.ID]
             #     'p1', 'p2', 'p3', 'p4'
             else:
                 fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
@@ -838,7 +900,9 @@ class PDAgent(Agent):
                               'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
                               'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID,
                               'm4_%d' % self.ID, 'uv_%d' % self.ID,
-                              'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID]
+                              'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
+                              'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
+                              'globav_%d' % self.ID]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             # moves = []
@@ -866,7 +930,10 @@ class PDAgent(Agent):
                      'm4_%d' % self.ID: move_partner_4,
                      'uv_%d' % self.ID: self.update_value, 'wm_%d' % self.ID: self.working_memory,
                      'nc_%d' % self.ID: self.number_of_c,
-                     'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners})
+                     'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners,
+                     'avp1_%d' % self.ID: avpay_partner_1, 'avp2_%d' % self.ID: avpay_partner_2,
+                     'avp3_%d' % self.ID: avpay_partner_3, 'avp4_%d' % self.ID: avpay_partner_4,
+                     'globav_%d' % self.ID: self.globalAvPayoff})
             #
             else:
                 writer.writerow(
@@ -882,7 +949,10 @@ class PDAgent(Agent):
                      'm4_%d' % self.ID: move_partner_4, 'uv_%d' % self.ID: self.update_value,
                      'wm_%d' % self.ID: self.working_memory, 'nc_%d' % self.ID: self.number_of_c,
                      'mutC_%d' % self.ID: self.mutual_c_outcome,
-                     'simP_%d' % self.ID: self.similar_partners})
+                     'simP_%d' % self.ID: self.similar_partners,
+                     'avp1_%d' % self.ID: avpay_partner_1, 'avp2_%d' % self.ID: avpay_partner_2,
+                     'avp3_%d' % self.ID: avpay_partner_3, 'avp4_%d' % self.ID: avpay_partner_4,
+                     'globav_%d' % self.ID: self.globalAvPayoff})
 
     def reset_values(self):
         self.number_of_d = 0
