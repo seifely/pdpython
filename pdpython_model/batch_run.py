@@ -148,7 +148,26 @@ def get_wsls_performance(model):
                 agent_scores.append(agent)
 
     # if sum(agent_scores) != 0:
-        # print("wsls scored", sum(agent_scores))
+    #     print("wsls scored", sum(agent_scores))
+    return sum(agent_scores)
+
+def get_iwsls_performance(model):
+    """ For acquiring the sum total performance of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    scores = [a.score for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_scores = []
+    for i in strategy:
+            if i == "iWSLS":
+                indices = strategy.index(i)
+                agent = scores[indices]
+                agent_scores.append(agent)
+
+    # if sum(agent_scores) != 0:
+    #     print("iwsls scored", sum(agent_scores))
     return sum(agent_scores)
 
 def get_wsls_cooperations(model):
@@ -167,7 +186,26 @@ def get_wsls_cooperations(model):
                 agent_coops.append(agent)
 
     # if sum(agent_coops) != 0:
-        # print("wsls cooped", sum(agent_coops))
+    #     print("wsls cooped", sum(agent_coops))
+    return sum(agent_coops)
+
+def get_iwsls_cooperations(model):
+    """ For acquiring the sum total cooperations of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    coops = [a.number_of_c for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_coops = []
+    for i in strategy:
+            if i == "iWSLS":
+                indices = strategy.index(i)
+                agent = coops[indices]
+                agent_coops.append(agent)
+
+    # if sum(agent_coops) != 0:
+    #     print("iwsls cooped", sum(agent_coops))
     return sum(agent_coops)
 
 def track_params(model):
@@ -252,7 +290,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('highppd_iwsls_8x8_no_%s' % (self.iteration_n), "a")
+        concatenator = ('wsls_vsvpp_8x8_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -303,12 +341,14 @@ class PDModel(Model):
             "VPP Cooperations": get_vpp_cooperations,
             "WSLS Performance": get_wsls_performance,
             "WSLS Cooperations": get_wsls_cooperations,
+            "iWSLS Performance": get_iwsls_performance,
+            "iWSLS Cooperations": get_iwsls_cooperations,
             "Model Params": track_params,
-            },
+        },
             agent_reporters={
-                 "Cooperations": lambda x: x.number_of_c,
-                 "Defections": lambda x: x.number_of_d
-                })
+                "Cooperations": lambda x: x.number_of_c,
+                "Defections": lambda x: x.number_of_d
+            })
 
         self.memory_states = self.get_memory_states(['C', 'D'])
         self.state_values = self.state_evaluation(self.memory_states)

@@ -149,6 +149,25 @@ def get_wsls_performance(model):
         print("wsls scored", sum(agent_scores))
     return sum(agent_scores)
 
+def get_iwsls_performance(model):
+    """ For acquiring the sum total performance of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    scores = [a.score for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_scores = []
+    for i in strategy:
+            if i == "iWSLS":
+                indices = strategy.index(i)
+                agent = scores[indices]
+                agent_scores.append(agent)
+
+    if sum(agent_scores) != 0:
+        print("iwsls scored", sum(agent_scores))
+    return sum(agent_scores)
+
 def get_wsls_cooperations(model):
     """ For acquiring the sum total cooperations of a strategy"""
 
@@ -166,6 +185,25 @@ def get_wsls_cooperations(model):
 
     if sum(agent_coops) != 0:
         print("wsls cooped", sum(agent_coops))
+    return sum(agent_coops)
+
+def get_iwsls_cooperations(model):
+    """ For acquiring the sum total cooperations of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    coops = [a.number_of_c for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_coops = []
+    for i in strategy:
+            if i == "iWSLS":
+                indices = strategy.index(i)
+                agent = coops[indices]
+                agent_coops.append(agent)
+
+    if sum(agent_coops) != 0:
+        print("iwsls cooped", sum(agent_coops))
     return sum(agent_coops)
 
 def track_params(model):
@@ -197,9 +235,9 @@ class PDModel(Model):
                  simplified_payoffs=False,
                  b=0,
                  c=0,
-                 learning_rate = 1,
-                 gamma = 0.015,
-                 init_ppD = 0.2):
+                 learning_rate=1,
+                 gamma=0.015,
+                 init_ppD=0.2):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -290,6 +328,8 @@ class PDModel(Model):
             "VPP Cooperations": get_vpp_cooperations,
             "WSLS Performance": get_wsls_performance,
             "WSLS Cooperations": get_wsls_cooperations,
+            "iWSLS Performance": get_iwsls_performance,
+            "iWSLS Cooperations": get_iwsls_cooperations,
             "Model Params": track_params,
             },
             agent_reporters={
