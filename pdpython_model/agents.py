@@ -5,6 +5,7 @@ import time
 from math import ceil
 import itertools
 import statistics
+import pickle
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
@@ -49,7 +50,8 @@ class PDAgent(Agent):
         self.gamma = 0.015  # uv we manipulate, stays static
         self.delta = 3  # max memory size
         self.init_uv = self.model.gamma
-        self.init_ppD = model.init_ppD
+        # self.init_ppD = model.init_ppD  # this isn't actually used
+
 
         self.move = None
         self.next_move = None
@@ -79,7 +81,7 @@ class PDAgent(Agent):
         self.globalAvPayoff = 0
         self.globalHighPayoff = 0  # effectively the highscore
         self.indivAvPayoff = {}
-        self.proportional_score = 0  # can't remember what I was using this for, maybe proportional to its prev payoff
+        self.proportional_score = 0  # this is used by the visualiser
 
         # self.average_payoff = 0  # should this be across partners or between them?
 
@@ -119,8 +121,16 @@ class PDAgent(Agent):
                     # self.ppD_partner[partner_ID] = 0.5
 
     def set_defaults(self, ids):
+        # open the ppD pickle
+        agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
+        # print(agent_ppds)
+        my_pickle = agent_ppds[self.ID]
+        # print("my defaults are", my_pickle)
+        # j = 0
         for i in ids:
-            self.ppD_partner[i] = self.model.init_ppD
+            index = ids.index(i)
+            self.ppD_partner[i] = my_pickle[index]
+            # print("this partner's pickled ppd is ", my_pickle[index])
 
     def pick_strategy(self):
         """ This is an initial strategy selector for agents """
@@ -135,7 +145,7 @@ class PDAgent(Agent):
                 start on q strategy """
 
         elif self.pickstrat == "RDISTRO":  # Random Distribution of the selected strategies
-            choices = ["WSLS", "VPP"]
+            choices = ["iWSLS", "VPP"]
             if not self.checkerboard:
                 if not self.lineplace:
                     strat = random.choice(choices)
@@ -517,15 +527,15 @@ class PDAgent(Agent):
         if state_value in bound_a:
             return gamma * 1
         if state_value in bound_b:
-            return gamma * 2
+            return gamma * 1
         if state_value in bound_c:
-            return gamma * 3
+            return gamma * 2
         if state_value in bound_d:
-            return gamma * 4
+            return gamma * 2
         if state_value in bound_e:
-            return gamma * 5
+            return gamma * 3
         if state_value in bound_f:
-            return gamma * 6
+            return gamma * 3
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
@@ -991,6 +1001,7 @@ class PDAgent(Agent):
             self.common_move = commonest_move[:1]
 
     def step(self):
+        self.compare_score()
         self.reset_values()
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
         if self.stepCount == 1:
@@ -1097,7 +1108,7 @@ class PDAgent(Agent):
         self.check_partner()  # Update Knowledge
         round_payoffs = self.increment_score(self.payoffs)
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
-        self.compare_score()
+        # self.compare_score()
 
         self.output_data_to_model()
         if self.model.collect_data:

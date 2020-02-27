@@ -248,7 +248,7 @@ class PDModel(Model):
                  batch_iterations = 2,
                  learning_rate = 1,
                  gamma = 0.015,
-                 init_ppD = 0.1):
+                 init_ppD = 0.5):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -290,7 +290,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('wsls_vsvpp_8x8_no_%s' % (self.iteration_n), "a")
+        concatenator = ('iwsls_memory2low_8x8_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -507,7 +507,7 @@ br_params = {"number_of_agents": [64],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.15, #0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09
+            "init_ppD": [0.5, #0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09
                          ]}
 
 br = BatchRunner(PDModel,

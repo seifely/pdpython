@@ -22,11 +22,11 @@ HIGH_MID = "#117A65"
 
 LOW_MID = "#16A085"
 
-LOWEST_COL = "#73C6B6"
+LOWEST_COL = "#8ACFC2"
 
 REST_COL = "#E8F8F5"
 
-score_vis = False
+score_vis = True
 
 def gen_Model_Portrayal(agent):
     if agent is None:
@@ -83,16 +83,16 @@ def gen_Model_Portrayal(agent):
             if agent.proportional_score == 100:
                 color = HIGHEST_COL
                 text_color = "white"
-            if agent.proportional_score <= 98 < 100:
-                color = TOP_COL
+            if agent.proportional_score <= 97 < 100:
+                color = HIGHEST_COL
                 text_color = "black"
-            if agent.proportional_score <= 96 < 98:
+            if agent.proportional_score <= 94 < 97:
                 color = HIGH_MID
                 text_color = "black"
-            if agent.proportional_score <= 94 < 96:
+            if agent.proportional_score <= 92 < 94:
                 color = LOW_MID
                 text_color = "black"
-            if agent.proportional_score <= 90 < 94:
+            if agent.proportional_score <= 90 < 92:
                 color = LOWEST_COL
                 text_color = "black"
             if agent.proportional_score <= 0 < 90:
@@ -220,15 +220,16 @@ step_element = StepCountDisplay()
 model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 64, 2, 64, 1),
                 "rounds": UserSettableParameter('slider', 'Number of Rounds', 2000,1,3000,10),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', False),
-                "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),
+                "init_ppD": UserSettableParameter('slider', 'Initial Probability VPP Agents Defect', 0.50,0.01,1,0.01),
+                # "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),
                 "CC": UserSettableParameter('number', 'Payoff for C-C (Default: 3)', value=1.5),
                 "CD": UserSettableParameter('number', 'Payoff for C-D (Default: 0)', value=-2),
                 "DC": UserSettableParameter('number', 'Payoff for D-C (Default: 5)', value=2),
                 "DD": UserSettableParameter('number', 'Payoff for D-D (Default: 2)', value=1),
 
-                "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),
-                "b": UserSettableParameter('number', 'Simplified Payoffs: Benefit of Co-op', value=4),
-                "c": UserSettableParameter('number', 'Simplified Payoffs: Cost of Co-op', value=1),
+                # "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),
+                # "b": UserSettableParameter('number', 'Simplified Payoffs: Benefit of Co-op', value=4),
+                # "c": UserSettableParameter('number', 'Simplified Payoffs: Cost of Co-op', value=1),
 
                 }
 

@@ -10,14 +10,17 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="137" column="35" selection-start-line="137" selection-start-column="35" selection-end-line="137" selection-end-column="35" />
+            <state relative-caret-position="348">
+              <caret line="134" lean-forward="true" selection-start-line="134" selection-end-line="134" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#7305#8498#0" />
+                <element signature="e#22323#27935#0" />
+                <element signature="e#27985#31031#0" />
+                <element signature="e#31774#43450#0" />
               </folding>
             </state>
           </provider>
@@ -26,8 +29,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-689">
-              <caret line="165" selection-start-line="165" selection-end-line="165" />
+            <state relative-caret-position="387">
+              <caret line="465" column="34" lean-forward="true" selection-start-line="465" selection-start-column="34" selection-end-line="465" selection-end-column="34" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -35,11 +38,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="292" column="35" selection-start-line="292" selection-start-column="35" selection-end-line="292" selection-end-column="35" />
+            <state relative-caret-position="3791">
+              <caret line="292" column="26" selection-start-line="292" selection-start-column="26" selection-end-line="292" selection-end-column="26" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -59,8 +62,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="28" column="17" selection-start-line="28" selection-start-column="17" selection-end-line="28" selection-end-column="17" />
+            <state relative-caret-position="254">
+              <caret line="86" column="35" selection-start-line="86" selection-start-column="35" selection-end-line="86" selection-end-column="35" />
               <folding>
                 <element signature="e#0#65#0" expanded="true" />
               </folding>
@@ -82,6 +85,13 @@
       <find>if strategy</find>
       <find>ppD</find>
       <find>WSLS&quot;</find>
+      <find>highscore</find>
+      <find>self.init_pp</find>
+      <find>self.init_ppD</find>
+      <find>init_ppD</find>
+      <find>self.ID</find>
+      <find>self.init</find>
+      <find>init_pp</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -91,15 +101,15 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/pdpython_model/server.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/model.py" />
         <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="719" />
-    <option name="width" value="1208" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-7" />
+    <option name="width" value="974" />
     <option name="height" value="1047" />
   </component>
   <component name="ProjectView">
@@ -149,7 +159,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.batch_run">
+  <component name="RunManager" selected="Python.run">
     <configuration name="batch_run" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="pdpython" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -194,8 +204,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.batch_run" />
         <item itemvalue="Python.run" />
+        <item itemvalue="Python.batch_run" />
       </list>
     </recent_temporary>
   </component>
@@ -213,23 +223,23 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-7" y="0" width="974" height="1047" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11169652" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22649573" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33152762" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32932165" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33479214" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32932165" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32827735" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32822758" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -238,6 +248,26 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/pdpython_model/generic_model/batch_run.py" />
     <entry file="file://$USER_HOME$/.PyCharmCE2018.3/system/python_stubs/55578246/builtins.py" />
+    <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="254">
+          <caret line="86" column="35" selection-start-line="86" selection-start-column="35" selection-end-line="86" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#65#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3791">
+          <caret line="292" column="26" selection-start-line="292" selection-start-column="26" selection-end-line="292" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/run.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -245,43 +275,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="28" column="17" selection-start-line="28" selection-start-column="17" selection-end-line="28" selection-end-column="17" />
+        <state relative-caret-position="387">
+          <caret line="465" column="34" lean-forward="true" selection-start-line="465" selection-start-column="34" selection-end-line="465" selection-end-column="34" />
           <folding>
-            <element signature="e#0#65#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="137" column="35" selection-start-line="137" selection-start-column="35" selection-end-line="137" selection-end-column="35" />
+        <state relative-caret-position="348">
+          <caret line="134" lean-forward="true" selection-start-line="134" selection-end-line="134" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#7305#8498#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-689">
-          <caret line="165" selection-start-line="165" selection-end-line="165" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="292" column="35" selection-start-line="292" selection-start-column="35" selection-end-line="292" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#22323#27935#0" />
+            <element signature="e#27985#31031#0" />
+            <element signature="e#31774#43450#0" />
           </folding>
         </state>
       </provider>

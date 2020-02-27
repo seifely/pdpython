@@ -9,6 +9,8 @@ import time
 import csv
 import numpy as np
 import sys
+import os.path
+import pickle
 
 
 def get_num_coop_agents(model):
@@ -237,7 +239,7 @@ class PDModel(Model):
                  c=0,
                  learning_rate=1,
                  gamma=0.015,
-                 init_ppD=0.2):
+                 init_ppD=0.5):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -456,6 +458,13 @@ class PDModel(Model):
         self.number_of_NULL = 0  # should be coops
 
     def make_agents(self):
+        # generate current experiment ppD pickle if one does not exist?
+        if not os.path.isfile('agent_ppds.p'):
+            initialised = {}
+            for i in range(self.number_of_agents):
+                initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+                pickle.dump(initialised, open("agent_ppds.p", "wb"))
+
         if not self.randspawn:
             for i in range(self.number_of_agents):
                 """This is for adding agents in sequentially."""
