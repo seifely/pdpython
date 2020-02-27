@@ -713,6 +713,7 @@ class PDAgent(Agent):
         # and also time each agent's step to create a total time thingybob
 
     def output_data_to_file(self, outcomes):
+        """ Outputs the data collected each turn on multiple agent variables to a .csv file"""
 
         for m in self.per_partner_strategies:
             if self.per_partner_strategies[m] == self.strategy:
@@ -965,12 +966,30 @@ class PDAgent(Agent):
                      'globav_%d' % self.ID: self.globalAvPayoff})
 
     def reset_values(self):
+        """ Resets relevant global variables to default values. """
         self.number_of_d = 0
         self.number_of_c = 0
         self.update_value = self.init_uv
         self.mutual_c_outcome = 0
 
+    def set_ppds(self):
+        """ Use this function on the last round of the game, after final score checking, to
+            determine what the classification of a partner might be."""
+        return
+
+    def knn_analysis(self, input):
+        """ Takes an input, checks it against training data, and returns a partner classification """
+
+        return
+
+    def ppd_select(self, classification, optimisation_choice):
+        """ Takes a class of partner, given by the kNN algorithm, and returns a starting ppD to
+        use in future games for the same partner based on which variable (or combo) we want to optimise """
+        return
+
     def find_average_move(self):
+        """ Counts up how many of each behaviour type was performed that round and returns which was
+            the most commonly chosen move (or Eq if there was a tie). """
         move_list = []
         for n in self.itermove_result:
             move_list.append(self.itermove_result[n])
