@@ -233,14 +233,14 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=8, width=8,
-                 number_of_agents=64,
+    def __init__(self, height=11, width=11,
+                 number_of_agents=47,
                  schedule_type="Simultaneous",
                  rounds=2000,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=True,
-                 experimental_spawn=False,
+                 experimental_spawn=True,
                  DD=1,
                  CC=1.5,
                  CD=-2,

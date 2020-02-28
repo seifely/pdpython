@@ -136,58 +136,52 @@ class PDAgent(Agent):
         """ This is an initial strategy selector for agents """
 
         if self.model.experimental_spawn:
-            if self.ID in self.model.experimental_defectors:
-                return "DEVIL"
-            if self.ID in self.model.experimental_cooperators:
-                return "ANGEL"
-            if self.ID in self.model.experimental_vpp:
-                return "VPP"
-            if self.ID in self.model.experimental_wsls:
-                return "WSLS"
-            if self.ID in self.model.experimental_tft:
-                return "TFT"
-
-
-        if self.pickstrat == "RANDOM":
-            choices = ["EV", "ANGEL", "RANDOM", "DEVIL", "VEV", "TFT", "WSLS", "VPP", "iWSLS"]
-            strat = random.choice(choices)
-            # print("strat is", strat)
+            print("My id is", self.ID)
+            strat = "RANDOM"
+            strat = self.model.experimental_strategies[self.ID]
             return str(strat)
-        elif self.pickstrat == "DISTRIBUTION":
-            """ This is for having x agents start on y strategy and the remaining p agents
-                start on q strategy """
 
-        elif self.pickstrat == "RDISTRO":  # Random Distribution of the selected strategies
-            choices = ["iWSLS", "VPP"]
-            if not self.checkerboard:
-                if not self.lineplace:
-                    strat = random.choice(choices)
-                    return str(strat)
-                elif self.lineplace:
+        elif not self.model.experimental_spawn:
+            if self.pickstrat == "RANDOM":
+                choices = ["EV", "ANGEL", "RANDOM", "DEVIL", "VEV", "TFT", "WSLS", "VPP", "iWSLS"]
+                strat = random.choice(choices)
+                # print("strat is", strat)
+                return str(strat)
+            elif self.pickstrat == "DISTRIBUTION":
+                """ This is for having x agents start on y strategy and the remaining p agents
+                    start on q strategy """
+
+            elif self.pickstrat == "RDISTRO":  # Random Distribution of the selected strategies
+                choices = ["iWSLS", "VPP"]
+                if not self.checkerboard:
+                    if not self.lineplace:
+                        strat = random.choice(choices)
+                        return str(strat)
+                    elif self.lineplace:
+                        if len(choices) == 2:
+                            if (self.ID % 2) == 0:
+                                strat = choices[0]
+                                return str(strat)
+                            else:
+                                strat = choices[1]
+                                return str(strat)
+                        elif len(choices) == 3:
+                            # make choices into a popped queue, take the front most and then add it in at the back after
+                            # choosing
+                            return
+                elif self.checkerboard:
+                    print("My ID is...", self.ID)
                     if len(choices) == 2:
-                        if (self.ID % 2) == 0:
+                        check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
+                                   42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
+                        check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
+                                   43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
+                        if self.ID in check_a:
                             strat = choices[0]
                             return str(strat)
-                        else:
+                        elif self.ID in check_b:
                             strat = choices[1]
                             return str(strat)
-                    elif len(choices) == 3:
-                        # make choices into a popped queue, take the front most and then add it in at the back after
-                        # choosing
-                        return
-            elif self.checkerboard:
-                print("My ID is...", self.ID)
-                if len(choices) == 2:
-                    check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
-                               42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
-                    check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
-                               43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
-                    if self.ID in check_a:
-                        strat = choices[0]
-                        return str(strat)
-                    elif self.ID in check_b:
-                        strat = choices[1]
-                        return str(strat)
 
     def change_strategy(self):
         return

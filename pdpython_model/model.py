@@ -222,15 +222,15 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=8, width=8,
-                 number_of_agents=64,
+    def __init__(self, height=11, width=11,
+                 number_of_agents=47,
                  schedule_type="Simultaneous",
                  rounds=2000,
                  collect_data=False,
                  #score_vis=False,
                  agent_printing=False,
                  randspawn=True,
-                 experimental_spawn=False,
+                 experimental_spawn=True,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -257,16 +257,20 @@ class PDModel(Model):
         self.init_ppD = init_ppD
         self.learning_rate = learning_rate
         self.simplified_payoffs = simplified_payoffs
+        self.experimental_spawn = experimental_spawn
         self.rounds = rounds
         self.randspawn = randspawn
         self.iteration_n = 0
         self.new_filenumber = 0
 
-        self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
-        self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
-        self.experimental_vpp = [41, 74, 50, 83, 26, 59, 92]
-        self.experimental_wsls = [30, 63, 96, 39, 72, 48, 81]
-        self.experimental_tft = [52, 85, 28, 61, 94, 37, 70]
+        self.experimental_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
+                                        20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
+                                        46: "DEVIL", 2: "ANGEL", 4: "ANGEL", 14: "ANGEL", 15: "ANGEL", 17: "ANGEL",
+                                        19: "ANGEL", 28: "ANGEL", 30: "ANGEL", 32: "ANGEL", 42: "ANGEL", 43: "ANGEL",
+                                        45: "ANGEL", 47: "ANGEL", 8: "VPP", 11: "VPP", 23: "VPP", 26: "VPP", 35: "VPP",
+                                        38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
+                                        37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
+                                        36: "TFT", 39: "TFT"}
 
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader
@@ -507,9 +511,11 @@ class PDModel(Model):
                 initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
                 pickle.dump(initialised, open("agent_ppds.p", "wb"))
 
-        for i in range(self.number_of_agents):
+        for i in range(46):
             """This is for adding agents in sequentially."""
-            x, y = self.experimental_coordinates.pop(0)
+            # x, y = self.experimental_coordinates.pop(0)
+            print(i)
+            x, y = self.experimental_coordinates[i]
             # print("x, y:", x, y)
             # x, y = self.grid.find_empty()
             pdagent = PDAgent((x, y), self, True)
