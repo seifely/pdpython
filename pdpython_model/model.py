@@ -262,6 +262,11 @@ class PDModel(Model):
         self.iteration_n = 0
         self.new_filenumber = 0
 
+        self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
+        self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
+        self.experimental_vpp = [41, 74, 50, 83, 26, 59, 92]
+        self.experimental_wsls = [30, 63, 96, 39, 72, 48, 81]
+        self.experimental_tft = [52, 85, 28, 61, 94, 37, 70]
 
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader

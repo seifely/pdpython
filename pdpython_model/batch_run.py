@@ -12,6 +12,8 @@ import numpy as np
 import pandas as pd
 import statistics
 import sys
+import os
+import pickle
 
 
 def get_num_coop_agents(model):
@@ -238,6 +240,7 @@ class PDModel(Model):
                  collect_data=True,
                  agent_printing=False,
                  randspawn=True,
+                 experimental_spawn=False,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -270,6 +273,12 @@ class PDModel(Model):
         self.randspawn = randspawn
         self.iteration_n = 0
         self.new_filenumber = 0
+
+        self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
+        self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
+        self.experimental_vpp = [41, 74, 50, 83, 26, 59, 92]
+        self.experimental_wsls = [30, 63, 96, 39, 72, 48, 81]
+        self.experimental_tft = [52, 85, 28, 61, 94, 37, 70]
 
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader
@@ -317,11 +326,21 @@ class PDModel(Model):
 
         # Find list of empty cells
         self.coordinates = [(x, y) for x in range(self.width) for y in range(self.height)]
+        self.experimental_coordinates = [(3, 8), (4, 8), (5, 8), (6, 8), (7, 8), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7),
+                                         (6, 7),
+                                         (7, 7), (8, 7), (9, 7), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6), (1, 5), (2, 5),
+                                         (3, 5),
+                                         (4, 5), (5, 5), (6, 5), (7, 5), (8, 5), (9, 5), (3, 4), (4, 4), (5, 4), (6, 4),
+                                         (7, 4),
+                                         (1, 3), (2, 3), (3, 3), (4, 3), (5, 3), (6, 3), (7, 3), (8, 3), (9, 3), (3, 2),
+                                         (4, 2),
+                                         (5, 2), (6, 2), (7, 2)]
 
         self.agentIDs = list(range(1, (number_of_agents + 1)))
 
 
         # ----- Storage -----
+
         self.agents_cooperating = 0
         self.agents_defecting = 0
         self.number_of_defects = 0
@@ -352,7 +371,10 @@ class PDModel(Model):
 
         self.memory_states = self.get_memory_states(['C', 'D'])
         self.state_values = self.state_evaluation(self.memory_states)
-        self.make_agents()
+        if not experimental_spawn:
+            self.make_agents()
+        elif experimental_spawn:
+            self.make_set_agents()
         self.running = True
         self.datacollector.collect(self)
 
@@ -480,6 +502,23 @@ class PDModel(Model):
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
                 self.schedule.add(pdagent)
+
+    def make_set_agents(self):
+        # generate current experiment ppD pickle if one does not exist?
+        if not os.path.isfile('agent_ppds.p'):
+            initialised = {}
+            for i in range(self.number_of_agents):
+                initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+                pickle.dump(initialised, open("agent_ppds.p", "wb"))
+
+        for i in range(self.number_of_agents):
+            """This is for adding agents in sequentially."""
+            x, y = self.experimental_coordinates.pop(0)
+            # print("x, y:", x, y)
+            # x, y = self.grid.find_empty()
+            pdagent = PDAgent((x, y), self, True)
+            self.grid.place_agent(pdagent, (x, y))
+            self.schedule.add(pdagent)
 
     def step(self):
         start = time.time()

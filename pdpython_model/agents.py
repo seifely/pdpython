@@ -135,6 +135,19 @@ class PDAgent(Agent):
     def pick_strategy(self):
         """ This is an initial strategy selector for agents """
 
+        if self.model.experimental_spawn:
+            if self.ID in self.model.experimental_defectors:
+                return "DEVIL"
+            if self.ID in self.model.experimental_cooperators:
+                return "ANGEL"
+            if self.ID in self.model.experimental_vpp:
+                return "VPP"
+            if self.ID in self.model.experimental_wsls:
+                return "WSLS"
+            if self.ID in self.model.experimental_tft:
+                return "TFT"
+
+
         if self.pickstrat == "RANDOM":
             choices = ["EV", "ANGEL", "RANDOM", "DEVIL", "VEV", "TFT", "WSLS", "VPP", "iWSLS"]
             strat = random.choice(choices)
