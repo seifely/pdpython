@@ -67,6 +67,7 @@ class PDAgent(Agent):
         self.partner_IDs = []
         self.partner_moves = {}
         self.per_partner_payoffs = {}  # this should be list of all prev payoffs from my partner, only used fr averaging
+        self.per_partner_coops = {}
         self.partner_latest_move = {}  # this is a popped list
         self.partner_scores = {}
         self.per_partner_utility = {}
@@ -583,6 +584,9 @@ class PDAgent(Agent):
                     if self.per_partner_payoffs.get(partner_ID) is None:
                         self.per_partner_payoffs[partner_ID] = [0]
 
+                    if self.per_partner_coops.get(partner_ID) is None:
+                        self.per_partner_coops[partner_ID] = 0
+
                     if self.indivAvPayoff.get(partner_ID) is None:
                         self.indivAvPayoff[partner_ID] = 0
 
@@ -645,6 +649,12 @@ class PDAgent(Agent):
 
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
+
+
+            if my_move == 'C':
+                self.per_partner_coops[i] += 1
+                print("I cooperated with my partner so my total C with them is,", self.per_partner_coops[i])
+                print("My score with them is", self.per_partner_utility[i])
 
             if outcome == ['C', 'C']:
                 self.mutual_c_outcome += 1

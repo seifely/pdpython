@@ -511,9 +511,11 @@ class PDModel(Model):
                 initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
                 pickle.dump(initialised, open("agent_ppds.p", "wb"))
 
-        for i in range(self.number_of_agents):
+        for i in range(47):
             """This is for adding agents in sequentially."""
-            x, y = self.experimental_coordinates.pop(0)
+            # x, y = self.experimental_coordinates.pop(0)
+            # print(i)
+            x, y = self.experimental_coordinates[i]
             # print("x, y:", x, y)
             # x, y = self.grid.find_empty()
             pdagent = PDAgent((x, y), self, True)

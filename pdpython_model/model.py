@@ -475,6 +475,38 @@ class PDModel(Model):
         # self.number_of_defects = 0
         self.number_of_NULL = 0  # should be coops
 
+    def training_data_collector(self):
+        # get vpp agents
+        if not os.path.isfile('training_data.p'):
+            training_data = []
+            pickle.dump(training_data, open("agent_ppds.p", "wb"))
+
+        training_data = pickle.load(training_data, open("training_data.p", "wb"))
+
+        agents = [a.ID for a in self.schedule.agents]
+        strategy = [a.strategy for a in self.schedule.agents]
+        oppo_strat = [a.per_partner_strategies for a in self.schedule.agents]
+
+
+        for i in agents:
+            index = #get the index of this agent
+            # if the index of strategy == VPP
+            #do this next bit
+
+
+        # for each agent that is VPP:
+            # for each of their partners:
+                # get their ppD value (should be randomised or thoroughly incremented)
+                # get their end utility score
+                # get their end cooperation score
+                # get the strategy of their opponent (as a number)
+                # append all this as a new line in the matrix
+
+        # we could add an emotional judgement metric later
+
+        return
+
+
     def make_agents(self):
         # generate current experiment ppD pickle if one does not exist?
         if not os.path.isfile('agent_ppds.p'):
@@ -514,7 +546,7 @@ class PDModel(Model):
         for i in range(47):
             """This is for adding agents in sequentially."""
             # x, y = self.experimental_coordinates.pop(0)
-            print(i)
+            # print(i)
             x, y = self.experimental_coordinates[i]
             # print("x, y:", x, y)
             # x, y = self.grid.find_empty()
