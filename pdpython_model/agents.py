@@ -534,15 +534,15 @@ class PDAgent(Agent):
         if state_value in bound_a:
             return gamma * 1
         if state_value in bound_b:
-            return gamma * 1
+            return gamma * 2
         if state_value in bound_c:
-            return gamma * 2
+            return gamma * 3
         if state_value in bound_d:
-            return gamma * 2
+            return gamma * 4
         if state_value in bound_e:
-            return gamma * 3
+            return gamma * 5
         if state_value in bound_f:
-            return gamma * 3
+            return gamma * 6
 
     def check_partner(self):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
