@@ -236,11 +236,12 @@ class PDModel(Model):
     def __init__(self, height=11, width=11,
                  number_of_agents=47,
                  schedule_type="Simultaneous",
-                 rounds=2000,
+                 rounds=250,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
+                 kNN_training=True,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -251,7 +252,8 @@ class PDModel(Model):
                  batch_iterations = 2,
                  learning_rate = 1,
                  gamma = 0.015,
-                 init_ppD = 0.5):
+                 init_ppD = 0.5,
+                 ):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -273,6 +275,7 @@ class PDModel(Model):
         self.randspawn = randspawn
         self.iteration_n = 0
         self.new_filenumber = 0
+        self.kNN_training = kNN_training
 
         self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
         self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
@@ -482,7 +485,41 @@ class PDModel(Model):
         # self.number_of_defects = 0
         self.number_of_NULL = 0  # should be coops
 
+    def training_data_collector(self):
+        if self.kNN_training:
+            if not os.path.isfile('training_data.p'):
+                training_data = []
+                pickle.dump(training_data, open("training_data.p", "wb"))
+
+            agent_training_data = [a.training_data for a in self.schedule.agents]
+            training_data = []
+
+            for i in agent_training_data:
+                # print("agent has:", i)
+                if len(i) is not 0:
+                    for j in range(len(i)):
+                        jj = i[j]
+                        # print("data to append", jj)
+                        training_data.append(jj)
+
+            # print("save data", save_data)
+            training_update = pickle.load(open("training_data.p", "rb"))
+            print("Training Data Size Pre-Update:", len(training_update))
+            for i in training_data:
+                training_update.append(i)
+            print("Training Data Size Post-Update:", len(training_update))
+            # print(training_update)
+            pickle.dump(training_update, open("training_data.p", "wb"))
+        else:
+            return
+
     def make_agents(self):
+        if not os.path.isfile('agent_ppds.p'):
+            initialised = {}
+            for i in range(self.number_of_agents):
+                initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+                pickle.dump(initialised, open("agent_ppds.p", "wb"))
+
         if not self.randspawn:
             for i in range(self.number_of_agents):
                 """This is for adding agents in sequentially."""
@@ -538,17 +575,18 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=2000):
+    def run_model(self, rounds=250):
         for i in range(self.rounds):
             self.step()
 
 
 # parameter lists for each parameter to be tested in batch run
-br_params = {"number_of_agents": [64],
+br_params = {"number_of_agents": [47],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.5, #0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09
+            "init_ppD": [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
+                         0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95
                          ]}
 
 br = BatchRunner(PDModel,

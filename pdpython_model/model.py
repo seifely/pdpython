@@ -225,12 +225,13 @@ class PDModel(Model):
     def __init__(self, height=11, width=11,
                  number_of_agents=47,
                  schedule_type="Simultaneous",
-                 rounds=10,
+                 rounds=250,
                  collect_data=False,
                  #score_vis=False,
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
+                 kNN_training=False,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -240,7 +241,8 @@ class PDModel(Model):
                  c=0,
                  learning_rate=1,
                  gamma=0.015,
-                 init_ppD=0.5):
+                 init_ppD=0.5,
+                 ):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -262,6 +264,7 @@ class PDModel(Model):
         self.randspawn = randspawn
         self.iteration_n = 0
         self.new_filenumber = 0
+        self.kNN_training = kNN_training
 
         self.experimental_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
                                         20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
@@ -476,30 +479,32 @@ class PDModel(Model):
         self.number_of_NULL = 0  # should be coops
 
     def training_data_collector(self):
+        if self.kNN_training:
+            if not os.path.isfile('training_data.p'):
+                training_data = []
+                pickle.dump(training_data, open("training_data.p", "wb"))
 
-        if not os.path.isfile('training_data.p'):
+            agent_training_data = [a.training_data for a in self.schedule.agents]
             training_data = []
-            pickle.dump(training_data, open("training_data.p", "wb"))
 
-        agent_training_data = [a.training_data for a in self.schedule.agents]
-        training_data = []
+            for i in agent_training_data:
+                # print("agent has:", i)
+                if len(i) is not 0:
+                    for j in range(len(i)):
+                        jj = i[j]
+                        # print("data to append", jj)
+                        training_data.append(jj)
 
-        for i in agent_training_data:
-            # print("agent has:", i)
-            if len(i) is not 0:
-                for j in range(len(i)):
-                    jj = i[j]
-                    # print("data to append", jj)
-                    training_data.append(jj)
-
-        # print("save data", save_data)
-        training_update = pickle.load(open("training_data.p", "rb"))
-        print("Training Data Size Pre-Update:", len(training_update))
-        for i in training_data:
-            training_update.append(i)
-        print("Training Data Size Post-Update:", len(training_update))
-        print(training_update)
-        pickle.dump(training_update, open("training_data.p", "wb"))
+            # print("save data", save_data)
+            training_update = pickle.load(open("training_data.p", "rb"))
+            print("Training Data Size Pre-Update:", len(training_update))
+            for i in training_data:
+                training_update.append(i)
+            print("Training Data Size Post-Update:", len(training_update))
+            # print(training_update)
+            pickle.dump(training_update, open("training_data.p", "wb"))
+        else:
+            return
 
 
     def make_agents(self):
@@ -569,6 +574,6 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=2000):
+    def run_model(self, rounds=250):
         for i in range(self.rounds):
             self.step()

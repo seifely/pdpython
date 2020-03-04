@@ -218,7 +218,7 @@ step_element = StepCountDisplay()
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
 model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 122, 2, 47, 1),
-                "rounds": UserSettableParameter('slider', 'Number of Rounds', 10,1,3000,10),
+                "rounds": UserSettableParameter('slider', 'Number of Rounds', 250,1,3000,10),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', False),
                 "init_ppD": UserSettableParameter('slider', 'Initial Probability VPP Agents Defect', 0.50,0.01,1,0.01),
                 # "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),
