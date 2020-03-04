@@ -476,18 +476,30 @@ class PDModel(Model):
         self.number_of_NULL = 0  # should be coops
 
     def training_data_collector(self):
+
+        if not os.path.isfile('training_data.p'):
+            training_data = []
+            pickle.dump(training_data, open("training_data.p", "wb"))
+
         agent_training_data = [a.training_data for a in self.schedule.agents]
-        save_data = []
+        training_data = []
 
         for i in agent_training_data:
-            print("agent has:", i)
+            # print("agent has:", i)
             if len(i) is not 0:
                 for j in range(len(i)):
                     jj = i[j]
-                    print("data to append", jj)
-                    save_data.append(jj)
+                    # print("data to append", jj)
+                    training_data.append(jj)
 
-        print("save data", save_data)
+        # print("save data", save_data)
+        training_update = pickle.load(open("training_data.p", "rb"))
+        print("Training Data Size Pre-Update:", len(training_update))
+        for i in training_data:
+            training_update.append(i)
+        print("Training Data Size Post-Update:", len(training_update))
+        print(training_update)
+        pickle.dump(training_update, open("training_data.p", "wb"))
 
 
     def make_agents(self):
@@ -498,9 +510,6 @@ class PDModel(Model):
                 initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
                 pickle.dump(initialised, open("agent_ppds.p", "wb"))
 
-        if not os.path.isfile('training_data.p'):
-            training_data = []
-            pickle.dump(training_data, open("training_data.p", "wb"))
 
         if not self.randspawn:
             for i in range(self.number_of_agents):
