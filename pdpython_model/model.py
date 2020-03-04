@@ -19,7 +19,7 @@ def get_num_coop_agents(model):
     agent_cooperations = [a.number_of_c for a in model.schedule.agents]
     # print("hey", agent_cooperations)
     agent_cooperations = np.sum(agent_cooperations)
-    print("agent cooperations:", agent_cooperations.item())
+    # print("agent cooperations:", agent_cooperations.item())
     return agent_cooperations.item()
 
 def get_num_defect_agents(model):
@@ -28,7 +28,7 @@ def get_num_defect_agents(model):
     agent_defections = [a.number_of_d for a in model.schedule.agents]
     # print("hey", agent_defections)
     agent_defections = np.sum(agent_defections)
-    print("agent defections:", agent_defections.item())
+    # print("agent defections:", agent_defections.item())
     return agent_defections.item()
 
 def get_cooperators(model):
@@ -71,8 +71,8 @@ def get_tft_performance(model):
                 agent = scores[indices]
                 agent_scores.append(agent)
 
-    if sum(agent_scores) != 0:
-        print("tft scored", sum(agent_scores))
+    # if sum(agent_scores) != 0:
+    #     print("tft scored", sum(agent_scores))
     return sum(agent_scores)
 
 def get_tft_cooperations(model):
@@ -90,8 +90,8 @@ def get_tft_cooperations(model):
                 agent = coops[indices]
                 agent_coops.append(agent)
 
-    if sum(agent_coops) != 0:
-        print("tft cooped", sum(agent_coops))
+    # if sum(agent_coops) != 0:
+    #     print("tft cooped", sum(agent_coops))
     return sum(agent_coops)
 
 def get_vpp_performance(model):
@@ -109,8 +109,8 @@ def get_vpp_performance(model):
                 agent = scores[indices]
                 agent_scores.append(agent)
 
-    if sum(agent_scores) != 0:
-        print("vpp scored", sum(agent_scores))
+    # if sum(agent_scores) != 0:
+    #     print("vpp scored", sum(agent_scores))
     return sum(agent_scores)
 
 def get_vpp_cooperations(model):
@@ -128,8 +128,8 @@ def get_vpp_cooperations(model):
                 agent = coops[indices]
                 agent_coops.append(agent)
 
-    if sum(agent_coops) != 0:
-        print("vpp cooped", sum(agent_coops))
+    # if sum(agent_coops) != 0:
+    #     print("vpp cooped", sum(agent_coops))
     return sum(agent_coops)
 
 def get_wsls_performance(model):
@@ -147,8 +147,8 @@ def get_wsls_performance(model):
                 agent = scores[indices]
                 agent_scores.append(agent)
 
-    if sum(agent_scores) != 0:
-        print("wsls scored", sum(agent_scores))
+    # if sum(agent_scores) != 0:
+    #     print("wsls scored", sum(agent_scores))
     return sum(agent_scores)
 
 def get_iwsls_performance(model):
@@ -166,8 +166,8 @@ def get_iwsls_performance(model):
                 agent = scores[indices]
                 agent_scores.append(agent)
 
-    if sum(agent_scores) != 0:
-        print("iwsls scored", sum(agent_scores))
+    # if sum(agent_scores) != 0:
+    #     print("iwsls scored", sum(agent_scores))
     return sum(agent_scores)
 
 def get_wsls_cooperations(model):
@@ -185,8 +185,8 @@ def get_wsls_cooperations(model):
                 agent = coops[indices]
                 agent_coops.append(agent)
 
-    if sum(agent_coops) != 0:
-        print("wsls cooped", sum(agent_coops))
+    # if sum(agent_coops) != 0:
+    #     print("wsls cooped", sum(agent_coops))
     return sum(agent_coops)
 
 def get_iwsls_cooperations(model):
@@ -204,8 +204,8 @@ def get_iwsls_cooperations(model):
                 agent = coops[indices]
                 agent_coops.append(agent)
 
-    if sum(agent_coops) != 0:
-        print("iwsls cooped", sum(agent_coops))
+    # if sum(agent_coops) != 0:
+    #     print("iwsls cooped", sum(agent_coops))
     return sum(agent_coops)
 
 def track_params(model):
@@ -225,7 +225,7 @@ class PDModel(Model):
     def __init__(self, height=11, width=11,
                  number_of_agents=47,
                  schedule_type="Simultaneous",
-                 rounds=2000,
+                 rounds=10,
                  collect_data=False,
                  #score_vis=False,
                  agent_printing=False,
@@ -476,35 +476,18 @@ class PDModel(Model):
         self.number_of_NULL = 0  # should be coops
 
     def training_data_collector(self):
-        # get vpp agents
-        if not os.path.isfile('training_data.p'):
-            training_data = []
-            pickle.dump(training_data, open("agent_ppds.p", "wb"))
+        agent_training_data = [a.training_data for a in self.schedule.agents]
+        save_data = []
 
-        training_data = pickle.load(training_data, open("training_data.p", "wb"))
+        for i in agent_training_data:
+            print("agent has:", i)
+            if len(i) is not 0:
+                for j in range(len(i)):
+                    jj = i[j]
+                    print("data to append", jj)
+                    save_data.append(jj)
 
-        agents = [a.ID for a in self.schedule.agents]
-        strategy = [a.strategy for a in self.schedule.agents]
-        oppo_strat = [a.per_partner_strategies for a in self.schedule.agents]
-
-
-        for i in agents:
-            index = #get the index of this agent
-            # if the index of strategy == VPP
-            #do this next bit
-
-
-        # for each agent that is VPP:
-            # for each of their partners:
-                # get their ppD value (should be randomised or thoroughly incremented)
-                # get their end utility score
-                # get their end cooperation score
-                # get the strategy of their opponent (as a number)
-                # append all this as a new line in the matrix
-
-        # we could add an emotional judgement metric later
-
-        return
+        print("save data", save_data)
 
 
     def make_agents(self):
@@ -514,6 +497,10 @@ class PDModel(Model):
             for i in range(self.number_of_agents):
                 initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
                 pickle.dump(initialised, open("agent_ppds.p", "wb"))
+
+        if not os.path.isfile('training_data.p'):
+            training_data = []
+            pickle.dump(training_data, open("training_data.p", "wb"))
 
         if not self.randspawn:
             for i in range(self.number_of_agents):
@@ -557,6 +544,9 @@ class PDModel(Model):
     def step(self):
         start = time.time()
         self.schedule.step()
+        if self.step_count == self.rounds - 1:
+            self.training_data_collector()
+
         self.step_count += 1
         # print("Step:", self.step_count)
         end = time.time()

@@ -52,7 +52,6 @@ class PDAgent(Agent):
         self.init_uv = self.model.gamma
         # self.init_ppD = model.init_ppD  # this isn't actually used
 
-
         self.move = None
         self.next_move = None
         self.printing = self.model.agent_printing
@@ -66,11 +65,14 @@ class PDAgent(Agent):
         # ------------------------ LOCAL MEMORY --------------------------
         self.partner_IDs = []
         self.partner_moves = {}
+        self.ppD_partner = 0
         self.per_partner_payoffs = {}  # this should be list of all prev payoffs from my partner, only used fr averaging
-        self.per_partner_coops = {}
         self.partner_latest_move = {}  # this is a popped list
         self.partner_scores = {}
+        self.default_ppds = {}
+        self.training_data = []
         self.per_partner_utility = {}
+        self.per_partner_coops = {}
         self.per_partner_strategies = {}
         self.similar_partners = 0
         self.outcome_list = {}
@@ -131,13 +133,43 @@ class PDAgent(Agent):
         for i in ids:
             index = ids.index(i)
             self.ppD_partner[i] = my_pickle[index]
+            # print("this ppd was", self.ppD_partner[i])
             # print("this partner's pickled ppd is ", my_pickle[index])
+            self.default_ppds[i] = my_pickle[index]
+
+    def export_training_data(self):
+        # print("the ppds are", self.default_ppds)
+        my_data = []
+        for i in self.partner_IDs:
+            temp_data = []
+            temp_data.append(self.per_partner_utility[i])
+            temp_data.append(self.per_partner_coops[i])
+            temp_data.append(self.default_ppds[i])
+
+            if self.per_partner_strategies[i] == 'VPP':
+                temp_data.append(1)
+            elif self.per_partner_strategies[i] == 'ANGEL':
+                temp_data.append(2)
+            elif self.per_partner_strategies[i] == 'DEVIL':
+                temp_data.append(3)
+            elif self.per_partner_strategies[i] == 'TFT':
+                temp_data.append(4)
+            elif self.per_partner_strategies[i] == 'WSLS':
+                temp_data.append(5)
+            elif self.per_partner_strategies[i] == 'iWSLS':
+                temp_data.append(6)
+
+            # print("It's the last turn, and this train_data is", temp_data)
+            my_data.append(temp_data)
+
+        # print("my_data", my_data)
+        return my_data
 
     def pick_strategy(self):
         """ This is an initial strategy selector for agents """
 
         if self.model.experimental_spawn:
-            print("My id is", self.ID)
+            # print("My id is", self.ID)
             strat = "RANDOM"
             strat = self.model.experimental_strategies[self.ID]
             return str(strat)
@@ -653,8 +685,8 @@ class PDAgent(Agent):
 
             if my_move == 'C':
                 self.per_partner_coops[i] += 1
-                print("I cooperated with my partner so my total C with them is,", self.per_partner_coops[i])
-                print("My score with them is", self.per_partner_utility[i])
+                # print("I cooperated with my partner so my total C with them is,", self.per_partner_coops[i])
+                # print("My score with them is", self.per_partner_utility[i])
 
             if outcome == ['C', 'C']:
                 self.mutual_c_outcome += 1
@@ -1126,6 +1158,9 @@ class PDAgent(Agent):
                 # if self.model.collect_data:
                 #     self.output_data_to_file(self.outcome_list)
                 # self.reset_values()
+                # if self.last_round:
+                #         if self.strategy == 'VPP':
+                #             self.training_data = self.export_training_data()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -1142,9 +1177,13 @@ class PDAgent(Agent):
                 print("----------------------------------------------------------")
 
     def advance(self):
+
         # self.move = self.next_move
         self.check_partner()  # Update Knowledge
         round_payoffs = self.increment_score(self.payoffs)
+        if self.last_round:
+            if self.strategy == 'VPP':
+                self.training_data = self.export_training_data()
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
         # self.compare_score()
 
