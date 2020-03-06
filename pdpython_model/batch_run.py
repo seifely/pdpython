@@ -237,7 +237,7 @@ class PDModel(Model):
                  number_of_agents=47,
                  schedule_type="Simultaneous",
                  rounds=250,
-                 collect_data=True,
+                 collect_data=False,
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
@@ -276,12 +276,22 @@ class PDModel(Model):
         self.iteration_n = 0
         self.new_filenumber = 0
         self.kNN_training = kNN_training
+        self.experimental_spawn = experimental_spawn
 
-        self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
-        self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
-        self.experimental_vpp = [41, 74, 50, 83, 26, 59, 92]
-        self.experimental_wsls = [30, 63, 96, 39, 72, 48, 81]
-        self.experimental_tft = [52, 85, 28, 61, 94, 37, 70]
+        self.experimental_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
+                                        20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
+                                        46: "DEVIL", 2: "ANGEL", 4: "ANGEL", 14: "ANGEL", 15: "ANGEL", 17: "ANGEL",
+                                        19: "ANGEL", 28: "ANGEL", 30: "ANGEL", 32: "ANGEL", 42: "ANGEL", 43: "ANGEL",
+                                        45: "ANGEL", 47: "ANGEL", 8: "VPP", 11: "VPP", 23: "VPP", 26: "VPP", 35: "VPP",
+                                        38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
+                                        37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
+                                        36: "TFT", 39: "TFT"}
+
+        # self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
+        # self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
+        # self.experimental_vpp = [41, 74, 50, 83, 26, 59, 92]
+        # self.experimental_wsls = [30, 63, 96, 39, 72, 48, 81]
+        # self.experimental_tft = [52, 85, 28, 61, 94, 37, 70]
 
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader
@@ -514,11 +524,7 @@ class PDModel(Model):
             return
 
     def make_agents(self):
-        if not os.path.isfile('agent_ppds.p'):
-            initialised = {}
-            for i in range(self.number_of_agents):
-                initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
-                pickle.dump(initialised, open("agent_ppds.p", "wb"))
+        # if not os.path.isfile('agent_ppds.p'):
 
         if not self.randspawn:
             for i in range(self.number_of_agents):
@@ -542,11 +548,11 @@ class PDModel(Model):
 
     def make_set_agents(self):
         # generate current experiment ppD pickle if one does not exist?
-        if not os.path.isfile('agent_ppds.p'):
-            initialised = {}
-            for i in range(self.number_of_agents):
-                initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
-                pickle.dump(initialised, open("agent_ppds.p", "wb"))
+        # if not os.path.isfile('agent_ppds.p'):
+        #     initialised = {}
+        #     for i in range(self.number_of_agents):
+        #         initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+        #         pickle.dump(initialised, open("agent_ppds.p", "wb"))
 
         for i in range(47):
             """This is for adding agents in sequentially."""
@@ -562,6 +568,8 @@ class PDModel(Model):
     def step(self):
         start = time.time()
         self.schedule.step()
+        if self.step_count == self.rounds - 1:
+            self.training_data_collector()
         self.step_count += 1
         # print("Step:", self.step_count)
         end = time.time()
@@ -585,13 +593,16 @@ br_params = {"number_of_agents": [47],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5,
-                         0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95
+            "init_ppD": [0.05,
                          ]}
+
+""" For collecting training data for kNN, please run one init_ppD at a time.
+    Otherwise, it doesn't export the ppD variable correctly to the pickle! """
+
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=100,
+                 iterations=300,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
@@ -603,6 +614,6 @@ if __name__ == '__main__':
         if isinstance(br_df["Data Collector"][i], DataCollector):
             i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
             br_step_data = br_step_data.append(i_run_data, ignore_index=True)
-    br_step_data.to_csv("PDModel_Step_Data_%s.csv" % (str(random.randint(1,2000))))  # this might not be as useful for importing
-    # Current Solution: copy data to new folder when we make it
+    br_step_data.to_csv("PDModel_Step_Data_%s.csv" % (str(random.randint(1,200000))))  # this might not be as useful for importing
+
 

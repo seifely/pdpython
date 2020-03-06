@@ -124,6 +124,16 @@ class PDAgent(Agent):
                     # self.ppD_partner[partner_ID] = 0.5
 
     def set_defaults(self, ids):
+        initialised = {}
+        for i in range(self.model.number_of_agents):
+            initialised[i + 1] = [self.model.init_ppD, self.model.init_ppD, self.model.init_ppD, self.model.init_ppD]
+            pickle.dump(initialised, open("agent_ppds.p", "wb"))
+
+            """ This is used for setting ppD to a model-specified value. For agents
+                to alter their own ppDs for, they must use the kNN system and 
+                extract from a pickle file [INCOMPLETE] the classification of partner
+                etc. from the previous game."""
+
         # open the ppD pickle
         agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         # print(agent_ppds)

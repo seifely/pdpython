@@ -560,7 +560,6 @@ class PDModel(Model):
         self.schedule.step()
         if self.step_count == self.rounds - 1:
             self.training_data_collector()
-
         self.step_count += 1
         # print("Step:", self.step_count)
         end = time.time()
