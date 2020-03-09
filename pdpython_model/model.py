@@ -482,7 +482,8 @@ class PDModel(Model):
         if self.kNN_training:
             if not os.path.isfile('training_data.p'):
                 training_data = []
-                pickle.dump(training_data, open("training_data.p", "wb"))
+                with open("training_data.p", "wb") as f:
+                    pickle.dump(training_data, f)
 
             agent_training_data = [a.training_data for a in self.schedule.agents]
             training_data = []
@@ -496,13 +497,16 @@ class PDModel(Model):
                         training_data.append(jj)
 
             # print("save data", save_data)
-            training_update = pickle.load(open("training_data.p", "rb"))
+            with open("training_data.p", "rb") as f:
+                training_update = pickle.load(f)
+
             print("Training Data Size Pre-Update:", len(training_update))
             for i in training_data:
                 training_update.append(i)
             print("Training Data Size Post-Update:", len(training_update))
             # print(training_update)
-            pickle.dump(training_update, open("training_data.p", "wb"))
+            with open("training_data.p", "wb") as f:
+                pickle.dump(training_update, f)
         else:
             return
 
@@ -538,11 +542,11 @@ class PDModel(Model):
 
     def make_set_agents(self):
         # generate current experiment ppD pickle if one does not exist?
-        if not os.path.isfile('agent_ppds.p'):
-            initialised = {}
-            for i in range(self.number_of_agents):
-                initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
-                pickle.dump(initialised, open("agent_ppds.p", "wb"))
+        # if not os.path.isfile('agent_ppds.p'):
+        #     initialised = {}
+        #     for i in range(self.number_of_agents):
+        #         initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+        #         pickle.dump(initialised, open("agent_ppds.p", "wb"))
 
         for i in range(47):
             """This is for adding agents in sequentially."""

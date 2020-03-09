@@ -6,6 +6,7 @@ from math import ceil
 import itertools
 import statistics
 import pickle
+import time
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
@@ -124,28 +125,21 @@ class PDAgent(Agent):
                     # self.ppD_partner[partner_ID] = 0.5
 
     def set_defaults(self, ids):
-        initialised = {}
-        for i in range(self.model.number_of_agents):
-            initialised[i + 1] = [self.model.init_ppD, self.model.init_ppD, self.model.init_ppD, self.model.init_ppD]
-            pickle.dump(initialised, open("agent_ppds.p", "wb"))
 
-            """ This is used for setting ppD to a model-specified value. For agents
-                to alter their own ppDs for, they must use the kNN system and 
-                extract from a pickle file [INCOMPLETE] the classification of partner
-                etc. from the previous game."""
 
         # open the ppD pickle
-        agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
-        # print(agent_ppds)
-        my_pickle = agent_ppds[self.ID]
-        # print("my defaults are", my_pickle)
-        # j = 0
-        for i in ids:
-            index = ids.index(i)
-            self.ppD_partner[i] = my_pickle[index]
-            # print("this ppd was", self.ppD_partner[i])
-            # print("this partner's pickled ppd is ", my_pickle[index])
-            self.default_ppds[i] = my_pickle[index]
+        with open("agent_ppds.p", "rb") as f:
+            agent_ppds = pickle.load(f)
+            # print(agent_ppds)
+            my_pickle = agent_ppds[self.ID]
+            # print("my defaults are", my_pickle)
+            # j = 0
+            for i in ids:
+                index = ids.index(i)
+                self.ppD_partner[i] = my_pickle[index]
+                # print("this ppd was", self.ppD_partner[i])
+                # print("this partner's pickled ppd is ", my_pickle[index])
+                self.default_ppds[i] = my_pickle[index]
 
     def export_training_data(self):
         # print("the ppds are", self.default_ppds)

@@ -470,6 +470,18 @@ class PDModel(Model):
         return permutations
 
     def state_evaluation(self, state_list):
+        # if self.stepCount == 1:
+        initialised = {}
+        for i in range(self.number_of_agents):
+            initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+            with open("agent_ppds.p", "wb") as f:
+                pickle.dump(initialised, f)
+
+            """ This is used for setting ppD to a model-specified value. For agents
+                to alter their own ppDs for, they must use the kNN system and 
+                extract from a pickle file [INCOMPLETE] the classification of partner
+                etc. from the previous game."""
+
         state_value = []
         for i in state_list:
             current_value = 0
@@ -499,7 +511,8 @@ class PDModel(Model):
         if self.kNN_training:
             if not os.path.isfile('training_data.p'):
                 training_data = []
-                pickle.dump(training_data, open("training_data.p", "wb"))
+                with open("training_data.p", "wb") as f:
+                    pickle.dump(training_data, f)
 
             agent_training_data = [a.training_data for a in self.schedule.agents]
             training_data = []
@@ -513,13 +526,16 @@ class PDModel(Model):
                         training_data.append(jj)
 
             # print("save data", save_data)
-            training_update = pickle.load(open("training_data.p", "rb"))
+            with open("training_data.p", "rb") as f:
+                training_update = pickle.load(f)
+
             print("Training Data Size Pre-Update:", len(training_update))
             for i in training_data:
                 training_update.append(i)
             print("Training Data Size Post-Update:", len(training_update))
             # print(training_update)
-            pickle.dump(training_update, open("training_data.p", "wb"))
+            with open("training_data.p", "wb") as f:
+                pickle.dump(training_update, f)
         else:
             return
 
@@ -566,6 +582,7 @@ class PDModel(Model):
             self.schedule.add(pdagent)
 
     def step(self):
+
         start = time.time()
         self.schedule.step()
         if self.step_count == self.rounds - 1:
@@ -593,7 +610,7 @@ br_params = {"number_of_agents": [47],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.05,
+            "init_ppD": [0.75,
                          ]}
 
 """ For collecting training data for kNN, please run one init_ppD at a time.
