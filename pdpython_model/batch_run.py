@@ -237,11 +237,11 @@ class PDModel(Model):
                  number_of_agents=47,
                  schedule_type="Simultaneous",
                  rounds=250,
-                 collect_data=False,
+                 collect_data=True,
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
-                 kNN_training=True,
+                 kNN_training=False,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -384,6 +384,7 @@ class PDModel(Model):
 
         self.memory_states = self.get_memory_states(['C', 'D'])
         self.state_values = self.state_evaluation(self.memory_states)
+        self.agent_ppds = {}
         if not experimental_spawn:
             self.make_agents()
         elif experimental_spawn:
@@ -540,7 +541,8 @@ class PDModel(Model):
             return
 
     def make_agents(self):
-        # if not os.path.isfile('agent_ppds.p'):
+        with open("agent_ppds.p", "rb") as f:
+            self.agent_ppds = pickle.load(f)
 
         if not self.randspawn:
             for i in range(self.number_of_agents):
@@ -586,6 +588,7 @@ class PDModel(Model):
         start = time.time()
         self.schedule.step()
         if self.step_count == self.rounds - 1:
+            self.update_agent_ppds()
             self.training_data_collector()
         self.step_count += 1
         # print("Step:", self.step_count)
@@ -610,7 +613,7 @@ br_params = {"number_of_agents": [47],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.75,
+            "init_ppD": [0.95,
                          ]}
 
 """ For collecting training data for kNN, please run one init_ppD at a time.
@@ -619,7 +622,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=300,
+                 iterations=61,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

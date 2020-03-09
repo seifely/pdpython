@@ -226,7 +226,7 @@ class PDModel(Model):
                  number_of_agents=47,
                  schedule_type="Simultaneous",
                  rounds=250,
-                 collect_data=False,
+                 collect_data=True,
                  #score_vis=False,
                  agent_printing=False,
                  randspawn=True,
@@ -445,6 +445,18 @@ class PDModel(Model):
         return permutations
 
     def state_evaluation(self, state_list):
+        # if self.stepCount == 1:
+        initialised = {}
+        for i in range(self.number_of_agents):
+            initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+            with open("agent_ppds.p", "wb") as f:
+                pickle.dump(initialised, f)
+
+            """ This is used for setting ppD to a model-specified value. For agents
+                to alter their own ppDs for, they must use the kNN system and 
+                extract from a pickle file [INCOMPLETE] the classification of partner
+                etc. from the previous game."""
+
         state_value = []
         for i in state_list:
             current_value = 0

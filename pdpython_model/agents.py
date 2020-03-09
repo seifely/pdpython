@@ -1027,7 +1027,8 @@ class PDAgent(Agent):
 
     def set_ppds(self):
         """ Use this function on the last round of the game, after final score checking, to
-            determine what the classification of a partner might be."""
+            determine what the classification of a partner might be. It should alter the agent_ppds.p
+            file to provide a new starting ppd for each partner next turn."""
 
         #
         return
@@ -1035,11 +1036,14 @@ class PDAgent(Agent):
     def knn_analysis(self, input):
         """ Takes an input, checks it against training data, and returns a partner classification """
 
+
         return
 
     def ppd_select(self, classification, optimisation_choice):
         """ Takes a class of partner, given by the kNN algorithm, and returns a starting ppD to
         use in future games for the same partner based on which variable (or combo) we want to optimise """
+        # with f as
+        # training_data =
         return
 
     def find_average_move(self):
