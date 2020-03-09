@@ -472,6 +472,9 @@ class PDModel(Model):
 
     def state_evaluation(self, state_list):
         # if self.stepCount == 1:
+
+        """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
+            when actually we want it to start at 0.5 and then go unaltered by this method for the subsequent games"""
         initialised = {}
         for i in range(self.number_of_agents):
             initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
@@ -564,6 +567,10 @@ class PDModel(Model):
                 self.grid.place_agent(pdagent, (x, y))
                 self.schedule.add(pdagent)
 
+    def update_agent_ppds(self, ppds):
+        with open("agent_ppds.p", "wb") as f:
+            pickle.dump(ppds, f)
+
     def make_set_agents(self):
         # generate current experiment ppD pickle if one does not exist?
         # if not os.path.isfile('agent_ppds.p'):
@@ -588,7 +595,7 @@ class PDModel(Model):
         start = time.time()
         self.schedule.step()
         if self.step_count == self.rounds - 1:
-            self.update_agent_ppds()
+            self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
         self.step_count += 1
         # print("Step:", self.step_count)

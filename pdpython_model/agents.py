@@ -126,20 +126,20 @@ class PDAgent(Agent):
 
     def set_defaults(self, ids):
 
-
         # open the ppD pickle
-        with open("agent_ppds.p", "rb") as f:
-            agent_ppds = pickle.load(f)
-            # print(agent_ppds)
-            my_pickle = agent_ppds[self.ID]
-            # print("my defaults are", my_pickle)
-            # j = 0
-            for i in ids:
-                index = ids.index(i)
-                self.ppD_partner[i] = my_pickle[index]
-                # print("this ppd was", self.ppD_partner[i])
-                # print("this partner's pickled ppd is ", my_pickle[index])
-                self.default_ppds[i] = my_pickle[index]
+        # with open("agent_ppds.p", "rb") as f:
+        #     agent_ppds = pickle.load(f)
+        agent_ppds = self.model.agent_ppds
+        # print(agent_ppds)
+        my_pickle = agent_ppds[self.ID]
+        # print("my defaults are", my_pickle)
+        # j = 0
+        for i in ids:
+            index = ids.index(i)
+            self.ppD_partner[i] = my_pickle[index]
+            # print("this ppd was", self.ppD_partner[i])
+            # print("this partner's pickled ppd is ", my_pickle[index])
+            self.default_ppds[i] = my_pickle[index]
 
     def export_training_data(self):
         # print("the ppds are", self.default_ppds)
@@ -1027,10 +1027,14 @@ class PDAgent(Agent):
 
     def set_ppds(self):
         """ Use this function on the last round of the game, after final score checking, to
-            determine what the classification of a partner might be. It should alter the agent_ppds.p
-            file to provide a new starting ppd for each partner next turn."""
+            determine what the classification of a partner might be. It should alter the model's ppds storage
+            object to provide a new starting ppd for each partner next turn, which the model then outputs to the
+            relevant pickle."""
 
-        #
+        # The model loads in the ppd pickle file when it makes agents
+        # ====== BE SURE TO ALTER YOUR PPD WITHIN SELF.MODEL.AGENT_PPDS{AGENT_ID}
+
+        # don't return anything, just update the self.model.agent_ppds{agent_id} with the relevant ppd list
         return
 
     def knn_analysis(self, input):
