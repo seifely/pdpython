@@ -225,7 +225,7 @@ class PDModel(Model):
     def __init__(self, height=11, width=11,
                  number_of_agents=47,
                  schedule_type="Simultaneous",
-                 rounds=250,
+                 rounds=10,
                  collect_data=True,
                  #score_vis=False,
                  agent_printing=False,
@@ -359,6 +359,10 @@ class PDModel(Model):
 
         self.memory_states = self.get_memory_states(['C', 'D'])
         self.state_values = self.state_evaluation(self.memory_states)
+        self.agent_ppds = {}
+        self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
+        self.training_data = []
+        self.training_data = pickle.load(open("training_data.p", "rb"))
         if not experimental_spawn:
             self.make_agents()
         elif experimental_spawn:
@@ -446,8 +450,17 @@ class PDModel(Model):
 
     def state_evaluation(self, state_list):
         # if self.stepCount == 1:
+        """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
+                    when actually we want it to start at 0.5 and then go unaltered by this method for the subsequent games"""
         initialised = {}
-        for i in range(self.number_of_agents):
+        n_of_a = 0
+        if self.experimental_spawn:
+            n_of_a = 47
+        else:
+            n_of_a = 64
+
+        for i in range(n_of_a):
+            # print("n of a", i)
             initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
             with open("agent_ppds.p", "wb") as f:
                 pickle.dump(initialised, f)
@@ -524,12 +537,13 @@ class PDModel(Model):
 
 
     def make_agents(self):
+
         # generate current experiment ppD pickle if one does not exist?
-        if not os.path.isfile('agent_ppds.p'):
-            initialised = {}
-            for i in range(self.number_of_agents):
-                initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
-                pickle.dump(initialised, open("agent_ppds.p", "wb"))
+        # if not os.path.isfile('agent_ppds.p'):
+        #     initialised = {}
+        #     for i in range(self.number_of_agents):
+        #         initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+        #         pickle.dump(initialised, open("agent_ppds.p", "wb"))
 
 
         if not self.randspawn:
@@ -551,6 +565,10 @@ class PDModel(Model):
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
                 self.schedule.add(pdagent)
+
+    def update_agent_ppds(self, ppds):
+        with open("agent_ppds.p", "wb") as f:
+            pickle.dump(ppds, f)
 
     def make_set_agents(self):
         # generate current experiment ppD pickle if one does not exist?
@@ -575,6 +593,7 @@ class PDModel(Model):
         start = time.time()
         self.schedule.step()
         if self.step_count == self.rounds - 1:
+            self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
         self.step_count += 1
         # print("Step:", self.step_count)

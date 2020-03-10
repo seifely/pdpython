@@ -6,6 +6,7 @@ from math import ceil
 import itertools
 import statistics
 import pickle
+from scipy.spatial import distance as dst
 import time
 
 """Note on Strategies:
@@ -130,7 +131,7 @@ class PDAgent(Agent):
         # with open("agent_ppds.p", "rb") as f:
         #     agent_ppds = pickle.load(f)
         agent_ppds = self.model.agent_ppds
-        # print(agent_ppds)
+        # print("agent ppds are,", agent_ppds)
         my_pickle = agent_ppds[self.ID]
         # print("my defaults are", my_pickle)
         # j = 0
@@ -1025,23 +1026,91 @@ class PDAgent(Agent):
         self.update_value = self.init_uv
         self.mutual_c_outcome = 0
 
-    def set_ppds(self):
-        """ Use this function on the last round of the game, after final score checking, to
-            determine what the classification of a partner might be. It should alter the model's ppds storage
-            object to provide a new starting ppd for each partner next turn, which the model then outputs to the
-            relevant pickle."""
+    def knn_decision(self, partner_ids, partner_utils, partner_coops, ppds):
 
-        # The model loads in the ppd pickle file when it makes agents
-        # ====== BE SURE TO ALTER YOUR PPD WITHIN SELF.MODEL.AGENT_PPDS{AGENT_ID}
+        """ ppds needs to be self.model.agent_ppds"""
+        updated_ppds = []
+        old_ppds = self.model.agent_ppds[self.ID]
 
-        # don't return anything, just update the self.model.agent_ppds{agent_id} with the relevant ppd list
+        updated_ppds = old_ppds
+
+        for i in partner_ids:
+            partner_index = partner_ids.index(i)
+            game_utility = partner_utils[i]
+            game_cooperations = partner_coops[i]
+            game_ppd = ppds[partner_index]
+
+            """ The bit above might not work; because when we get ppds from the model it's a 4-long list,
+                and some agents only use the first 2 to 3 items, we need to update the ppds in the list by 
+                their indices to let them be used against the same agent next game"""
+
+            partner_class = self.knn_analysis(game_utility, game_cooperations, game_ppd, 3)
+            priority = "C"  # out of options 'C', 'U', and 'CU' - latter being coops to utility ratio
+
+            # so far, we should have a knn classification of what the ith partner is, which we then feed in to
+            new_ppd = self.ppd_select(partner_class, priority)
+
+            updated_ppds[partner_index] = new_ppd
+
+
+        self.model.agent_ppds[self.ID] = updated_ppds
         return
 
-    def knn_analysis(self, input):
+
+    # def set_ppds(self):
+    #     """ Use this function on the last round of the game, after final score checking, to
+    #         determine what the classification of a partner might be. It should alter the model's ppds storage
+    #         object to provide a new starting ppd for each partner next turn, which the model then outputs to the
+    #         relevant pickle."""
+    #
+    #     # The model loads in the ppd pickle file when it makes agents
+    #     # ====== BE SURE TO ALTER YOUR PPD WITHIN SELF.MODEL.AGENT_PPDS{AGENT_ID}
+    #
+    #     # don't return anything, just update the self.model.agent_ppds{agent_id} with the relevant ppd list
+    #     return
+
+    def knn_analysis(self, utility, cooperations, ppd, k):
         """ Takes an input, checks it against training data, and returns a partner classification """
+        classification = 1  # CLASSES START AT 1 INSTEAD OF 0 BECAUSE IM A FOOL
+        current_data = [utility, cooperations, ppd]
+        training_data = self.model.training_data
+
+        relevant_data = []
+        r_data_indices = []
+        r_data_distances_to_goal = []
+
+        for i in training_data:
+            """ We'll just use standard linear search for now, and maybe implement something faster later"""
+            # get the third index of i
+            if i[2] == ppd:
+                relevant_data.append(i)
+                r_data_indices.append(training_data.index(i))
+
+        for i in relevant_data:
+            """ We take each item and calculate the Euclidean distance to the data we already have"""
+            distance_to_target = dst.euclidean(current_data, i)
+            r_data_distances_to_goal.append(distance_to_target)
+
+        """ Now we have a list of distances to our current dataset, need to select k closest in terms of utility 
+        and cooperations. Then access the relevant data and find the classification values ( i[3]) for them. """
+
+        # sorted_distances = {k: v for k, v in sorted(r_data_distances_to_goal.items(), key=lambda item: item[1])}
+        # # this may or may not work, it's a method taken from elsewhere...
+
+        ascending_data = sorted(zip(relevant_data, r_data_distances_to_goal), key=lambda t: t[1])[0:]
+        categories = []
+
+        for i in range(0, k):
+            temp = ascending_data[i]
+            categories.append(temp[0][3])
+
+        """Then, we find the most common category offered and return it. """
+        print("The k closest categories were:", categories)
+        classification = statistics.mode(categories)
+        print("The most common classification from the k neighbours is:", classification)
 
 
-        return
+        return classification
 
     def ppd_select(self, classification, optimisation_choice):
         """ Takes a class of partner, given by the kNN algorithm, and returns a starting ppD to
@@ -1139,40 +1208,20 @@ class PDAgent(Agent):
                 self.strategy = self.pick_strategy()
                 # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 self.previous_moves.append(self.move)
-                # print("My ppDs are:", self.ppD_partner)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.find_average_move()
-
-                # self.output_data_to_model()
-                # if self.model.collect_data:
-                #     self.output_data_to_file(self.outcome_list)
-                # self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
                 self.stepCount += 1
             else:
-                # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
-                # this line is now redundant in a system that picks multiple moves per turn
-                # print("My ppDs are:", self.ppD_partner)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-                # print("Number of c and d at V4S3: ", self.number_of_c, self.number_of_d)
-                # print("Number of C and D at V4S3: ", self.model.number_of_coops, self.model.number_of_defects)
-                self.find_average_move()
-                # print("Number of c and d at V4S4: ", self.number_of_c, self.number_of_d)
-                # print("Number of C and D at V4S4: ", self.model.number_of_coops, self.model.number_of_defects)
 
-                # self.output_data_to_model()
-                # if self.model.collect_data:
-                #     self.output_data_to_file(self.outcome_list)
-                # self.reset_values()
-                # if self.last_round:
-                #         if self.strategy == 'VPP':
-                #             self.training_data = self.export_training_data()
+                self.find_average_move()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -1180,10 +1229,9 @@ class PDAgent(Agent):
         if self.stepCount == (self.model.rounds - 1):
             # print("My stepcount is", self.stepCount, "Next round is", (self.model.rounds - 1), "Next round is the last round!")
             self.last_round = True
+            if self.strategy == "VPP":
+                self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_coops, self.ppD_partner)
 
-        # self.find_average_move()
-        # print("At the end of this agent, model C and D are:", self.model.number_of_coops,
-        #       self.model.number_of_defects, ", total:", (self.model.number_of_defects + self.model.number_of_coops))
         if self.printing:
             for n in range(1):
                 print("----------------------------------------------------------")
