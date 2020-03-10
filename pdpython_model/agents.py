@@ -138,6 +138,7 @@ class PDAgent(Agent):
         for i in ids:
             index = ids.index(i)
             self.ppD_partner[i] = my_pickle[index]
+
             # print("this ppd was", self.ppD_partner[i])
             # print("this partner's pickled ppd is ", my_pickle[index])
             self.default_ppds[i] = my_pickle[index]
@@ -1038,17 +1039,20 @@ class PDAgent(Agent):
             partner_index = partner_ids.index(i)
             game_utility = partner_utils[i]
             game_cooperations = partner_coops[i]
-            game_ppd = ppds[partner_index]
+            game_ppd = ppds[i]
 
             """ The bit above might not work; because when we get ppds from the model it's a 4-long list,
                 and some agents only use the first 2 to 3 items, we need to update the ppds in the list by 
                 their indices to let them be used against the same agent next game"""
 
-            partner_class = self.knn_analysis(game_utility, game_cooperations, game_ppd, 3)
+            class_list, classification = self.knn_analysis(game_utility, game_cooperations, game_ppd, 300)
             priority = "C"  # out of options 'C', 'U', and 'CU' - latter being coops to utility ratio
 
+            print("Partner ID:", i, "k Classifications:", class_list, "Decided Class:", classification)
+            """ TODO : WE SHOULD PUT CLASSIFICATION ERROR HERE. """
+
             # so far, we should have a knn classification of what the ith partner is, which we then feed in to
-            new_ppd = self.ppd_select(partner_class, priority)
+            new_ppd = self.ppd_select(classification, priority)
 
             updated_ppds[partner_index] = new_ppd
 
@@ -1086,9 +1090,14 @@ class PDAgent(Agent):
                 relevant_data.append(i)
                 r_data_indices.append(training_data.index(i))
 
+        # print("Current Data", current_data)
+        # print("Relevant Data", relevant_data)
+
         for i in relevant_data:
             """ We take each item and calculate the Euclidean distance to the data we already have"""
-            distance_to_target = dst.euclidean(current_data, i)
+            slice = i[:3]
+            distance_to_target = dst.euclidean(current_data, slice)
+            # print("data:", i, "distance:", distance_to_target)
             r_data_distances_to_goal.append(distance_to_target)
 
         """ Now we have a list of distances to our current dataset, need to select k closest in terms of utility 
@@ -1098,6 +1107,8 @@ class PDAgent(Agent):
         # # this may or may not work, it's a method taken from elsewhere...
 
         ascending_data = sorted(zip(relevant_data, r_data_distances_to_goal), key=lambda t: t[1])[0:]
+        # print("ascend", ascending_data)
+        # print(len(ascending_data))
         categories = []
 
         for i in range(0, k):
@@ -1105,12 +1116,10 @@ class PDAgent(Agent):
             categories.append(temp[0][3])
 
         """Then, we find the most common category offered and return it. """
-        print("The k closest categories were:", categories)
+        # print("The k closest categories were:", categories)
         classification = statistics.mode(categories)
-        print("The most common classification from the k neighbours is:", classification)
-
-
-        return classification
+        # print("The most common classification from the k neighbours is:", classification)
+        return categories, classification
 
     def ppd_select(self, classification, optimisation_choice):
         """ Takes a class of partner, given by the kNN algorithm, and returns a starting ppD to
@@ -1229,8 +1238,6 @@ class PDAgent(Agent):
         if self.stepCount == (self.model.rounds - 1):
             # print("My stepcount is", self.stepCount, "Next round is", (self.model.rounds - 1), "Next round is the last round!")
             self.last_round = True
-            if self.strategy == "VPP":
-                self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_coops, self.ppD_partner)
 
         if self.printing:
             for n in range(1):
@@ -1243,7 +1250,10 @@ class PDAgent(Agent):
         round_payoffs = self.increment_score(self.payoffs)
         if self.last_round:
             if self.strategy == 'VPP':
-                self.training_data = self.export_training_data()
+                if self.model.kNN_training:
+                    self.training_data = self.export_training_data()
+
+                self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_coops, self.default_ppds)
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
         # self.compare_score()
 
