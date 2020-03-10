@@ -629,7 +629,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=61,
+                 iterations=300,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

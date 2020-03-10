@@ -1045,10 +1045,13 @@ class PDAgent(Agent):
                 and some agents only use the first 2 to 3 items, we need to update the ppds in the list by 
                 their indices to let them be used against the same agent next game"""
 
-            class_list, classification = self.knn_analysis(game_utility, game_cooperations, game_ppd, 300)
+            class_list, classification = self.knn_analysis(game_utility, game_cooperations, game_ppd, 50)
             priority = "C"  # out of options 'C', 'U', and 'CU' - latter being coops to utility ratio
 
-            print("Partner ID:", i, "k Classifications:", class_list, "Decided Class:", classification)
+            print("Partner ID:", i,
+                  #"k Classifications:", class_list,
+                  "Decided Class:", classification)
+            print("kNN was", self.knn_error_statement(classification, i))
             """ TODO : WE SHOULD PUT CLASSIFICATION ERROR HERE. """
 
             # so far, we should have a knn classification of what the ith partner is, which we then feed in to
@@ -1072,6 +1075,29 @@ class PDAgent(Agent):
     #
     #     # don't return anything, just update the self.model.agent_ppds{agent_id} with the relevant ppd list
     #     return
+
+    def knn_error_statement(self, classification, opp_id):
+
+        strat = 0
+
+        if self.per_partner_strategies[opp_id] == 'VPP':
+            strat = 1
+        elif self.per_partner_strategies[opp_id] == 'ANGEL':
+            strat = 2
+        elif self.per_partner_strategies[opp_id] == 'DEVIL':
+            strat = 3
+        elif self.per_partner_strategies[opp_id] == 'TFT':
+            strat = 4
+        elif self.per_partner_strategies[opp_id] == 'WSLS':
+            strat = 5
+        elif self.per_partner_strategies[opp_id] == 'iWSLS':
+            strat = 6
+
+        if classification != strat:
+            return "Wrong"
+        else:
+            return "Right"
+
 
     def knn_analysis(self, utility, cooperations, ppd, k):
         """ Takes an input, checks it against training data, and returns a partner classification """
