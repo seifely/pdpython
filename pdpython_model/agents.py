@@ -1045,14 +1045,14 @@ class PDAgent(Agent):
                 and some agents only use the first 2 to 3 items, we need to update the ppds in the list by 
                 their indices to let them be used against the same agent next game"""
 
-            class_list, classification = self.knn_analysis(game_utility, game_cooperations, game_ppd, 50)
+            class_list, classification = self.knn_analysis(game_utility, game_cooperations, game_ppd, self.model.k)
             priority = "C"  # out of options 'C', 'U', and 'CU' - latter being coops to utility ratio
 
-            print("Partner ID:", i,
-                  #"k Classifications:", class_list,
-                  "Decided Class:", classification)
-            print("kNN was", self.knn_error_statement(classification, i))
-            """ TODO : WE SHOULD PUT CLASSIFICATION ERROR HERE. """
+            # print("Partner ID:", i,
+            #       "k Classifications:", class_list,
+                  # "Decided Class:", classification)
+            self.knn_error_statement(classification, i)
+            # print("kNN was", self.knn_error_statement(classification, i))
 
             # so far, we should have a knn classification of what the ith partner is, which we then feed in to
             new_ppd = self.ppd_select(classification, priority)
@@ -1096,6 +1096,7 @@ class PDAgent(Agent):
         if classification != strat:
             return "Wrong"
         else:
+            self.model.kNN_accuracy += 1
             return "Right"
 
 

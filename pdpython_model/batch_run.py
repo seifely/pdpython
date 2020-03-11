@@ -253,6 +253,7 @@ class PDModel(Model):
                  learning_rate = 1,
                  gamma = 0.015,
                  init_ppD = 0.5,
+                 k=11
                  ):
 
         # ---------- Model Parameters --------
@@ -277,6 +278,8 @@ class PDModel(Model):
         self.new_filenumber = 0
         self.kNN_training = kNN_training
         self.experimental_spawn = experimental_spawn
+        self.kNN_accuracy = 0
+        self.k = k
 
         self.experimental_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
                                         20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
@@ -403,6 +406,20 @@ class PDModel(Model):
             writer.writerow({'n agents': self.number_of_agents, 'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating, 'defecting': self.agents_defecting,
                              'coop total': self.number_of_coops, 'defect total': self.number_of_defects,
                              })
+
+        with open('{}_kNN.csv'.format(self.filename), 'a', newline='') as csvfile:
+            fieldnames = ['k', 'accuracy', 'accuracy_p',]
+
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            kNN_accuracy_percent = ((self.kNN_accuracy / 24) * 100)
+
+            if self.step_count == 1:
+                writer.writeheader()
+            writer.writerow({'k': self.k, 'accuracy': self.kNN_accuracy, 'accuracy_p': kNN_accuracy_percent,
+                             })
+
+            self.kNN_accuracy = 0  # Hopefully resetting this value here is fine
 
         # with open('{} agent strategies.csv'.format(self.filename), 'a', newline='') as csvfile:
         #     fieldnames = ['stepcount', 'agent_strategy']
