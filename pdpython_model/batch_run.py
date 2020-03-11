@@ -315,7 +315,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('iwsls_memory2low_8x8_no_%s' % (self.iteration_n), "a")
+        concatenator = ('kNN_accuracy_t1_47_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -637,8 +637,9 @@ br_params = {"number_of_agents": [47],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.95,
-                         ]}
+            "init_ppD": [0.5,
+                         ],
+             "k": [1, 3, 5, 9, 11, 13, 15, 21, 31,]}
 
 """ For collecting training data for kNN, please run one init_ppD at a time.
     Otherwise, it doesn't export the ppD variable correctly to the pickle! """
@@ -646,7 +647,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=300,
+                 iterations=25,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

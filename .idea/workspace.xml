@@ -180,7 +180,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.run">
+  <component name="RunManager" selected="Python.batch_run">
     <configuration name="batch_run" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="pdpython" />
       <option name="INTERPRETER_OPTIONS" value="" />
