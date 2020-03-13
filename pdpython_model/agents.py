@@ -1155,6 +1155,8 @@ class PDAgent(Agent):
         # training_data =
         return
 
+    
+
     def find_average_move(self):
         """ Counts up how many of each behaviour type was performed that round and returns which was
             the most commonly chosen move (or Eq if there was a tie). """
@@ -1279,10 +1281,11 @@ class PDAgent(Agent):
             if self.strategy == 'VPP':
                 if self.model.kNN_training:
                     self.training_data = self.export_training_data()
-
-        if self.stepCount == self.model.rounds - 2:
-            if self.strategy == 'VPP':
                 self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_coops, self.default_ppds)
+
+
+        # if self.stepCount == self.model.rounds - 2:
+        #     if self.strategy == 'VPP':
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
         # self.compare_score()
 

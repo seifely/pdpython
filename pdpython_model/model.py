@@ -242,7 +242,7 @@ class PDModel(Model):
                  learning_rate=1,
                  gamma=0.015,
                  init_ppD=0.5,
-                 k=11
+                 k=5
                  ):
 
         # ---------- Model Parameters --------
