@@ -388,6 +388,10 @@ class PDModel(Model):
         self.memory_states = self.get_memory_states(['C', 'D'])
         self.state_values = self.state_evaluation(self.memory_states)
         self.agent_ppds = {}
+        self.set_ppds()
+        self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
+        self.training_data = []
+        self.training_data = pickle.load(open("training_data.p", "rb"))
         if not experimental_spawn:
             self.make_agents()
         elif experimental_spawn:
@@ -487,13 +491,18 @@ class PDModel(Model):
                                 permutations.append(new)
         return permutations
 
-    def state_evaluation(self, state_list):
-        # if self.stepCount == 1:
-
+    def set_ppds(self):
         """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
-            when actually we want it to start at 0.5 and then go unaltered by this method for the subsequent games"""
+                    when actually we want it to start at 0.5 and then go unaltered by this method for the subsequent games"""
         initialised = {}
-        for i in range(self.number_of_agents):
+        n_of_a = 0
+        if self.experimental_spawn:
+            n_of_a = 47
+        else:
+            n_of_a = 64
+
+        for i in range(n_of_a):
+            # print("n of a", i)
             initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
             with open("agent_ppds.p", "wb") as f:
                 pickle.dump(initialised, f)
@@ -502,6 +511,9 @@ class PDModel(Model):
                 to alter their own ppDs for, they must use the kNN system and 
                 extract from a pickle file [INCOMPLETE] the classification of partner
                 etc. from the previous game."""
+
+    def state_evaluation(self, state_list):
+        # if self.stepCount == 1:
 
         state_value = []
         for i in state_list:

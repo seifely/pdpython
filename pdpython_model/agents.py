@@ -1280,6 +1280,8 @@ class PDAgent(Agent):
                 if self.model.kNN_training:
                     self.training_data = self.export_training_data()
 
+        if self.stepCount == self.model.rounds - 2:
+            if self.strategy == 'VPP':
                 self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_coops, self.default_ppds)
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
         # self.compare_score()
