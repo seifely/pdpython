@@ -584,7 +584,6 @@ class PDModel(Model):
         #         initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
         #         pickle.dump(initialised, open("agent_ppds.p", "wb"))
 
-
         if not self.randspawn:
             for i in range(self.number_of_agents):
                 """This is for adding agents in sequentially."""

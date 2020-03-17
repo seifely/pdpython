@@ -130,7 +130,7 @@ class PDAgent(Agent):
         # open the ppD pickle
         # with open("agent_ppds.p", "rb") as f:
         #     agent_ppds = pickle.load(f)
-        agent_ppds = self.model.agent_ppds
+        agent_ppds = copy.deepcopy(self.model.agent_ppds)
         # print("agent ppds are,", agent_ppds)
         my_pickle = agent_ppds[self.ID]
         # print("my defaults are", my_pickle)
@@ -1164,7 +1164,7 @@ class PDAgent(Agent):
         for i in relevant_data:
             """ We take each item and calculate the Euclidean distance to the data we already have"""
             slice = i[:3]
-            distance_to_target = dst.euclidean(current_data, slice)
+            distance_to_target = dst.chebyshev(current_data, slice)
             # print("data:", i, "distance:", distance_to_target)
             r_data_distances_to_goal.append(distance_to_target)
 
@@ -1333,8 +1333,8 @@ class PDAgent(Agent):
         # self.compare_score()
 
         self.output_data_to_model()
-        if self.model.collect_data:
-            self.output_data_to_file(self.outcome_list)
+        # if self.model.collect_data:
+        #     self.output_data_to_file(self.outcome_list)
 
 
         self.stepCount += 1
