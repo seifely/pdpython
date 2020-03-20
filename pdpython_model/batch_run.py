@@ -651,7 +651,8 @@ br_params = {"number_of_agents": [47],
             #model.learning_rate
             "init_ppD": [0.5,
                          ],
-             "k": [1,3,5,9,11,13,15,17,19,21,25,35,45,55,65]}
+             "k": [35]
+             }
 
 """ For collecting training data for kNN, please run one init_ppD at a time.
     Otherwise, it doesn't export the ppD variable correctly to the pickle! """
@@ -659,7 +660,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=100,
+                 iterations=1,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

@@ -1,6 +1,7 @@
 from mesa import Agent
 import random
 import csv
+import numpy as np
 import time
 from math import ceil
 import itertools
@@ -1035,6 +1036,7 @@ class PDAgent(Agent):
 
         updated_ppds = old_ppds
         training_data = copy.deepcopy(self.model.training_data)
+        decision_data = copy.deepcopy(self.model.training_data)
 
         for i in partner_ids:
             # training_data_list = training_data
@@ -1059,7 +1061,7 @@ class PDAgent(Agent):
             # print("kNN was", self.knn_error_statement(classification, i))
 
             # so far, we should have a knn classification of what the ith partner is, which we then feed in to
-            new_ppd = self.ppd_select(classification, priority)
+            new_ppd = self.ppd_select(decision_data, classification, priority)
 
             updated_ppds[partner_index] = new_ppd
 
@@ -1102,14 +1104,14 @@ class PDAgent(Agent):
             self.model.kNN_accuracy += 1
             return "Right"
 
-    def BinaryPPDSearch(self, list, value, n_times):
+    def BinaryPPDSearch(self, list, value, n_times, indx):
         """ This should return a list of indexes to search the data with """
         copy_list = copy.deepcopy(list)
         # index_list = []
         data_list = []
 
         for i in range(0, n_times): # would alternatively prefer his to while loop
-            index = self.BSearch(copy_list, value)  # get the index of the ppd item
+            index = self.BSearch(copy_list, value, indx)  # get the index of the ppd item
 
             if index != -1:
                 # index_list.append(index)  # index list is garbage because of popping
@@ -1119,16 +1121,16 @@ class PDAgent(Agent):
 
         return data_list
 
-    def BSearch(self, lys, val):
+    def BSearch(self, lys, val, indx_value):
         first = 0
         last = len(lys) - 1
         index = -1
         while (first <= last) and (index == -1):
             mid = (first + last) // 2
-            if lys[mid][2] == val:
+            if lys[mid][indx_value] == val:
                 index = mid
             else:
-                if val < lys[mid][2]:
+                if val < lys[mid][indx_value]:
                     last = mid - 1
                 else:
                     first = mid + 1
@@ -1156,7 +1158,7 @@ class PDAgent(Agent):
         # For Binary Search, we need to know how many times to search the list - I think with the 113,400 data
         # it's 12,600 data points per ppd we collected
         # print("gonna do binary search with ppd of", ppd)
-        relevant_data = self.BinaryPPDSearch(training_data, ppd, 12600)
+        relevant_data = self.BinaryPPDSearch(training_data, ppd, 12600, 2)
 
         # can't get the indices from this, nor replace properly - but we don't need indices for a later search
         # because the search for optimal values will be a separate search
@@ -1164,7 +1166,7 @@ class PDAgent(Agent):
         for i in relevant_data:
             """ We take each item and calculate the Euclidean distance to the data we already have"""
             slice = i[:3]
-            distance_to_target = dst.chebyshev(current_data, slice)
+            distance_to_target = dst.cosine(current_data, slice)
             # print("data:", i, "distance:", distance_to_target)
             r_data_distances_to_goal.append(distance_to_target)
 
@@ -1190,15 +1192,56 @@ class PDAgent(Agent):
 
         """Then, we find the most common category offered and return it. """
         # print("The k closest categories were:", categories)
-        classification = statistics.mode(categories)
+        try:
+            classification = statistics.mode(categories)
+        except statistics.StatisticsError:
+            classification = categories[0]
+            # classification = statistics.mode(categories[0])
+
+            # tryk = copy.deepcopy(k)
+            # tryk = int((tryk/2)-1)
+
+            # for i in range(0, tryk):
+            #     # print("ass data2", ascending_data)
+            #     temp = ascending_data[i]
+            #     categories.append(temp[0][3])
+
+            # classification = statistics.mode(categories)
+
+            # if k < 3:
+            #     classification = statistics.mode(categories[0])
+            # if k > 3:
+            #     classification = statistics.mode(categories[0:5])
         # print("The most common classification from the k neighbours is:", classification)
         return categories, classification
 
-    def ppd_select(self, classification, optimisation_choice):
+    def ppd_select(self, list, classification, optimisation_choice):
         """ Takes a class of partner, given by the kNN algorithm, and returns a starting ppD to
         use in future games for the same partner based on which variable (or combo) we want to optimise """
-        # with f as
-        # training_data =
+        # don't need to make a deep copy of this list, because we're not altering it
+        relevant_data = []
+
+        relevant_data = self.BinaryPPDSearch(list,
+                                             classification,
+                                             12600, 3)  # need to decide how many times to run this for
+        npRev = np.array(relevant_data)
+
+        col = 0
+        if optimisation_choice == 'C':
+            col = 0
+        elif optimisation_choice == 'U':
+            col = 1
+        elif optimisation_choice == 'CU':
+            # eh we need to decide this
+            pass
+
+        npRev = npRev[np.argsort(npRev[:, col])]
+        npRev = np.ndarray.tolist(npRev)
+        # so, now we have a list sorted by the column we prefer, we can select the ppD associated with the highest score
+
+        highest = npRev[len(npRev)-1]
+        new_ppd = highest[2]
+
         return
 
     def find_average_move(self):
