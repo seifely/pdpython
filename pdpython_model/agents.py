@@ -1033,6 +1033,7 @@ class PDAgent(Agent):
         """ ppds needs to be self.model.agent_ppds"""
         updated_ppds = []
         old_ppds = self.model.agent_ppds[self.ID]
+        # print("The old ppds are", old_ppds)
 
         updated_ppds = old_ppds
         training_data = copy.deepcopy(self.model.training_data)
@@ -1065,6 +1066,7 @@ class PDAgent(Agent):
 
             updated_ppds[partner_index] = new_ppd
 
+        # print("The new ppds are", updated_ppds)
         self.model.agent_ppds[self.ID] = updated_ppds
         return
 
@@ -1238,11 +1240,13 @@ class PDAgent(Agent):
         npRev = npRev[np.argsort(npRev[:, col])]
         npRev = np.ndarray.tolist(npRev)
         # so, now we have a list sorted by the column we prefer, we can select the ppD associated with the highest score
+        # print("checking npRev", npRev)
 
         highest = npRev[len(npRev)-1]
         new_ppd = highest[2]
+        # print("The ppd I should use next game for this partner is", new_ppd)
 
-        return
+        return new_ppd
 
     def find_average_move(self):
         """ Counts up how many of each behaviour type was performed that round and returns which was
@@ -1376,8 +1380,8 @@ class PDAgent(Agent):
         # self.compare_score()
 
         self.output_data_to_model()
-        # if self.model.collect_data:
-        #     self.output_data_to_file(self.outcome_list)
+        if self.model.collect_data:
+            self.output_data_to_file(self.outcome_list)
 
 
         self.stepCount += 1

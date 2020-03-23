@@ -467,8 +467,7 @@ class PDModel(Model):
         return permutations
 
     def set_ppds(self):
-        """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
-                    when actually we want it to start at 0.5 and then go unaltered by this method for the subsequent games"""
+        """ Function to set ppds based on the value specified as init_ppD """
         initialised = {}
         n_of_a = 0
         if self.experimental_spawn:
@@ -491,23 +490,7 @@ class PDModel(Model):
         # if self.stepCount == 1:
         """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
                     when actually we want it to start at 0.5 and then go unaltered by this method for the subsequent games"""
-        initialised = {}
-        n_of_a = 0
-        if self.experimental_spawn:
-            n_of_a = 47
-        else:
-            n_of_a = 64
-
-        for i in range(n_of_a):
-            # print("n of a", i)
-            initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
-            with open("agent_ppds.p", "wb") as f:
-                pickle.dump(initialised, f)
-
-            """ This is used for setting ppD to a model-specified value. For agents
-                to alter their own ppDs for, they must use the kNN system and 
-                extract from a pickle file [INCOMPLETE] the classification of partner
-                etc. from the previous game."""
+        # self.set_ppds()
 
         state_value = []
         for i in state_list:
@@ -573,7 +556,6 @@ class PDModel(Model):
                 pickle.dump(training_update, f)
         else:
             return
-
 
     def make_agents(self):
 
