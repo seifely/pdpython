@@ -10,11 +10,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="1036" lean-forward="true" selection-start-line="1036" selection-end-line="1036" />
+            <state relative-caret-position="-955">
+              <caret line="1230" column="15" selection-start-line="1230" selection-start-column="15" selection-end-line="1230" selection-end-column="15" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#9505#10698#0" />
@@ -39,8 +39,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="262">
-              <caret line="620" column="30" selection-start-line="620" selection-start-column="30" selection-end-line="620" selection-end-column="30" />
+            <state relative-caret-position="1714">
+              <caret line="625" column="27" selection-start-line="625" selection-start-column="27" selection-end-line="625" selection-end-column="27" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#13791#15410#0" />
@@ -56,11 +56,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="484">
-              <caret line="660" column="25" selection-start-line="660" selection-start-column="25" selection-end-line="660" selection-end-column="25" />
+            <state relative-caret-position="198">
+              <caret line="627" column="42" selection-start-line="627" selection-start-column="42" selection-end-line="627" selection-end-column="42" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#16480#18821#0" />
@@ -98,7 +98,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>check_part</find>
       <find>if self.strategy</find>
       <find>if strategy</find>
       <find>ppD</find>
@@ -128,6 +127,7 @@
       <find>training</find>
       <find>self.model.training_data</find>
       <find>self.mode</find>
+      <find>train</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -137,9 +137,9 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/pdpython_model/server.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/model.py" />
         <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
       </list>
     </option>
   </component>
@@ -329,25 +329,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="660" column="25" selection-start-line="660" selection-start-column="25" selection-end-line="660" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#16480#18821#0" />
-            <element signature="e#18855#19788#0" />
-            <element signature="e#19842#20450#0" />
-            <element signature="e#20822#22000#0" />
-            <element signature="e#22037#23016#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
-          <caret line="620" column="30" selection-start-line="620" selection-start-column="30" selection-end-line="620" selection-end-column="30" />
+        <state relative-caret-position="1714">
+          <caret line="625" column="27" selection-start-line="625" selection-start-column="27" selection-end-line="625" selection-end-column="27" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#13791#15410#0" />
@@ -364,8 +349,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="1036" lean-forward="true" selection-start-line="1036" selection-end-line="1036" />
+        <state relative-caret-position="-955">
+          <caret line="1230" column="15" selection-start-line="1230" selection-start-column="15" selection-end-line="1230" selection-end-column="15" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#9505#10698#0" />
@@ -382,6 +367,21 @@
             <element signature="e#49420#49892#0" />
             <element signature="e#50417#53372#0" />
             <element signature="e#53152#54558#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="627" column="42" selection-start-line="627" selection-start-column="42" selection-end-line="627" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#16480#18821#0" />
+            <element signature="e#18855#19788#0" />
+            <element signature="e#19842#20450#0" />
+            <element signature="e#20822#22000#0" />
+            <element signature="e#22037#23016#0" />
           </folding>
         </state>
       </provider>

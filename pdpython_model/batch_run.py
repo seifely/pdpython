@@ -315,7 +315,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('kNN_accuracy_t1_47_no_%s' % (self.iteration_n), "a")
+        concatenator = ('kNN_test2_47_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -660,7 +660,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
+                 iterations=100,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

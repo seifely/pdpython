@@ -1230,9 +1230,9 @@ class PDAgent(Agent):
 
         col = 0
         if optimisation_choice == 'C':
-            col = 0
-        elif optimisation_choice == 'U':
             col = 1
+        elif optimisation_choice == 'U':
+            col = 0
         elif optimisation_choice == 'CU':
             # eh we need to decide this
             pass
