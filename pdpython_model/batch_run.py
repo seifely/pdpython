@@ -241,6 +241,7 @@ class PDModel(Model):
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
+                 test_scenario=True,
                  kNN_training=False,
                  DD=1,
                  CC=1.5,
@@ -278,6 +279,7 @@ class PDModel(Model):
         self.new_filenumber = 0
         self.kNN_training = kNN_training
         self.experimental_spawn = experimental_spawn
+        self.test_scenario = test_scenario
         self.kNN_accuracy = 0
         self.k = k
 
@@ -289,6 +291,19 @@ class PDModel(Model):
                                         38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
                                         37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
                                         36: "TFT", 39: "TFT"}
+
+        self.experimental_strategies_test = {2: "DEVIL", 4: "DEVIL", 14: "DEVIL", 15: "DEVIL", 17: "DEVIL", 19: "DEVIL",
+                                             28: "DEVIL", 30: "DEVIL", 32: "DEVIL", 42: "DEVIL", 43: "DEVIL",
+                                             45: "DEVIL",
+                                             47: "DEVIL", 1: "ANGEL", 3: "ANGEL", 5: "ANGEL", 6: "ANGEL", 16: "ANGEL",
+                                             18: "ANGEL", 20: "ANGEL", 29: "ANGEL", 31: "ANGEL", 33: "ANGEL",
+                                             34: "ANGEL",
+                                             44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT",
+                                             26: "TFT",
+                                             36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
+                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 12: "WSLS", 22: "WSLS",
+                                             25: "WSLS",
+                                             35: "WSLS", 38: "WSLS", 41: "WSLS"}
 
         # self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
         # self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
@@ -315,7 +330,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('kNN_test2_47_no_%s' % (self.iteration_n), "a")
+        concatenator = ('kNN_test4_newenv_47_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")

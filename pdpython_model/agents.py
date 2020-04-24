@@ -176,10 +176,16 @@ class PDAgent(Agent):
         """ This is an initial strategy selector for agents """
 
         if self.model.experimental_spawn:
-            # print("My id is", self.ID)
-            strat = "RANDOM"
-            strat = self.model.experimental_strategies[self.ID]
-            return str(strat)
+            if not self.model.test_scenario:
+                # print("My id is", self.ID)
+                strat = "RANDOM"
+                strat = self.model.experimental_strategies[self.ID]
+                return str(strat)
+            elif self.model.test_scenario:
+                # print("My id is", self.ID)
+                strat = "RANDOM"
+                strat = self.model.experimental_strategies_test[self.ID]
+                return str(strat)
 
         elif not self.model.experimental_spawn:
             if self.pickstrat == "RANDOM":

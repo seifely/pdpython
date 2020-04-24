@@ -231,6 +231,7 @@ class PDModel(Model):
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
+                 test_scenario = True,
                  kNN_training=False,
                  DD=1,
                  CC=1.5,
@@ -261,6 +262,7 @@ class PDModel(Model):
         self.learning_rate = learning_rate
         self.simplified_payoffs = simplified_payoffs
         self.experimental_spawn = experimental_spawn
+        self.test_scenario = test_scenario
         self.rounds = rounds
         self.randspawn = randspawn
         self.iteration_n = 0
@@ -277,6 +279,15 @@ class PDModel(Model):
                                         38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
                                         37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
                                         36: "TFT", 39: "TFT"}
+
+        self.experimental_strategies_test = {2:"DEVIL", 4: "DEVIL", 14: "DEVIL", 15: "DEVIL", 17:"DEVIL", 19: "DEVIL",
+                                             28: "DEVIL", 30: "DEVIL", 32: "DEVIL", 42: "DEVIL", 43: "DEVIL", 45: "DEVIL",
+                                             47: "DEVIL", 1: "ANGEL", 3: "ANGEL", 5: "ANGEL", 6: "ANGEL", 16: "ANGEL",
+                                             18: "ANGEL", 20: "ANGEL", 29: "ANGEL", 31: "ANGEL", 33: "ANGEL", 34: "ANGEL",
+                                             44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT", 26: "TFT",
+                                             36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
+                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 12: "WSLS", 22: "WSLS", 25: "WSLS",
+                                             35: "WSLS", 38: "WSLS", 41: "WSLS"}
 
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader
