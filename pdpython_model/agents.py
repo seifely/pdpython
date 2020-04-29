@@ -198,7 +198,7 @@ class PDAgent(Agent):
                     start on q strategy """
 
             elif self.pickstrat == "RDISTRO":  # Random Distribution of the selected strategies
-                choices = ["iWSLS", "VPP"]
+                choices = ["ANGEL", "DEVIL", "TFT", "WSLS", "VPP"]
                 if not self.checkerboard:
                     if not self.lineplace:
                         strat = random.choice(choices)
@@ -747,14 +747,14 @@ class PDAgent(Agent):
 
         """ Here, we want to increment the GLOBAL, across-partner average payoff for the round """
         round_average = []
-        for j in self.indivAvPayoff:
-            item = self.indivAvPayoff[j]
-            round_average.append(item)
-        self.globalAvPayoff = statistics.mean(round_average)
-
-        if self.globalAvPayoff > self.globalHighPayoff:
-            self.globalHighPayoff = self.globalAvPayoff
-        # print("My round average was ", self.globalAvPayoff, "and my highscore is ", self.globalHighPayoff)
+        # for j in self.indivAvPayoff:
+        #     item = self.indivAvPayoff[j]
+        #     round_average.append(item)
+        # self.globalAvPayoff = statistics.mean(round_average)
+        #
+        # if self.globalAvPayoff > self.globalHighPayoff:
+        #     self.globalHighPayoff = self.globalAvPayoff
+        # # print("My round average was ", self.globalAvPayoff, "and my highscore is ", self.globalHighPayoff)
 
         return total_utility
 

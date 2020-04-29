@@ -240,7 +240,7 @@ class PDModel(Model):
                  collect_data=True,
                  agent_printing=False,
                  randspawn=True,
-                 experimental_spawn=True,
+                 experimental_spawn=False,
                  test_scenario=True,
                  kNN_training=False,
                  DD=1,
@@ -330,7 +330,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('kNN_test4_newenv_47_no_%s' % (self.iteration_n), "a")
+        concatenator = ('kNN_test5_random_47_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -514,7 +514,7 @@ class PDModel(Model):
         if self.experimental_spawn:
             n_of_a = 47
         else:
-            n_of_a = 64
+            n_of_a = 47
 
         for i in range(n_of_a):
             # print("n of a", i)
@@ -675,7 +675,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=100,
+                 iterations=5,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
