@@ -76,7 +76,9 @@ class PDAgent(Agent):
         self.default_ppds = {}
         self.training_data = []
         self.per_partner_utility = {}
-        self.per_partner_coops = {}
+        self.per_partner_mcoops = {}  # MY cooperations that I perform
+        self.per_partner_tcoops = {}  # THEIR cooperations that THEY perform
+        self.per_parter_mutc = {}   # cumulative number of mutual cooperations me and each partner did
         self.per_partner_strategies = {}
         self.similar_partners = 0
         self.outcome_list = {}
@@ -150,7 +152,7 @@ class PDAgent(Agent):
         for i in self.partner_IDs:
             temp_data = []
             temp_data.append(self.per_partner_utility[i])
-            temp_data.append(self.per_partner_coops[i])
+            temp_data.append(self.per_partner_mcoops[i])
             temp_data.append(self.default_ppds[i])
 
             if self.per_partner_strategies[i] == 'VPP':
@@ -629,8 +631,8 @@ class PDAgent(Agent):
                     if self.per_partner_payoffs.get(partner_ID) is None:
                         self.per_partner_payoffs[partner_ID] = [0]
 
-                    if self.per_partner_coops.get(partner_ID) is None:
-                        self.per_partner_coops[partner_ID] = 0
+                    if self.per_partner_mcoops.get(partner_ID) is None:
+                        self.per_partner_mcoops[partner_ID] = 0
 
                     if self.indivAvPayoff.get(partner_ID) is None:
                         self.indivAvPayoff[partner_ID] = 0
@@ -697,12 +699,15 @@ class PDAgent(Agent):
 
 
             if my_move == 'C':
-                self.per_partner_coops[i] += 1
+                self.per_partner_mcoops[i] += 1
                 # print("I cooperated with my partner so my total C with them is,", self.per_partner_coops[i])
                 # print("My score with them is", self.per_partner_utility[i])
+            if this_partner_move == 'C':
+                self.per_partner_tcoops[i] += 1
 
             if outcome == ['C', 'C']:
                 self.mutual_c_outcome += 1
+                self.per_parter_mutc[i] += 1
 
             outcome_listicle[i] = outcome
             outcome_payoff = payoffs[my_move, this_partner_move]
@@ -1059,7 +1064,7 @@ class PDAgent(Agent):
 
             class_list, classification = self.knn_analysis(game_utility, game_cooperations, game_ppd, training_data,
                                                            self.model.k)
-            priority = "C"  # out of options 'C', 'U', and 'CU' - latter being coops to utility ratio
+            priority = "U"  # out of options 'C', 'U', and 'CU' - latter being coops to utility ratio
 
             # print("Partner ID:", i,
             #       "k Classifications:", class_list,
@@ -1250,7 +1255,7 @@ class PDAgent(Agent):
 
         highest = npRev[len(npRev)-1]
         new_ppd = highest[2]
-        # print("The ppd I should use next game for this partner is", new_ppd)
+        print("I'm agent", self.ID,"My partner's class is", classification, "and the ppd I should use for them is", new_ppd)
 
         return new_ppd
 
@@ -1381,7 +1386,8 @@ class PDAgent(Agent):
 
         if self.stepCount == self.model.rounds - 1:
             if self.strategy == 'VPP':
-                self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_coops, self.default_ppds)
+
+                self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_mcoops, self.default_ppds)
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
         # self.compare_score()
 

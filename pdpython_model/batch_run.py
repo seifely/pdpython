@@ -237,7 +237,7 @@ class PDModel(Model):
                  number_of_agents=47,
                  schedule_type="Simultaneous",
                  rounds=250,
-                 collect_data=True,
+                 collect_data=False,
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
@@ -675,7 +675,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=100,
+                 iterations=1,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
