@@ -78,7 +78,7 @@ class PDAgent(Agent):
         self.per_partner_utility = {}
         self.per_partner_mcoops = {}  # MY cooperations that I perform
         self.per_partner_tcoops = {}  # THEIR cooperations that THEY perform
-        self.per_parter_mutc = {}   # cumulative number of mutual cooperations me and each partner did
+        self.per_partner_mutc = {}   # cumulative number of mutual cooperations me and each partner did
         self.per_partner_strategies = {}
         self.similar_partners = 0
         self.outcome_list = {}
@@ -153,6 +153,8 @@ class PDAgent(Agent):
             temp_data = []
             temp_data.append(self.per_partner_utility[i])
             temp_data.append(self.per_partner_mcoops[i])
+            temp_data.append(self.per_partner_tcoops[i])
+            temp_data.append(self.per_partner_mutc[i])
             temp_data.append(self.default_ppds[i])
 
             if self.per_partner_strategies[i] == 'VPP':
@@ -634,6 +636,12 @@ class PDAgent(Agent):
                     if self.per_partner_mcoops.get(partner_ID) is None:
                         self.per_partner_mcoops[partner_ID] = 0
 
+                    if self.per_partner_tcoops.get(partner_ID) is None:
+                        self.per_partner_tcoops[partner_ID] = 0
+
+                    if self.per_partner_mutc.get(partner_ID) is None:
+                        self.per_partner_mutc[partner_ID] = 0
+
                     if self.indivAvPayoff.get(partner_ID) is None:
                         self.indivAvPayoff[partner_ID] = 0
 
@@ -702,12 +710,13 @@ class PDAgent(Agent):
                 self.per_partner_mcoops[i] += 1
                 # print("I cooperated with my partner so my total C with them is,", self.per_partner_coops[i])
                 # print("My score with them is", self.per_partner_utility[i])
+
             if this_partner_move == 'C':
                 self.per_partner_tcoops[i] += 1
 
             if outcome == ['C', 'C']:
                 self.mutual_c_outcome += 1
-                self.per_parter_mutc[i] += 1
+                self.per_partner_mutc[i] += 1
 
             outcome_listicle[i] = outcome
             outcome_payoff = payoffs[my_move, this_partner_move]
@@ -1123,7 +1132,7 @@ class PDAgent(Agent):
         # index_list = []
         data_list = []
 
-        for i in range(0, n_times): # would alternatively prefer his to while loop
+        for i in range(0, n_times):     # would alternatively prefer this to while loop
             index = self.BSearch(copy_list, value, indx)  # get the index of the ppd item
 
             if index != -1:
@@ -1131,6 +1140,9 @@ class PDAgent(Agent):
                 data_list.append(copy_list[index])
                 # copy_list[index] = [0, 0, 0.0, 0]
                 copy_list.pop(index)
+
+        """ So, could we improve this by running the Search function indefinitely until it can no longer 
+            find the value we're looking for? """
 
         return data_list
 
@@ -1173,6 +1185,7 @@ class PDAgent(Agent):
         # print("gonna do binary search with ppd of", ppd)
         relevant_data = self.BinaryPPDSearch(training_data, ppd, 12600, 2)
 
+        print("rd", relevant_data)
         # can't get the indices from this, nor replace properly - but we don't need indices for a later search
         # because the search for optimal values will be a separate search
 
@@ -1183,8 +1196,8 @@ class PDAgent(Agent):
             # print("data:", i, "distance:", distance_to_target)
             r_data_distances_to_goal.append(distance_to_target)
 
-        # print("rel data", relevant_data)
-        # print("distances", r_data_distances_to_goal)
+        print("rel data", relevant_data)
+        print("distances", r_data_distances_to_goal)
 
         """ Now we have a list of distances to our current dataset, need to select k closest in terms of utility 
         and cooperations. Then access the relevant data and find the classification values ( i[3]) for them. """
@@ -1386,8 +1399,9 @@ class PDAgent(Agent):
 
         if self.stepCount == self.model.rounds - 1:
             if self.strategy == 'VPP':
-
-                self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_mcoops, self.default_ppds)
+                if not self.model.kNN_training:
+                    self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_mcoops, self.default_ppds)
+                    # Only use this if we are not training as presumably we will have no training data because we will be training
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
         # self.compare_score()
 

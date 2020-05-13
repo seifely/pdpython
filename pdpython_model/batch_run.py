@@ -241,8 +241,8 @@ class PDModel(Model):
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
-                 test_scenario=True,
-                 kNN_training=False,
+                 test_scenario=False,
+                 kNN_training=True,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -406,7 +406,7 @@ class PDModel(Model):
         self.set_ppds()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
-        self.training_data = pickle.load(open("training_data.p", "rb"))
+        # self.training_data = pickle.load(open("training_data.p", "rb"))
         if not experimental_spawn:
             self.make_agents()
         elif experimental_spawn:
@@ -664,7 +664,13 @@ br_params = {"number_of_agents": [47],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.5,
+            "init_ppD": [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45,
+                         0.5,
+                         0.55, 0.6,
+                         0.65, 0.7,
+                         0.75,
+                         0.8, 0.85,
+                         0.9, 0.95
                          ],
              "k": [35]
              }
@@ -675,7 +681,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
+                 iterations=250,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
