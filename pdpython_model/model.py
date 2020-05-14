@@ -377,7 +377,7 @@ class PDModel(Model):
         self.set_ppds()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
-        self.training_data = pickle.load(open("training_data.p", "rb"))
+        self.training_data = pickle.load(open("training_data_5.p", "rb"))
         if not experimental_spawn:
             self.make_agents()
         elif experimental_spawn:

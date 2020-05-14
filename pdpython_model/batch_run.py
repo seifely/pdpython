@@ -237,12 +237,12 @@ class PDModel(Model):
                  number_of_agents=47,
                  schedule_type="Simultaneous",
                  rounds=250,
-                 collect_data=False,
+                 collect_data=True,
                  agent_printing=False,
                  randspawn=True,
                  experimental_spawn=True,
-                 test_scenario=False,
-                 kNN_training=True,
+                 test_scenario=True,
+                 kNN_training=False,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -301,7 +301,7 @@ class PDModel(Model):
                                              44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT",
                                              26: "TFT",
                                              36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
-                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 12: "WSLS", 22: "WSLS",
+                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 22: "WSLS",
                                              25: "WSLS",
                                              35: "WSLS", 38: "WSLS", 41: "WSLS"}
 
@@ -664,16 +664,7 @@ br_params = {"number_of_agents": [47],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [#0.1, 0.15, 0.2, 0.25, 0.3, 0.35,
-                         #0.4, 0.45,
-                         #0.5,
-                         #0.55, 0.6,
-                         #0.65, 0.7,
-                         #0.75,
-                         #0.8, 0.85,
-                         #0.9,
-                         0.95
-                         ],
+            "init_ppD": [0.1,],
              "k": [35]
              }
 
@@ -683,7 +674,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=250,
+                 iterations=100,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

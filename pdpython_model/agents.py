@@ -1132,7 +1132,7 @@ class PDAgent(Agent):
         # index_list = []
         data_list = []
 
-        for i in range(0, n_times):     # would alternatively prefer this to while loop
+        for i in range(0, n_times):     # would alternatively prefer this to be a while loop
             index = self.BSearch(copy_list, value, indx)  # get the index of the ppd item
 
             if index != -1:
@@ -1161,11 +1161,11 @@ class PDAgent(Agent):
                     first = mid + 1
         return index
 
-    def knn_analysis(self, utility, cooperations, ppd, training_data, k):
+    def knn_analysis(self, utility, selfcoops, oppcoops, mutcoops, ppd, training_data, k):
         """ Takes an input, checks it against training data, and returns a partner classification """
         classification = 1  # CLASSES START AT 1 INSTEAD OF 0 BECAUSE IM A FOOL
         # print("Initialising knn analysis")
-        current_data = [utility, cooperations, ppd]
+        current_data = [utility, selfcoops, oppcoops, mutcoops, ppd]
         # print(current_data)
         # print(len(training_data), type(training_data))
 
@@ -1183,7 +1183,8 @@ class PDAgent(Agent):
         # For Binary Search, we need to know how many times to search the list - I think with the 113,400 data
         # it's 12,600 data points per ppd we collected
         # print("gonna do binary search with ppd of", ppd)
-        relevant_data = self.BinaryPPDSearch(training_data, ppd, 12600, 2)
+        training_size = len(relevant_data)
+        relevant_data = self.BinaryPPDSearch(training_data, ppd, (training_size/3), 4)
 
         print("rd", relevant_data)
         # can't get the indices from this, nor replace properly - but we don't need indices for a later search
@@ -1191,7 +1192,7 @@ class PDAgent(Agent):
 
         for i in relevant_data:
             """ We take each item and calculate the Euclidean distance to the data we already have"""
-            slice = i[:3]
+            slice = i[:5]   #  =========== THIS MIGHT NEED TO BE 5 =======
             distance_to_target = dst.cosine(current_data, slice)
             # print("data:", i, "distance:", distance_to_target)
             r_data_distances_to_goal.append(distance_to_target)
@@ -1207,8 +1208,8 @@ class PDAgent(Agent):
 
         ascending_data = sorted(zip(relevant_data, r_data_distances_to_goal), key=lambda t: t[1])[0:]
         # print("ass data", ascending_data)
-        # print("ascend", ascending_data)
-        # print(len(ascending_data))
+        print("ascend", ascending_data)
+        print(len(ascending_data))
         categories = []
 
         for i in range(0, k):
@@ -1217,7 +1218,7 @@ class PDAgent(Agent):
             categories.append(temp[0][3])
 
         """Then, we find the most common category offered and return it. """
-        # print("The k closest categories were:", categories)
+        print("The k closest categories were:", categories)
         try:
             classification = statistics.mode(categories)
         except statistics.StatisticsError:
