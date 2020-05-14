@@ -372,12 +372,14 @@ class PDModel(Model):
                 })
 
         self.memory_states = self.get_memory_states(['C', 'D'])
+        # self.training_data = []
+        self.training_data = pickle.load(open("training_data_5.p", "rb"))
         self.state_values = self.state_evaluation(self.memory_states)
         self.agent_ppds = {}
         self.set_ppds()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
-        self.training_data = []
-        self.training_data = pickle.load(open("training_data_5.p", "rb"))
+
+
         if not experimental_spawn:
             self.make_agents()
         elif experimental_spawn:

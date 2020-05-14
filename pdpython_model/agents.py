@@ -2,9 +2,7 @@ from mesa import Agent
 import random
 import csv
 import numpy as np
-import time
-from math import ceil
-import itertools
+import pdb
 import statistics
 import pickle
 from scipy.spatial import distance as dst
@@ -1048,7 +1046,7 @@ class PDAgent(Agent):
         self.update_value = self.init_uv
         self.mutual_c_outcome = 0
 
-    def knn_decision(self, partner_ids, partner_utils, partner_coops, ppds):
+    def knn_decision(self, partner_ids, partner_utils, partner_selfcoops, partner_oppcoops, partner_mutcoops, ppds):
 
         """ ppds needs to be self.model.agent_ppds"""
         updated_ppds = []
@@ -1057,6 +1055,7 @@ class PDAgent(Agent):
 
         updated_ppds = old_ppds
         training_data = copy.deepcopy(self.model.training_data)
+        print(len(training_data))
         decision_data = copy.deepcopy(self.model.training_data)
 
         for i in partner_ids:
@@ -1064,16 +1063,19 @@ class PDAgent(Agent):
             # print("HELLA", len(self.model.training_data))
             partner_index = partner_ids.index(i)
             game_utility = partner_utils[i]
-            game_cooperations = partner_coops[i]
+            game_selfcoops = partner_selfcoops[i]
+            game_oppcoops = partner_oppcoops[i]
+            game_mutcoops = partner_mutcoops[i]
             game_ppd = ppds[i]
 
             """ The bit above might not work; because when we get ppds from the model it's a 4-long list,
                 and some agents only use the first 2 to 3 items, we need to update the ppds in the list by 
                 their indices to let them be used against the same agent next game"""
 
-            class_list, classification = self.knn_analysis(game_utility, game_cooperations, game_ppd, training_data,
+            class_list, classification = self.knn_analysis(game_utility, game_selfcoops, game_oppcoops, game_mutcoops,
+                                                           game_ppd, training_data,
                                                            self.model.k)
-            priority = "U"  # out of options 'C', 'U', and 'CU' - latter being coops to utility ratio
+            priority = "U"  # out of options 'C', 'U', and // TODO
 
             # print("Partner ID:", i,
             #       "k Classifications:", class_list,
@@ -1128,22 +1130,29 @@ class PDAgent(Agent):
 
     def BinaryPPDSearch(self, list, value, n_times, indx):
         """ This should return a list of indexes to search the data with """
+
+
         copy_list = copy.deepcopy(list)
+        print("bsearchinput", len(list), value, n_times, indx)
         # index_list = []
         data_list = []
+        n_times = int(n_times)
 
         for i in range(0, n_times):     # would alternatively prefer this to be a while loop
             index = self.BSearch(copy_list, value, indx)  # get the index of the ppd item
-
+            # print("I found an index")
             if index != -1:
                 # index_list.append(index)  # index list is garbage because of popping
+                # print("The item is", copy_list[index])
                 data_list.append(copy_list[index])
+                # print("I appended it")
                 # copy_list[index] = [0, 0, 0.0, 0]
                 copy_list.pop(index)
+                # print("I removed it")
 
         """ So, could we improve this by running the Search function indefinitely until it can no longer 
             find the value we're looking for? """
-
+        print("agent", self.ID, "index:",indx,"bsearch output", data_list)
         return data_list
 
     def BSearch(self, lys, val, indx_value):
@@ -1183,10 +1192,10 @@ class PDAgent(Agent):
         # For Binary Search, we need to know how many times to search the list - I think with the 113,400 data
         # it's 12,600 data points per ppd we collected
         # print("gonna do binary search with ppd of", ppd)
-        training_size = len(relevant_data)
+        training_size = len(training_data)
         relevant_data = self.BinaryPPDSearch(training_data, ppd, (training_size/3), 4)
 
-        print("rd", relevant_data)
+        # print("rd", relevant_data)
         # can't get the indices from this, nor replace properly - but we don't need indices for a later search
         # because the search for optimal values will be a separate search
 
@@ -1197,8 +1206,8 @@ class PDAgent(Agent):
             # print("data:", i, "distance:", distance_to_target)
             r_data_distances_to_goal.append(distance_to_target)
 
-        print("rel data", relevant_data)
-        print("distances", r_data_distances_to_goal)
+        # print("rel data", relevant_data)
+        # print("distances", r_data_distances_to_goal)
 
         """ Now we have a list of distances to our current dataset, need to select k closest in terms of utility 
         and cooperations. Then access the relevant data and find the classification values ( i[3]) for them. """
@@ -1206,19 +1215,20 @@ class PDAgent(Agent):
         # sorted_distances = {k: v for k, v in sorted(r_data_distances_to_goal.items(), key=lambda item: item[1])}
         # # this may or may not work, it's a method taken from elsewhere...
 
+        #
         ascending_data = sorted(zip(relevant_data, r_data_distances_to_goal), key=lambda t: t[1])[0:]
         # print("ass data", ascending_data)
-        print("ascend", ascending_data)
-        print(len(ascending_data))
+        # print("ascend", ascending_data)
+        # print(len(ascending_data))
         categories = []
 
         for i in range(0, k):
             # print("ass data2", ascending_data)
             temp = ascending_data[i]
-            categories.append(temp[0][3])
+            categories.append(temp[0][5])
 
         """Then, we find the most common category offered and return it. """
-        print("The k closest categories were:", categories)
+        # print("The k closest categories were:", categories)
         try:
             classification = statistics.mode(categories)
         except statistics.StatisticsError:
@@ -1240,23 +1250,31 @@ class PDAgent(Agent):
             # if k > 3:
             #     classification = statistics.mode(categories[0:5])
         # print("The most common classification from the k neighbours is:", classification)
+        # TODO - in future might want to weight each neighbour by closeness
         return categories, classification
 
     def ppd_select(self, list, classification, optimisation_choice):
         """ Takes a class of partner, given by the kNN algorithm, and returns a starting ppD to
         use in future games for the same partner based on which variable (or combo) we want to optimise """
         # don't need to make a deep copy of this list, because we're not altering it
-        relevant_data = []
+        # print("pdsel", list, classification, optimisation_choice)
+        # relevant_data = []
+        relevant_data2 = self.BinaryPPDSearch(list, 250, 500, 1)
 
+        print("lenny", len(relevant_data2))
         relevant_data = self.BinaryPPDSearch(list,
                                              classification,
-                                             12600, 3)  # need to decide how many times to run this for
+                                             (len(list)), 5)  # need to decide how many times to run this for
+                                             # TODO my GODS why is this not fucking working
         npRev = np.array(relevant_data)
+        if len(npRev) == 0:
+            print("I'm agent", self.ID, "and ", len(list), classification, optimisation_choice, len(relevant_data))
+            print("npRev empty")
 
         col = 0
-        if optimisation_choice == 'C':
+        if optimisation_choice == 'C':  # optimise for MY cooperation
             col = 1
-        elif optimisation_choice == 'U':
+        elif optimisation_choice == 'U':  # optimise to maximise utility
             col = 0
         elif optimisation_choice == 'CU':
             # eh we need to decide this
@@ -1268,8 +1286,8 @@ class PDAgent(Agent):
         # print("checking npRev", npRev)
 
         highest = npRev[len(npRev)-1]
-        new_ppd = highest[2]
-        print("I'm agent", self.ID,"My partner's class is", classification, "and the ppd I should use for them is", new_ppd)
+        new_ppd = highest[4]
+        print("I'm agent", self.ID, "My partner's class is", classification, "and the ppd I should use for them is", new_ppd)
 
         return new_ppd
 
@@ -1401,7 +1419,8 @@ class PDAgent(Agent):
         if self.stepCount == self.model.rounds - 1:
             if self.strategy == 'VPP':
                 if not self.model.kNN_training:
-                    self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_mcoops, self.default_ppds)
+                    self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_mcoops,
+                                      self.per_partner_tcoops, self.per_partner_mutc, self.default_ppds)
                     # Only use this if we are not training as presumably we will have no training data because we will be training
         """ Because model outputting is below, we can add update values to the list before it *may get reset """
         # self.compare_score()

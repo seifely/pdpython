@@ -301,7 +301,7 @@ class PDModel(Model):
                                              44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT",
                                              26: "TFT",
                                              36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
-                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 22: "WSLS",
+                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 12:"WSLS", 22: "WSLS",
                                              25: "WSLS",
                                              35: "WSLS", 38: "WSLS", 41: "WSLS"}
 
@@ -330,7 +330,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('kNN_test4_newenv_47_no_%s' % (self.iteration_n), "a")
+        concatenator = ('kNN_test5_newtrain_47_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -406,7 +406,7 @@ class PDModel(Model):
         self.set_ppds()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
-        # self.training_data = pickle.load(open("training_data.p", "rb"))
+        self.training_data = pickle.load(open("training_data_5.p", "rb"))
         if not experimental_spawn:
             self.make_agents()
         elif experimental_spawn:
@@ -674,7 +674,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=100,
+                 iterations=5,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
