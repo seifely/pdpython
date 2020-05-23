@@ -1055,7 +1055,7 @@ class PDAgent(Agent):
 
         updated_ppds = old_ppds
         training_data = copy.deepcopy(self.model.training_data)
-        print(len(training_data))
+        # print(len(training_data))
         decision_data = copy.deepcopy(self.model.training_data)
 
         for i in partner_ids:
@@ -1131,28 +1131,30 @@ class PDAgent(Agent):
     def BinaryPPDSearch(self, list, value, n_times, indx):
         """ This should return a list of indexes to search the data with """
 
-
         copy_list = copy.deepcopy(list)
-        print("bsearchinput", len(list), value, n_times, indx)
+        # print("bsearchinput", len(list), value, n_times, indx)
         # index_list = []
         data_list = []
         n_times = int(n_times)
 
         for i in range(0, n_times):     # would alternatively prefer this to be a while loop
             index = self.BSearch(copy_list, value, indx)  # get the index of the ppd item
-            # print("I found an index")
+            # print("I found an index, it's", index)
+            # print(len(copy_list))
             if index != -1:
                 # index_list.append(index)  # index list is garbage because of popping
                 # print("The item is", copy_list[index])
                 data_list.append(copy_list[index])
-                # print("I appended it")
+                # print("I appended it and the list now has", len(data_list), "items")
                 # copy_list[index] = [0, 0, 0.0, 0]
                 copy_list.pop(index)
                 # print("I removed it")
+            else:
+                copy_list.pop(index)
 
         """ So, could we improve this by running the Search function indefinitely until it can no longer 
             find the value we're looking for? """
-        print("agent", self.ID, "index:",indx,"bsearch output", data_list)
+        # print("agent", self.ID, "index:",indx,"bsearch output", data_list)
         return data_list
 
     def BSearch(self, lys, val, indx_value):
@@ -1175,6 +1177,7 @@ class PDAgent(Agent):
         classification = 1  # CLASSES START AT 1 INSTEAD OF 0 BECAUSE IM A FOOL
         # print("Initialising knn analysis")
         current_data = [utility, selfcoops, oppcoops, mutcoops, ppd]
+        current_data2 = [utility, selfcoops, ppd]
         # print(current_data)
         # print(len(training_data), type(training_data))
 
@@ -1202,6 +1205,7 @@ class PDAgent(Agent):
         for i in relevant_data:
             """ We take each item and calculate the Euclidean distance to the data we already have"""
             slice = i[:5]   #  =========== THIS MIGHT NEED TO BE 5 =======
+            slice2 = [i[0], i[1], i[5]]
             distance_to_target = dst.cosine(current_data, slice)
             # print("data:", i, "distance:", distance_to_target)
             r_data_distances_to_goal.append(distance_to_target)
@@ -1259,17 +1263,15 @@ class PDAgent(Agent):
         # don't need to make a deep copy of this list, because we're not altering it
         # print("pdsel", list, classification, optimisation_choice)
         # relevant_data = []
-        relevant_data2 = self.BinaryPPDSearch(list, 250, 500, 1)
 
-        print("lenny", len(relevant_data2))
         relevant_data = self.BinaryPPDSearch(list,
                                              classification,
                                              (len(list)), 5)  # need to decide how many times to run this for
                                              # TODO my GODS why is this not fucking working
         npRev = np.array(relevant_data)
-        if len(npRev) == 0:
-            print("I'm agent", self.ID, "and ", len(list), classification, optimisation_choice, len(relevant_data))
-            print("npRev empty")
+        # if len(npRev) == 0:
+            # print("I'm agent", self.ID, "and ", len(list), classification, optimisation_choice, len(relevant_data))
+            # print("npRev empty")
 
         col = 0
         if optimisation_choice == 'C':  # optimise for MY cooperation
@@ -1287,7 +1289,7 @@ class PDAgent(Agent):
 
         highest = npRev[len(npRev)-1]
         new_ppd = highest[4]
-        print("I'm agent", self.ID, "My partner's class is", classification, "and the ppd I should use for them is", new_ppd)
+        # print("I'm agent", self.ID, "My partner's class is", classification, "and the ppd I should use for them is", new_ppd)
 
         return new_ppd
 

@@ -330,7 +330,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('kNN_test5_newtrain_47_no_%s' % (self.iteration_n), "a")
+        concatenator = ('kNN_test15_traincomp_47_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -406,7 +406,7 @@ class PDModel(Model):
         self.set_ppds()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
-        self.training_data = pickle.load(open("training_data_5.p", "rb"))
+        self.training_data = pickle.load(open("training_data_300.p", "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if not experimental_spawn:
             self.make_agents()
         elif experimental_spawn:
@@ -664,7 +664,7 @@ br_params = {"number_of_agents": [47],
             "gamma": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
-            "init_ppD": [0.1,],
+            "init_ppD": [0.5],
              "k": [35]
              }
 
@@ -674,7 +674,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=5,
+                 iterations=1,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
