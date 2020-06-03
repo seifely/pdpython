@@ -172,6 +172,7 @@ class PDAgent(Agent):
             my_data.append(temp_data)
 
         # print("my_data", my_data)
+
         return my_data
 
     def pick_strategy(self):
@@ -1077,7 +1078,8 @@ class PDAgent(Agent):
                                                            self.model.k)
             priority = "U"  # out of options 'C', 'U', and // TODO
 
-            # print("Partner ID:", i,
+            # print("My ID:", self.ID,
+            #       "Partner ID:", i,
             #       "k Classifications:", class_list,
             #       "Decided Class:", classification)
             self.knn_error_statement(classification, i)
