@@ -1090,7 +1090,8 @@ class PDAgent(Agent):
 
             updated_ppds[partner_index] = new_ppd
 
-        # print("The new ppds are", updated_ppds)
+        print("The Old ppds were:", old_ppds)
+        print("The new ppds are", updated_ppds)
         self.model.agent_ppds[self.ID] = updated_ppds
         return
 
@@ -1276,13 +1277,14 @@ class PDAgent(Agent):
             # print("npRev empty")
 
         col = 0
-        if optimisation_choice == 'C':  # optimise for MY cooperation
+        if optimisation_choice == 'MC':  # optimise for MY cooperation
             col = 1
         elif optimisation_choice == 'U':  # optimise to maximise utility
             col = 0
-        elif optimisation_choice == 'CU':
-            # eh we need to decide this
-            pass
+        elif optimisation_choice == 'OC':
+            col = 2
+        elif optimisation_choice == 'MutC':
+            col = 3
 
         npRev = npRev[np.argsort(npRev[:, col])]
         npRev = np.ndarray.tolist(npRev)

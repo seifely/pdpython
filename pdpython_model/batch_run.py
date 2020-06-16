@@ -330,7 +330,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('kNN_test16_oneoff_47_no_%s' % (self.iteration_n), "a")
+        concatenator = ('kNN_ppdupdater_1_47_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -402,6 +402,7 @@ class PDModel(Model):
 
         self.memory_states = self.get_memory_states(['C', 'D'])
         self.state_values = self.state_evaluation(self.memory_states)
+        self.firstgame = self.first_game_check()
         self.agent_ppds = {}
         self.set_ppds()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
@@ -413,6 +414,17 @@ class PDModel(Model):
             self.make_set_agents()
         self.running = True
         self.datacollector.collect(self)
+
+    def first_game_check(self):
+        try:
+            success = pickle.load(open("firstgame.p", "rb"))
+            print("Val of Success was : ", success)
+            if success == 1:
+                return False
+        except (OSError, IOError) as e:
+            foo = 1
+            pickle.dump(foo, open("firstgame.p", "wb"))
+            return True
 
     def output_data(self, steptime):
         with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
@@ -516,16 +528,17 @@ class PDModel(Model):
         else:
             n_of_a = 64
 
-        for i in range(n_of_a):
-            # print("n of a", i)
-            initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
-            with open("agent_ppds.p", "wb") as f:
-                pickle.dump(initialised, f)
+        if self.firstgame:
+            for i in range(n_of_a):
+                # print("n of a", i)
+                initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+                with open("agent_ppds.p", "wb") as f:
+                    pickle.dump(initialised, f)
 
-            """ This is used for setting ppD to a model-specified value. For agents
-                to alter their own ppDs for, they must use the kNN system and 
-                extract from a pickle file [INCOMPLETE] the classification of partner
-                etc. from the previous game."""
+                """ This is used for setting ppD to a model-specified value. For agents
+                    to alter their own ppDs for, they must use the kNN system and 
+                    extract from a pickle file [INCOMPLETE] the classification of partner
+                    etc. from the previous game."""
 
     def state_evaluation(self, state_list):
         # if self.stepCount == 1:
@@ -674,7 +687,7 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
+                 iterations=5,
                  max_steps=250,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
