@@ -212,7 +212,7 @@ def get_iwsls_cooperations(model):
 
 def track_params(model):
     return (model.number_of_agents,
-            model.gamma,
+            model.theta,
             #model.learning_rate
             model.init_ppD,
             )
@@ -252,7 +252,7 @@ class PDModel(Model):
                  c=0,
                  batch_iterations = 2,  # wait what is this doing again
                  learning_rate = 1,
-                 gamma = 0.015,
+                 theta = 0.015,
                  init_ppD = 0.5,
                  k=11
                  ):
@@ -269,7 +269,7 @@ class PDModel(Model):
         self.b = b
         self.c = c
         self.batch_iterations = batch_iterations
-        self.gamma = gamma
+        self.theta = theta
         self.init_ppD = init_ppD
         self.learning_rate = learning_rate
         self.simplified_payoffs = simplified_payoffs
@@ -674,7 +674,7 @@ class PDModel(Model):
 
 # parameter lists for each parameter to be tested in batch run
 br_params = {"number_of_agents": [47],
-            "gamma": [0.015, #0.01, 0.015, 0.02
+            "theta": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
             "init_ppD": [0.5],

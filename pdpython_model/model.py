@@ -210,7 +210,7 @@ def get_iwsls_cooperations(model):
 
 def track_params(model):
     return (model.number_of_agents,
-            model.gamma,
+            model.theta,
             #model.learning_rate
             model.init_ppD,
             )
@@ -241,10 +241,14 @@ class PDModel(Model):
                  b=0,
                  c=0,
                  learning_rate=1,
-                 gamma=0.015,
+                 theta=0.015,
                  init_ppD=0.5,
-                 k=5
-                 ):
+                 k=5,
+
+                 alpha=0.1,
+                 epsilon=0.99,
+                 gamma=0.95,
+                  ):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -257,7 +261,7 @@ class PDModel(Model):
         self.DC = DC
         self.b = b
         self.c = c
-        self.gamma = gamma
+        self.theta = theta
         self.init_ppD = init_ppD
         self.learning_rate = learning_rate
         self.simplified_payoffs = simplified_payoffs
@@ -270,6 +274,8 @@ class PDModel(Model):
         self.kNN_training = kNN_training
         self.kNN_accuracy = 0
         self.k = k
+
+        # SARSA
 
         self.experimental_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
                                         20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
