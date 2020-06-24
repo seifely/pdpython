@@ -69,6 +69,7 @@ class PDAgent(Agent):
         self.ppD_partner = 0
         self.per_partner_payoffs = {}  # this should be list of all prev payoffs from my partner, only used fr averaging
         self.partner_latest_move = {}  # this is a popped list
+        #self.my_latest_move = {} # this is a popped list
         self.partner_scores = {}
         self.default_ppds = {}
         self.training_data = []
@@ -98,6 +99,7 @@ class PDAgent(Agent):
         self.states = []
         self.pp_sprime = {}
         self.pp_aprime = {}
+        self.pp_payoff = {}
 
         self.epsilon = self.model.epsilon
         self.alpha = self.model.alpha
@@ -105,10 +107,6 @@ class PDAgent(Agent):
 
         # Per Partner Q Tables
         self.qtable = []
-        # self.q1 = []
-        # self.q2 = []
-        # self.q3 = []
-        # self.q4 = []
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
@@ -281,6 +279,33 @@ class PDAgent(Agent):
 
                     # pick a move
                     move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
+                    # add that move, with partner ID, to the versus choice dictionary
+                    versus_moves[partner_ID] = move
+        # print("agent", self.ID,"versus moves:", versus_moves)
+        return versus_moves
+
+    def iter_pick_nextmove(self, strategy, payoffs, nextstates):
+        """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
+        keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
+        versus_moves = {}
+        x, y = self.pos
+        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+
+        # First, get the neighbours
+        for i in neighbouring_cells:
+            bound_checker = self.model.grid.out_of_bounds(i)
+            if not bound_checker:
+                this_cell = self.model.grid.get_cell_list_contents([i])
+                # print("This cell", this_cell)
+
+                if len(this_cell) > 0:
+                    partner = [obj for obj in this_cell
+                               if isinstance(obj, PDAgent)][0]
+
+                    partner_ID = partner.ID
+
+                    # pick a move
+                    move = self.pick_move(strategy, payoffs, partner_ID, nextstates)
                     # add that move, with partner ID, to the versus choice dictionary
                     versus_moves[partner_ID] = move
         # print("agent", self.ID,"versus moves:", versus_moves)
@@ -633,6 +658,9 @@ class PDAgent(Agent):
                     if self.per_partner_payoffs.get(partner_ID) is None:
                         self.per_partner_payoffs[partner_ID] = [0]
 
+                    if self.pp_payoff.get(partner_ID) is None:
+                        self.pp_payoff[partner_ID] = 0
+
                     if self.per_partner_mcoops.get(partner_ID) is None:
                         self.per_partner_mcoops[partner_ID] = 0
 
@@ -723,6 +751,7 @@ class PDAgent(Agent):
             # print("Outcome with partner %i was:" % i, outcome)
 
             self.per_partner_payoffs[i].append(outcome_payoff)
+            self.pp_payoff[i] = outcome_payoff
             self.indivAvPayoff[i] = statistics.mean(self.per_partner_payoffs[i])
             # print("My individual average payoff for partner", i, "is ", self.indivAvPayoff[i])
 
@@ -1347,12 +1376,7 @@ class PDAgent(Agent):
 
                 if self.strategy == 'LEARN':
                     # Initialise the q tables and states on the first turn
-                    # self.q1 = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
-                    # self.q2 = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
-                    # self.q3 = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
-                    # self.q4 = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
                     self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
-
                     self.states = copy.deepcopy(self.model.memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
@@ -1369,28 +1393,18 @@ class PDAgent(Agent):
 
                 # self.stepCount += 1
             else:
-                # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
-                # this line is now redundant in a system that picks multiple moves per turn
+
                 self.set_defaults(self.partner_IDs)
                 # print("My ppDs are:", self.ppD_partner)
 
                 if self.strategy == 'LEARN':
                     # Initialise the q tables and states on the first turn
-                    # self.q1 = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
-                    # self.q2 = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
-                    # self.q3 = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
-                    # self.q4 = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
                     self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
-
                     self.states = copy.deepcopy(self.model.memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
-                # print("Number of c and d at V3S3: ", self.number_of_c, self.number_of_d)
-                # print("Number of C and D at V3S3: ", self.model.number_of_coops, self.model.number_of_defects)
                 self.find_average_move()
-                # print("Number of c and d at V3S4: ", self.number_of_c, self.number_of_d)
-                # print("Number of C and D at V3S4: ", self.model.number_of_coops, self.model.number_of_defects)
 
                 # self.output_data_to_model()
                 # if self.model.collect_data:
@@ -1406,7 +1420,13 @@ class PDAgent(Agent):
                 # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
                 self.previous_moves.append(self.move)
 
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+                if self.strategy == 'LEARN':
+                    #if self.pp_aprime exists, itermove_result = copy.deepcopy(self.pp_aprime)
+                    #clear next_action?
+
+                else:
+                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+
                 self.find_average_move()
 
                 if self.model.schedule_type != "Simultaneous":
@@ -1435,15 +1455,40 @@ class PDAgent(Agent):
 
         if self.strategy == 'LEARN':
             self.check_partner()  # Update Knowledge
-            # get sprimes
+            round_payoffs = self.increment_score(self.payoffs)
+            # get sprimes (next states we will be in)
             for i in self.working_memory:
                 state = self.working_memory[i]
                 obs = self.partner_latest_move[i]
                 self.pp_sprime[i] = sarsa.output_sprime(state, obs)
+            ########## TODO: GENERATE THE APRIMES BEFORE THE SPRIMES
+            # Currently here we are generating sprimes based on our CURRENT state?
 
-            # for each partner
-                # next_action = e_greedy(sprime)
-                # update Q for current_action
+            # get aprimes (next actions to do)
+            self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.pp_sprime)
+            # update the Q for the CURRENT state (self.working_memory)
+            for i in self.working_memory:
+                state = self.working_memory[i]
+                my_move = self.itermove_result[i]
+                reward = self.pp_payoff[i]  # the unmanipulated value
+
+                # for the states I'm in, update the relevant q value
+                # access the qtable value we already have
+                oldQValues = self.qtable[state]   # THIS MIGHT BREAK BECAUSE OF TUPLES
+                if my_move == 'C':
+                    idx = 0
+                elif my_move == 'D':
+                    idx = 1
+
+                next_state = self.pp_sprime[i]
+                nextQValues = self.qtable[next_state]
+                nextQValue = nextQValues[idx2]  # this is wrong, just want
+
+                oldQValue = oldQValues[idx]
+                new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
+
+
+
             # update epsilon
 
         else:
