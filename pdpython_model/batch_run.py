@@ -240,9 +240,9 @@ class PDModel(Model):
                  collect_data=True,
                  agent_printing=False,
                  randspawn=True,
-                 experimental_spawn=True,
-                 test_scenario=True,
+                 kNN_spawn=True,
                  kNN_training=False,
+                 kNN_testing=False,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -254,6 +254,9 @@ class PDModel(Model):
                  learning_rate = 1,
                  theta = 0.015,
                  init_ppD = 0.5,
+                 sarsa_spawn=False,
+                 sarsa_training=False,
+                 sarsa_testing=False,
                  k=11
                  ):
 
@@ -277,22 +280,26 @@ class PDModel(Model):
         self.randspawn = randspawn
         self.iteration_n = 0
         self.new_filenumber = 0
+        self.kNN_spawn = kNN_spawn
+        self.kNN_testing = kNN_testing
         self.kNN_training = kNN_training
-        self.experimental_spawn = experimental_spawn
-        self.test_scenario = test_scenario
+        self.sarsa_spawn = sarsa_spawn
+        self.sarsa_training = sarsa_training
+        self.sarsa_testing = sarsa_testing
         self.kNN_accuracy = 0
         self.k = k
 
-        self.experimental_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
-                                        20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
-                                        46: "DEVIL", 2: "ANGEL", 4: "ANGEL", 14: "ANGEL", 15: "ANGEL", 17: "ANGEL",
-                                        19: "ANGEL", 28: "ANGEL", 30: "ANGEL", 32: "ANGEL", 42: "ANGEL", 43: "ANGEL",
-                                        45: "ANGEL", 47: "ANGEL", 8: "VPP", 11: "VPP", 23: "VPP", 26: "VPP", 35: "VPP",
-                                        38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
-                                        37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
-                                        36: "TFT", 39: "TFT"}
-
-        self.experimental_strategies_test = {2: "DEVIL", 4: "DEVIL", 14: "DEVIL", 15: "DEVIL", 17: "DEVIL", 19: "DEVIL",
+        if self.kNN_training:
+            self.kNN_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
+                                            20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
+                                            46: "DEVIL", 2: "ANGEL", 4: "ANGEL", 14: "ANGEL", 15: "ANGEL", 17: "ANGEL",
+                                            19: "ANGEL", 28: "ANGEL", 30: "ANGEL", 32: "ANGEL", 42: "ANGEL", 43: "ANGEL",
+                                            45: "ANGEL", 47: "ANGEL", 8: "VPP", 11: "VPP", 23: "VPP", 26: "VPP", 35: "VPP",
+                                            38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
+                                            37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
+                                            36: "TFT", 39: "TFT"}
+        elif self.kNN_testing:
+            self.kNN_strategies = {2: "DEVIL", 4: "DEVIL", 14: "DEVIL", 15: "DEVIL", 17: "DEVIL", 19: "DEVIL",
                                              28: "DEVIL", 30: "DEVIL", 32: "DEVIL", 42: "DEVIL", 43: "DEVIL",
                                              45: "DEVIL",
                                              47: "DEVIL", 1: "ANGEL", 3: "ANGEL", 5: "ANGEL", 6: "ANGEL", 16: "ANGEL",
@@ -408,9 +415,9 @@ class PDModel(Model):
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
         self.training_data = pickle.load(open("training_data_50.p", "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if not experimental_spawn:
+        if not kNN_spawn:
             self.make_agents()
-        elif experimental_spawn:
+        elif kNNl_spawn:
             self.make_set_agents()
         self.running = True
         self.datacollector.collect(self)
@@ -477,6 +484,7 @@ class PDModel(Model):
 
         # to generate the < step 7 states
         initial_state1 = [0, 0, 0, 0, 0, 0]
+        permutations.append(initial_state1)
         initial_state2 = [0, 0, 0, 0, 0]
         initial_state3 = [0, 0, 0, 0]
         initial_state4 = [0, 0, 0]
@@ -523,7 +531,7 @@ class PDModel(Model):
                     when actually we want it to start at 0.5 and then go unaltered by this method for the subsequent games"""
         initialised = {}
         n_of_a = 0
-        if self.experimental_spawn:
+        if self.kNN_spawn:
             n_of_a = 47
         else:
             n_of_a = 64
@@ -667,7 +675,7 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=250):
+    def run_model(self, rounds=1000):
         for i in range(self.rounds):
             self.step()
 

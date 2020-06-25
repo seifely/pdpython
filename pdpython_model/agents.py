@@ -100,6 +100,7 @@ class PDAgent(Agent):
         self.pp_sprime = {}
         self.pp_aprime = {}
         self.pp_payoff = {}
+        self.oldstates = {}
 
         self.epsilon = self.model.epsilon
         self.alpha = self.model.alpha
@@ -192,19 +193,34 @@ class PDAgent(Agent):
     def pick_strategy(self):
         """ This is an initial strategy selector for agents """
 
-        if self.model.experimental_spawn:
-            if not self.model.test_scenario:
+        if self.model.kNN_spawn:
+            if not self.model.kNN_testing:
                 # print("My id is", self.ID)
                 strat = "RANDOM"
-                strat = self.model.experimental_strategies[self.ID]
+                strat = self.model.kNN_strategies[self.ID]
                 return str(strat)
-            elif self.model.test_scenario:
+            elif self.model.kNN_testing:
                 # print("My id is", self.ID)
                 strat = "RANDOM"
-                strat = self.model.experimental_strategies_test[self.ID]
+                strat = self.model.kNN_strategies[self.ID]
                 return str(strat)
 
-        elif not self.model.experimental_spawn:
+        elif self.model.sarsa_spawn:
+            choices = ["LEARN", "TFT"]
+
+            if len(choices) == 2:
+                check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
+                           42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
+                check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
+                           43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
+                if self.ID in check_a:
+                    strat = choices[0]
+                    return str(strat)
+                elif self.ID in check_b:
+                    strat = choices[1]
+                    return str(strat)
+
+        else:
             if self.pickstrat == "RANDOM":
                 choices = ["EV", "ANGEL", "RANDOM", "DEVIL", "VEV", "TFT", "WSLS", "VPP", "iWSLS"]
                 strat = random.choice(choices)
@@ -1366,6 +1382,8 @@ class PDAgent(Agent):
             # self.strategy = self.pick_strategy()
             self.set_defaults(self.partner_IDs)
             self.get_IDs()
+            for i in self.partner_IDs:
+                self.oldstates[i] = [0, 0, 0, 0, 0, 0]
 
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
@@ -1423,7 +1441,9 @@ class PDAgent(Agent):
                 if self.strategy == 'LEARN':
                     #if self.pp_aprime exists, itermove_result = copy.deepcopy(self.pp_aprime)
                     #clear next_action?
-
+                    if self.pp_aprime:
+                        self.itermove_result = copy.deepcopy(self.pp_aprime)
+                        # TODO: Do I then need to wipe the aprime dict?
                 else:
                     self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
@@ -1435,8 +1455,14 @@ class PDAgent(Agent):
                 self.stepCount += 1
             else:
 
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
-                self.previous_moves.append(self.move)
+                if self.strategy == 'LEARN':
+                    if self.pp_aprime:
+                        self.itermove_result = copy.deepcopy(self.pp_aprime)
+                        # TODO: Do I then need to wipe the aprime dict?
+                else:
+                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+
+                self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?
 
                 self.find_average_move()
 
@@ -1454,42 +1480,87 @@ class PDAgent(Agent):
     def advance(self):
 
         if self.strategy == 'LEARN':
-            self.check_partner()  # Update Knowledge
-            round_payoffs = self.increment_score(self.payoffs)
-            # get sprimes (next states we will be in)
-            for i in self.working_memory:
-                state = self.working_memory[i]
-                obs = self.partner_latest_move[i]
-                self.pp_sprime[i] = sarsa.output_sprime(state, obs)
-            ########## TODO: GENERATE THE APRIMES BEFORE THE SPRIMES
-            # Currently here we are generating sprimes based on our CURRENT state?
+            self.check_partner()  # We took action a, what s prime did we end up in?
+            # ----- WORKING MEMORY IS NOW S-PRIME -----
+            round_payoffs = self.increment_score(self.payoffs) # Accept the reward for that s prime
+
+            # update the sprimes (the states we have found ourselves in)
+            # for i in self.working_memory:
+            #     state = self.working_memory[i]
+            #     obs = self.partner_latest_move[i]
+            #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
 
             # get aprimes (next actions to do)
-            self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.pp_sprime)
-            # update the Q for the CURRENT state (self.working_memory)
-            for i in self.working_memory:
-                state = self.working_memory[i]
-                my_move = self.itermove_result[i]
-                reward = self.pp_payoff[i]  # the unmanipulated value
+            self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory)
 
-                # for the states I'm in, update the relevant q value
-                # access the qtable value we already have
-                oldQValues = self.qtable[state]   # THIS MIGHT BREAK BECAUSE OF TUPLES
-                if my_move == 'C':
+            # update the Q for the CURRENT sprime
+            # TODO: what we need for this is the OLD state, pre checking the partner
+
+            for i in self.oldstates:
+                s = i                           # the state I used to be in
+                a = self.itermove_result[i]     # the action I took
+                sprime = self.working_memory[i] # the state I found myself in
+                reward = self.pp_payoff[i]      # the reward I observed
+                aprime = self.pp_aprime[i]      # the action I will take next
+
+                oldQValues = self.qtable[s]  # THIS MIGHT BREAK BECAUSE OF TUPLES
+                if a == 'C':
                     idx = 0
-                elif my_move == 'D':
+                elif a == 'D':
                     idx = 1
 
-                next_state = self.pp_sprime[i]
-                nextQValues = self.qtable[next_state]
-                nextQValue = nextQValues[idx2]  # this is wrong, just want
+                newQValues = self.qtable[sprime]  # THIS ISNT RIGHT IS IT?
+                if aprime == 'C':
+                    idxprime = 0
+                elif aprime == 'D':
+                    idxprime = 1
 
-                oldQValue = oldQValues[idx]
-                new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
+                Qsa = oldQValues[idx]
+                Qsaprime = newQValues[idxprime]
+
+                # update the Q value for the old state and old action
+                newQ = sarsa.update_q(reward, self.gamma, self.alpha, Qsa, Qsaprime)
+
+                # then put newQ in the Qtable[s] at index idx
+                change = self.qtable[s]
+                change[idx] = newQ
+                self.qtable[s] = change
 
 
+            # for i in self.working_memory:
+            #     state = self.working_memory[i]
+            #     my_move = self.itermove_result[i]
+            #     reward = self.pp_payoff[i]  # the unmanipulated value
+            #
+            #     # for the states I'm in, update the relevant q value
+            #     # access the qtable value we already have
+            #     oldQValues = self.qtable[state]   # THIS MIGHT BREAK BECAUSE OF TUPLES
+            #     if my_move == 'C':
+            #         idx = 0
+            #     elif my_move == 'D':
+            #         idx = 1
+            #
+            #     next_state = self.pp_sprime[i]
+            #     nextQValues = self.qtable[next_state]
+            #     nextQValue = nextQValues[idx]  # this is wrong, just want
+            #
+            #     oldQValue = oldQValues[idx]
+            #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
 
             # update epsilon
+            self.epsilon = sarsa.update_epsilon(self.model.epsilon, self.epsilon, 1000, True)
+            # TODO: Change the maximum round value so that linear depreciates properly
+
+            # update s to be sprime
+            for i in self.partner_IDs:
+                self.oldstates[i] = self.working_memory[i]
+
+            if round_payoffs is not None:
+                if self.printing:
+                    print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
+                self.score += round_payoffs
+                # print("My total overall score is:", self.score)
+                return
 
         else:
             # self.move = self.next_move

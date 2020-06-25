@@ -225,14 +225,17 @@ class PDModel(Model):
     def __init__(self, height=11, width=11,
                  number_of_agents=47,
                  schedule_type="Simultaneous",
-                 rounds=250,
+                 rounds=1000,
                  collect_data=True,
                  #score_vis=False,
                  agent_printing=False,
                  randspawn=True,
-                 experimental_spawn=True,
-                 test_scenario = True,
+                 kNN_spawn=True,
+                 kNN_testing=True,
                  kNN_training=False,
+                 sarsa_spawn=False,
+                 sarsa_training=False,
+                 sarsa_testing=False,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -248,7 +251,7 @@ class PDModel(Model):
                  alpha=0.1,
                  epsilon=0.99,
                  gamma=0.95,
-                  ):
+                 ):
 
         # ---------- Model Parameters --------
         self.height = height
@@ -265,35 +268,43 @@ class PDModel(Model):
         self.init_ppD = init_ppD
         self.learning_rate = learning_rate
         self.simplified_payoffs = simplified_payoffs
-        self.experimental_spawn = experimental_spawn
-        self.test_scenario = test_scenario
+        self.kNN_spawn = kNN_spawn
+        self.kNN_testing = kNN_testing
+        self.kNN_training = kNN_training
         self.rounds = rounds
         self.randspawn = randspawn
         self.iteration_n = 0
         self.new_filenumber = 0
-        self.kNN_training = kNN_training
         self.kNN_accuracy = 0
         self.k = k
 
-        # SARSA
+        self.sarsa_spawn = sarsa_spawn
+        self.sarsa_training = sarsa_training
+        self.sarsa_testing = sarsa_testing
 
-        self.experimental_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
-                                        20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
-                                        46: "DEVIL", 2: "ANGEL", 4: "ANGEL", 14: "ANGEL", 15: "ANGEL", 17: "ANGEL",
-                                        19: "ANGEL", 28: "ANGEL", 30: "ANGEL", 32: "ANGEL", 42: "ANGEL", 43: "ANGEL",
-                                        45: "ANGEL", 47: "ANGEL", 8: "VPP", 11: "VPP", 23: "VPP", 26: "VPP", 35: "VPP",
-                                        38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
-                                        37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
-                                        36: "TFT", 39: "TFT"}
+        self.alpha = alpha
+        self.gamma = gamma
+        self.epsilon = epsilon
 
-        self.experimental_strategies_test = {2:"DEVIL", 4: "DEVIL", 14: "DEVIL", 15: "DEVIL", 17:"DEVIL", 19: "DEVIL",
-                                             28: "DEVIL", 30: "DEVIL", 32: "DEVIL", 42: "DEVIL", 43: "DEVIL", 45: "DEVIL",
-                                             47: "DEVIL", 1: "ANGEL", 3: "ANGEL", 5: "ANGEL", 6: "ANGEL", 16: "ANGEL",
-                                             18: "ANGEL", 20: "ANGEL", 29: "ANGEL", 31: "ANGEL", 33: "ANGEL", 34: "ANGEL",
-                                             44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT", 26: "TFT",
-                                             36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
-                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 12: "WSLS", 22: "WSLS", 25: "WSLS",
-                                             35: "WSLS", 38: "WSLS", 41: "WSLS"}
+        # kNN Spawning
+        if self.kNN_training:
+            self.kNN_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
+                                         20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
+                                         46: "DEVIL", 2: "ANGEL", 4: "ANGEL", 14: "ANGEL", 15: "ANGEL", 17: "ANGEL",
+                                         19: "ANGEL", 28: "ANGEL", 30: "ANGEL", 32: "ANGEL", 42: "ANGEL", 43: "ANGEL",
+                                         45: "ANGEL", 47: "ANGEL", 8: "VPP", 11: "VPP", 23: "VPP", 26: "VPP", 35: "VPP",
+                                         38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
+                                         37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
+                                         36: "TFT", 39: "TFT"}
+        elif self.kNN_testing:
+            self.kNN_strategies = {2:"DEVIL", 4: "DEVIL", 14: "DEVIL", 15: "DEVIL", 17:"DEVIL", 19: "DEVIL",
+                                                 28: "DEVIL", 30: "DEVIL", 32: "DEVIL", 42: "DEVIL", 43: "DEVIL", 45: "DEVIL",
+                                                 47: "DEVIL", 1: "ANGEL", 3: "ANGEL", 5: "ANGEL", 6: "ANGEL", 16: "ANGEL",
+                                                 18: "ANGEL", 20: "ANGEL", 29: "ANGEL", 31: "ANGEL", 33: "ANGEL", 34: "ANGEL",
+                                                 44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT", 26: "TFT",
+                                                 36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
+                                                 37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 12: "WSLS", 22: "WSLS", 25: "WSLS",
+                                                 35: "WSLS", 38: "WSLS", 41: "WSLS"}
 
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader
@@ -386,9 +397,9 @@ class PDModel(Model):
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
 
 
-        if not experimental_spawn:
+        if not kNN_spawn:
             self.make_agents()
-        elif experimental_spawn:
+        elif kNN_spawn:
             self.make_set_agents()
         self.running = True
         self.datacollector.collect(self)
@@ -444,6 +455,7 @@ class PDModel(Model):
 
         # to generate the < step 7 states
         initial_state1 = [0, 0, 0, 0, 0, 0]
+        permutations.append(initial_state1)
         initial_state2 = [0, 0, 0, 0, 0]
         initial_state3 = [0, 0, 0, 0]
         initial_state4 = [0, 0, 0]
@@ -489,7 +501,7 @@ class PDModel(Model):
         """ Function to set ppds based on the value specified as init_ppD """
         initialised = {}
         n_of_a = 0
-        if self.experimental_spawn:
+        if self.kNN_spawn:
             n_of_a = 47
         else:
             n_of_a = 64

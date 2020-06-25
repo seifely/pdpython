@@ -1,7 +1,7 @@
 import random
 
 
-def init_qtable(states,n_actions):
+def init_qtable(states, n_actions):
     iqtable = {}   # does this want to be a list or a dict?
 
     for i in states:
