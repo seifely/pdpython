@@ -1076,7 +1076,7 @@ class PDAgent(Agent):
             class_list, classification = self.knn_analysis(game_utility, game_selfcoops, game_oppcoops, game_mutcoops,
                                                            game_ppd, training_data,
                                                            self.model.k)
-            priority = "U"  # out of options 'C', 'U', and // TODO
+            priority = "U"  # out of options 'C', 'U', and ...?
 
             # print("My ID:", self.ID,
             #       "Partner ID:", i,

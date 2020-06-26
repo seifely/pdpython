@@ -418,7 +418,7 @@ class PDModel(Model):
     def first_game_check(self):
         try:
             success = pickle.load(open("firstgame.p", "rb"))
-            print("Val of Success was : ", success)
+            # print("Val of Success was : ", success)
             if success == 1:
                 return False
         except (OSError, IOError) as e:
