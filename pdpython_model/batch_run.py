@@ -233,14 +233,14 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=11, width=11,
-                 number_of_agents=47,
+    def __init__(self, height=8, width=8,
+                 number_of_agents=64,
                  schedule_type="Simultaneous",
-                 rounds=250,
+                 rounds=1000,
                  collect_data=True,
                  agent_printing=False,
-                 randspawn=True,
-                 kNN_spawn=True,
+                 randspawn=False,
+                 kNN_spawn=False,
                  kNN_training=False,
                  kNN_testing=False,
                  DD=1,
@@ -254,10 +254,13 @@ class PDModel(Model):
                  learning_rate = 1,
                  theta = 0.015,
                  init_ppD = 0.5,
-                 sarsa_spawn=False,
-                 sarsa_training=False,
-                 sarsa_testing=False,
-                 k=11
+                 sarsa_spawn=True,
+                 sarsa_training=True,
+                 sarsa_testing=True,
+                 k=11,
+                 epsilon=0.99,
+                 alpha=0.1,
+                 gamma=0.95,
                  ):
 
         # ---------- Model Parameters --------
@@ -283,11 +286,16 @@ class PDModel(Model):
         self.kNN_spawn = kNN_spawn
         self.kNN_testing = kNN_testing
         self.kNN_training = kNN_training
+        self.kNN_accuracy = 0
+        self.k = k
+
         self.sarsa_spawn = sarsa_spawn
         self.sarsa_training = sarsa_training
         self.sarsa_testing = sarsa_testing
-        self.kNN_accuracy = 0
-        self.k = k
+        self.alpha = alpha
+        self.gamma = gamma
+        self.epsilon = epsilon
+
 
         if self.kNN_training:
             self.kNN_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
@@ -337,7 +345,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('kNN_ppdupdater_1_47_no_%s' % (self.iteration_n), "a")
+        concatenator = ('test_sarsa_1_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -415,9 +423,10 @@ class PDModel(Model):
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
         self.training_data = pickle.load(open("training_data_50.p", "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         if not kNN_spawn:
             self.make_agents()
-        elif kNNl_spawn:
+        elif kNN_spawn:
             self.make_set_agents()
         self.running = True
         self.datacollector.collect(self)
@@ -483,8 +492,8 @@ class PDModel(Model):
                                     permutations.append([i1, i2, i3, i4, i5, i6, i7])
 
         # to generate the < step 7 states
+        permutations.append([0, 0, 0, 0, 0, 0, 0])
         initial_state1 = [0, 0, 0, 0, 0, 0]
-        permutations.append(initial_state1)
         initial_state2 = [0, 0, 0, 0, 0]
         initial_state3 = [0, 0, 0, 0]
         initial_state4 = [0, 0, 0]
@@ -696,7 +705,7 @@ br_params = {"number_of_agents": [47],
 br = BatchRunner(PDModel,
                  br_params,
                  iterations=5,
-                 max_steps=250,
+                 max_steps=1000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

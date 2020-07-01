@@ -20,15 +20,17 @@ def egreedy_action(e, qtable, current_state):
     p = random.random()
 
     if p < e:
-        return random.choice(['C', 'D'])
+        return random.choice(["C", "D"])
     else:
         # index qtable by current_state
+        # print('my state:', current_state)
         current = qtable[current_state]
+        # print('qvalues:', current)
         # pick the action with the highest Q value - if indx:0, C, if indx:1, D
         if current[0] > current[1]:
-            return 'C'
+            return "C"
         else:  # this might need to be an elif, but with two behaviours it's fine
-            return 'D'
+            return "D"
 
 
 def sarsa_decision(alpha, epsilon, gamma):

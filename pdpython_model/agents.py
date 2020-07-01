@@ -49,7 +49,7 @@ class PDAgent(Agent):
         self.update_values = {}
         self.update_value = 0.015  # this is the value that will change each turn
         self.theta = 0.015  # uv we manipulate, stays static
-        self.delta = 3  # max memory size
+        self.delta = 7  # max memory size
         self.init_uv = self.model.theta
         # self.init_ppD = model.init_ppD  # this isn't actually used
 
@@ -538,8 +538,12 @@ class PDAgent(Agent):
 
         elif strategy == "LEARN":
             """ Use the epsilon-greedy algorithm to select a move to play. """
+            if not opponent_states:
+                for j in self.partner_IDs:
+                    opponent_states[j] = [0, 0, 0, 0, 0, 0, 0]
 
-            return sarsa.egreedy_action(self.epsilon, self.qtable, opponent_states[id])
+            egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(opponent_states[id]))
+            return egreedy
 
     def change_update_value(self, partner_behaviour):
         """ Produce a [new update value] VALUE BY WHICH TO ALTER THE CURRENT UV given the current uv and the
@@ -704,9 +708,10 @@ class PDAgent(Agent):
                     current_uv = self.update_value
                     if self.strategy == "VPP" or "LEARN":
                         if self.working_memory.get(partner_ID) is None:
-                            self.working_memory[partner_ID] = [partner_move]  # initialise with first value if doesn't exist
+                            self.working_memory[partner_ID] = [0, 0, 0, 0, 0, 0, partner_move]  # initialise with first value if doesn't exist
                         else:
                             current_partner = self.working_memory.pop(partner_ID)
+
                             # first, check if it has more than three values
                             if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
                                 current_partner.append(partner_move)
@@ -719,10 +724,7 @@ class PDAgent(Agent):
                                 #     print("Gonna update my UV!", self.update_value)
 
                                 self.update_value = self.update_value + self.change_update_value(current_partner)
-
-                            # - UNCOMMENT ABOVE FOR MEMORY SYSTEM TO WORK
-                            #     print("I updated it!", self.update_value)
-
+                            # print('My current partner history is now:', current_partner)
                             self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
 
                     # First, check if we have a case file on them in each memory slot
@@ -835,7 +837,6 @@ class PDAgent(Agent):
 
     def output_data_to_file(self, outcomes):
         """ Outputs the data collected each turn on multiple agent variables to a .csv file"""
-
         for m in self.per_partner_strategies:
             if self.per_partner_strategies[m] == self.strategy:
                 self.similar_partners += 1
@@ -1022,7 +1023,7 @@ class PDAgent(Agent):
                               'uv_%d' % self.ID,
                               'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
                               'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID,'avp4_%d' % self.ID,
-                              'globav_%d' % self.ID]
+                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID]
             #     'p1', 'p2', 'p3', 'p4'
             else:
                 fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
@@ -1034,7 +1035,7 @@ class PDAgent(Agent):
                               'm4_%d' % self.ID, 'uv_%d' % self.ID,
                               'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
                               'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
-                              'globav_%d' % self.ID]
+                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             # moves = []
@@ -1065,7 +1066,7 @@ class PDAgent(Agent):
                      'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners,
                      'avp1_%d' % self.ID: avpay_partner_1, 'avp2_%d' % self.ID: avpay_partner_2,
                      'avp3_%d' % self.ID: avpay_partner_3, 'avp4_%d' % self.ID: avpay_partner_4,
-                     'globav_%d' % self.ID: self.globalAvPayoff})
+                     'globav_%d' % self.ID: self.globalAvPayoff, 'epsilon_%d' % self.ID: self.epsilon})
             #
             else:
                 writer.writerow(
@@ -1084,7 +1085,7 @@ class PDAgent(Agent):
                      'simP_%d' % self.ID: self.similar_partners,
                      'avp1_%d' % self.ID: avpay_partner_1, 'avp2_%d' % self.ID: avpay_partner_2,
                      'avp3_%d' % self.ID: avpay_partner_3, 'avp4_%d' % self.ID: avpay_partner_4,
-                     'globav_%d' % self.ID: self.globalAvPayoff})
+                     'globav_%d' % self.ID: self.globalAvPayoff, 'epsilon_%d' % self.ID: self.epsilon})
 
     def reset_values(self):
         """ Resets relevant global variables to default values. """
@@ -1383,7 +1384,7 @@ class PDAgent(Agent):
             self.set_defaults(self.partner_IDs)
             self.get_IDs()
             for i in self.partner_IDs:
-                self.oldstates[i] = [0, 0, 0, 0, 0, 0]
+                self.oldstates[i] = [0, 0, 0, 0, 0, 0, 0]
 
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
@@ -1463,7 +1464,6 @@ class PDAgent(Agent):
                     self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?
-
                 self.find_average_move()
 
                 if self.model.schedule_type != "Simultaneous":
@@ -1496,20 +1496,20 @@ class PDAgent(Agent):
             # update the Q for the CURRENT sprime
             # TODO: what we need for this is the OLD state, pre checking the partner
 
-            for i in self.oldstates:
-                s = i                           # the state I used to be in
+            for i in self.partner_IDs:
+                s = self.oldstates[i]           # the state I used to be in
                 a = self.itermove_result[i]     # the action I took
                 sprime = self.working_memory[i] # the state I found myself in
                 reward = self.pp_payoff[i]      # the reward I observed
                 aprime = self.pp_aprime[i]      # the action I will take next
 
-                oldQValues = self.qtable[s]  # THIS MIGHT BREAK BECAUSE OF TUPLES
+                oldQValues = self.qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES
                 if a == 'C':
                     idx = 0
                 elif a == 'D':
                     idx = 1
 
-                newQValues = self.qtable[sprime]  # THIS ISNT RIGHT IS IT?
+                newQValues = self.qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?
                 if aprime == 'C':
                     idxprime = 0
                 elif aprime == 'D':
@@ -1519,12 +1519,13 @@ class PDAgent(Agent):
                 Qsaprime = newQValues[idxprime]
 
                 # update the Q value for the old state and old action
-                newQ = sarsa.update_q(reward, self.gamma, self.alpha, Qsa, Qsaprime)
 
+                newQsa = sarsa.update_q(reward, self.gamma, self.alpha, Qsa, Qsaprime)
+                # print('My old Q for this partner was:', Qsa, 'and my new Q is:', newQsa)
                 # then put newQ in the Qtable[s] at index idx
-                change = self.qtable[s]
-                change[idx] = newQ
-                self.qtable[s] = change
+                change = self.qtable[tuple(s)]
+                change[idx] = newQsa
+                self.qtable[tuple(s)] = change
 
 
             # for i in self.working_memory:

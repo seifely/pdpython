@@ -45,7 +45,6 @@ def gen_Model_Portrayal(agent):
                          "r": 0.75,
                          "text": [agent.strategy, agent.score],
                          #"text_color": "black",
-                         "scale": 1
                          }
 
             color = MID_COLOR
@@ -73,7 +72,6 @@ def gen_Model_Portrayal(agent):
                          "r": 0.75,
                          "text": [agent.strategy, agent.score],
                          #"text_color": "black",
-                         "scale": 1
                          }
 
             color = REST_COL
@@ -212,13 +210,13 @@ class StepCountDisplay(TextElement):
         return "Step Count: " + str(model.step_count)
 
 
-canvas_element = CanvasGrid(gen_Model_Portrayal, 11, 11, 500, 500)
+canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
 step_element = StepCountDisplay()
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
-model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 122, 2, 47, 1),
-                "rounds": UserSettableParameter('slider', 'Number of Rounds', 250,1,3000,10),
+model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 64, 2, 64, 1),
+                "rounds": UserSettableParameter('slider', 'Number of Rounds', 1000,1,3000,10),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', False),
                 "init_ppD": UserSettableParameter('slider', 'Initial Probability VPP Agents Defect', 0.50,0.01,1,0.01),
                 # "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),
@@ -235,6 +233,7 @@ model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of A
 
 chart_element = ChartModule([{"Label": "Cooperations", "Color": C_COLOR},
                              {"Label": "Defections", "Color": D_COLOR}])
+# TODO: Kind of want to add in mutual cooperations tracking, but that's extraneous right now
 
 server = ModularServer(PDModel, [canvas_element, step_element, chart_element], "Prisoner's Dilemma Simulation", model_params)
 server.port = 8521

@@ -222,20 +222,20 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=11, width=11,
-                 number_of_agents=47,
+    def __init__(self, height=8, width=8,
+                 number_of_agents=64,
                  schedule_type="Simultaneous",
                  rounds=1000,
                  collect_data=True,
                  #score_vis=False,
                  agent_printing=False,
-                 randspawn=True,
-                 kNN_spawn=True,
-                 kNN_testing=True,
+                 randspawn=False,
+                 kNN_spawn=False,
+                 kNN_testing=False,
                  kNN_training=False,
-                 sarsa_spawn=False,
-                 sarsa_training=False,
-                 sarsa_testing=False,
+                 sarsa_spawn=True,
+                 sarsa_training=True,
+                 sarsa_testing=True,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -325,7 +325,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('scale2_wsls_8x8_no_25_%s' % (self.iteration_n), "a")
+        concatenator = ('test_learn_8x8_no_1_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -351,6 +351,7 @@ class PDModel(Model):
 
         # Find list of empty cells
         self.coordinates = [(x, y) for x in range(self.width) for y in range(self.height)]
+        # print(self.coordinates)
         self.experimental_coordinates = [(3,8), (4,8), (5,8), (6,8), (7,8), (1,7), (2,7), (3,7), (4,7), (5,7), (6,7),
                                          (7,7), (8,7), (9,7), (3,6), (4,6), (5,6), (6,6), (7,6), (1,5), (2,5), (3,5),
                                          (4,5), (5,5), (6,5), (7,5), (8,5), (9,5), (3,4), (4,4), (5,4), (6,4), (7,4),
@@ -397,10 +398,10 @@ class PDModel(Model):
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
 
 
-        if not kNN_spawn:
-            self.make_agents()
-        elif kNN_spawn:
+        if kNN_spawn:
             self.make_set_agents()
+        else:
+            self.make_agents()
         self.running = True
         self.datacollector.collect(self)
 
@@ -415,20 +416,20 @@ class PDModel(Model):
             writer.writerow({'n agents': self.number_of_agents, 'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating, 'defecting': self.agents_defecting,
                              'coop total': self.number_of_coops, 'defect total': self.number_of_defects,
                              })
+        if self.kNN_testing:
+            with open('{}_kNN.csv'.format(self.filename), 'a', newline='') as csvfile:
+                fieldnames = ['k', 'accuracy',]
 
-        with open('{}_kNN.csv'.format(self.filename), 'a', newline='') as csvfile:
-            fieldnames = ['k', 'accuracy',]
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                kNN_accuracy_percent = ((self.kNN_accuracy / 24) * 100)
 
-            kNN_accuracy_percent = ((self.kNN_accuracy / 24) * 100)
+                if self.step_count == 1:
+                    writer.writeheader()
+                writer.writerow({'k': self.k, 'accuracy': kNN_accuracy_percent,
+                                 })
 
-            if self.step_count == 1:
-                writer.writeheader()
-            writer.writerow({'k': self.k, 'accuracy': kNN_accuracy_percent,
-                             })
-
-            self.kNN_accuracy = 0  # Hopefully resetting this value here is fine
+                self.kNN_accuracy = 0  # Hopefully resetting this value here is fine
 
         # with open('{} agent strategies.csv'.format(self.filename), 'a', newline='') as csvfile:
         #     fieldnames = ['stepcount', 'agent_strategy']
@@ -454,8 +455,8 @@ class PDModel(Model):
                                     permutations.append([i1, i2, i3, i4, i5, i6, i7])
 
         # to generate the < step 7 states
+        permutations.append([0, 0, 0, 0, 0, 0, 0])
         initial_state1 = [0, 0, 0, 0, 0, 0]
-        permutations.append(initial_state1)
         initial_state2 = [0, 0, 0, 0, 0]
         initial_state3 = [0, 0, 0, 0]
         initial_state4 = [0, 0, 0]
@@ -588,20 +589,44 @@ class PDModel(Model):
         else:
             return
 
-    def make_agents(self):
+    # def make_agents(self):
+    #
+    #     # generate current experiment ppD pickle if one does not exist?
+    #     # if not os.path.isfile('agent_ppds.p'):
+    #     #     initialised = {}
+    #     #     for i in range(self.number_of_agents):
+    #     #         initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+    #     #         pickle.dump(initialised, open("agent_ppds.p", "wb"))
+    #
+    #     if not self.randspawn:
+    #         for i in range(self.number_of_agents):
+    #             """This is for adding agents in sequentially."""
+    #             x, y = self.coordinates.pop(0)
+    #             print("x, y:", x, y)
+    #             # x, y = self.grid.find_empty()
+    #             pdagent = PDAgent((x, y), self, True)
+    #             self.grid.place_agent(pdagent, (x, y))
+    #             self.schedule.add(pdagent)
+    #
+    #     elif self.randspawn:
+    #         """ This is for adding in agents randomly """
+    #         for i in range(self.number_of_agents):
+    #             x, y = self.coordinates.pop(random.randrange(len(self.coordinates)))
+    #             # print("x, y:", x, y)
+    #             # x, y = self.grid.find_empty()
+    #             pdagent = PDAgent((x, y), self, True)
+    #             self.grid.place_agent(pdagent, (x, y))
+    #             self.schedule.add(pdagent)
 
-        # generate current experiment ppD pickle if one does not exist?
-        # if not os.path.isfile('agent_ppds.p'):
-        #     initialised = {}
-        #     for i in range(self.number_of_agents):
-        #         initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
-        #         pickle.dump(initialised, open("agent_ppds.p", "wb"))
+    def make_agents(self):
+        with open("agent_ppds.p", "rb") as f:
+            self.agent_ppds = pickle.load(f)
 
         if not self.randspawn:
             for i in range(self.number_of_agents):
                 """This is for adding agents in sequentially."""
                 x, y = self.coordinates.pop(0)
-                # print("x, y:", x, y)
+                # x, y = self.coordinates[i]
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
@@ -659,6 +684,6 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=250):
+    def run_model(self, rounds=1000):
         for i in range(self.rounds):
             self.step()
