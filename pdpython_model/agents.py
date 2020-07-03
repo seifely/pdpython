@@ -543,6 +543,10 @@ class PDAgent(Agent):
                     opponent_states[j] = [0, 0, 0, 0, 0, 0, 0]
 
             egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(opponent_states[id]))
+            if egreedy == "C":
+                self.number_of_c += 1
+            elif egreedy == "D":
+                self.number_of_d += 1
             return egreedy
 
     def change_update_value(self, partner_behaviour):
@@ -1142,18 +1146,6 @@ class PDAgent(Agent):
         self.model.agent_ppds[self.ID] = updated_ppds
         return
 
-    # def set_ppds(self):
-    #     """ Use this function on the last round of the game, after final score checking, to
-    #         determine what the classification of a partner might be. It should alter the model's ppds storage
-    #         object to provide a new starting ppd for each partner next turn, which the model then outputs to the
-    #         relevant pickle."""
-    #
-    #     # The model loads in the ppd pickle file when it makes agents
-    #     # ====== BE SURE TO ALTER YOUR PPD WITHIN SELF.MODEL.AGENT_PPDS{AGENT_ID}
-    #
-    #     # don't return anything, just update the self.model.agent_ppds{agent_id} with the relevant ppd list
-    #     return
-
     def knn_error_statement(self, classification, opp_id):
 
         strat = 0
@@ -1375,6 +1367,11 @@ class PDAgent(Agent):
             commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
             self.common_move = commonest_move[:1]
 
+    def outputData(self):
+        self.output_data_to_model()
+        if self.model.collect_data:
+            self.output_data_to_file(self.outcome_list)
+
     def step(self):
         self.compare_score()
         self.reset_values()
@@ -1402,11 +1399,6 @@ class PDAgent(Agent):
 
                 self.find_average_move()
 
-                # self.output_data_to_model()
-                # if self.model.collect_data:
-                #     self.output_data_to_file(self.outcome_list)
-                # self.reset_values()
-
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
@@ -1424,11 +1416,6 @@ class PDAgent(Agent):
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
                 self.find_average_move()
-
-                # self.output_data_to_model()
-                # if self.model.collect_data:
-                #     self.output_data_to_file(self.outcome_list)
-                # self.reset_values()
 
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
@@ -1556,6 +1543,9 @@ class PDAgent(Agent):
             for i in self.partner_IDs:
                 self.oldstates[i] = self.working_memory[i]
 
+            self.outputData()
+            self.stepCount += 1
+
             if round_payoffs is not None:
                 if self.printing:
                     print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
@@ -1581,18 +1571,13 @@ class PDAgent(Agent):
             """ Because model outputting is below, we can add update values to the list before it *may get reset """
             # self.compare_score()
 
+            self.outputData()
+            self.stepCount += 1
+
             if round_payoffs is not None:
                 if self.printing:
                     print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
                 self.score += round_payoffs
                 # print("My total overall score is:", self.score)
                 return
-
-        self.output_data_to_model()
-        if self.model.collect_data:
-            self.output_data_to_file(self.outcome_list)
-
-
-        self.stepCount += 1
-
 

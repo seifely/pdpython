@@ -210,6 +210,63 @@ def get_iwsls_cooperations(model):
     #     print("iwsls cooped", sum(agent_coops))
     return sum(agent_coops)
 
+def get_learn_performance(model):
+    """ For acquiring the sum total performance of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    scores = [a.score for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_scores = []
+    for i in strategy:
+            if i == "LEARN":
+                indices = strategy.index(i)
+                agent = scores[indices]
+                agent_scores.append(agent)
+
+    # if sum(agent_scores) != 0:
+        # print("vpp scored", sum(agent_scores))
+    return sum(agent_scores)
+
+def get_learn_mutC(model):
+    """ For acquiring the sum total performance of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    mutc = [a.mutual_c_outcome for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_mutc = []
+    for i in strategy:
+            if i == "LEARN":
+                indices = strategy.index(i)
+                agent = mutc[indices]
+                agent_mutc.append(agent)
+
+    # if sum(agent_scores) != 0:
+        # print("vpp scored", sum(agent_scores))
+    return sum(agent_mutc)
+
+def get_learn_cooperations(model):
+    """ For acquiring the sum total cooperations of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    coops = [a.number_of_c for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_coops = []
+    for i in strategy:
+            if i == "LEARN":
+                indices = strategy.index(i)
+                agent = coops[indices]
+                agent_coops.append(agent)
+
+    # if sum(agent_coops) != 0:
+        # print("vpp cooped", sum(agent_coops))
+    return sum(agent_coops)
+
 def track_params(model):
     return (model.number_of_agents,
             model.theta,
@@ -236,7 +293,7 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=64,
                  schedule_type="Simultaneous",
-                 rounds=1000,
+                 rounds=2000,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=False,
@@ -408,6 +465,9 @@ class PDModel(Model):
             "WSLS Cooperations": get_wsls_cooperations,
             "iWSLS Performance": get_iwsls_performance,
             "iWSLS Cooperations": get_iwsls_cooperations,
+            "LEARN Performance": get_learn_performance,
+            "MutualCooperations": get_learn_mutC,
+            "LEARN Cooperations": get_learn_cooperations,
             "Model Params": track_params,
         },
             agent_reporters={
@@ -453,20 +513,20 @@ class PDModel(Model):
             writer.writerow({'n agents': self.number_of_agents, 'stepcount': self.step_count, 'steptime': steptime, 'cooperating': self.agents_cooperating, 'defecting': self.agents_defecting,
                              'coop total': self.number_of_coops, 'defect total': self.number_of_defects,
                              })
+        if self.kNN_testing:
+            with open('{}_kNN.csv'.format(self.filename), 'a', newline='') as csvfile:
+                fieldnames = ['k', 'accuracy', 'accuracy_p',]
 
-        with open('{}_kNN.csv'.format(self.filename), 'a', newline='') as csvfile:
-            fieldnames = ['k', 'accuracy', 'accuracy_p',]
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                kNN_accuracy_percent = ((self.kNN_accuracy / 24) * 100)
 
-            kNN_accuracy_percent = ((self.kNN_accuracy / 24) * 100)
+                if self.step_count == 1:
+                    writer.writeheader()
+                writer.writerow({'k': self.k, 'accuracy': self.kNN_accuracy, 'accuracy_p': kNN_accuracy_percent,
+                                 })
 
-            if self.step_count == 1:
-                writer.writeheader()
-            writer.writerow({'k': self.k, 'accuracy': self.kNN_accuracy, 'accuracy_p': kNN_accuracy_percent,
-                             })
-
-            self.kNN_accuracy = 0  # Hopefully resetting this value here is fine
+                self.kNN_accuracy = 0  # Hopefully resetting this value here is fine
 
         # with open('{} agent strategies.csv'.format(self.filename), 'a', newline='') as csvfile:
         #     fieldnames = ['stepcount', 'agent_strategy']
@@ -684,13 +744,13 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=1000):
+    def run_model(self, rounds=2000):
         for i in range(self.rounds):
             self.step()
 
 
 # parameter lists for each parameter to be tested in batch run
-br_params = {"number_of_agents": [47],
+br_params = {"number_of_agents": [64],
             "theta": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
@@ -704,8 +764,8 @@ br_params = {"number_of_agents": [47],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=5,
-                 max_steps=1000,
+                 iterations=10,
+                 max_steps=2000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
