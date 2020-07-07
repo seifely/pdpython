@@ -293,7 +293,7 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=64,
                  schedule_type="Simultaneous",
-                 rounds=2000,
+                 rounds=5000,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=False,
@@ -402,7 +402,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('test_sarsa_1_no_%s' % (self.iteration_n), "a")
+        concatenator = ('test_sarsa_2_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -494,7 +494,7 @@ class PDModel(Model):
     def first_game_check(self):
         try:
             success = pickle.load(open("firstgame.p", "rb"))
-            print("Val of Success was : ", success)
+            # print("Val of Success was : ", success)
             if success == 1:
                 return False
         except (OSError, IOError) as e:
@@ -744,7 +744,7 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=2000):
+    def run_model(self, rounds=5000):
         for i in range(self.rounds):
             self.step()
 
@@ -764,8 +764,8 @@ br_params = {"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=10,
-                 max_steps=2000,
+                 iterations=3,
+                 max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

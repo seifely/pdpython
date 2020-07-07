@@ -1141,8 +1141,8 @@ class PDAgent(Agent):
 
             updated_ppds[partner_index] = new_ppd
 
-        print("The Old ppds were:", old_ppds)
-        print("The new ppds are", updated_ppds)
+        # print("The Old ppds were:", old_ppds)
+        # print("The new ppds are", updated_ppds)
         self.model.agent_ppds[self.ID] = updated_ppds
         return
 
@@ -1536,7 +1536,7 @@ class PDAgent(Agent):
             #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
 
             # update epsilon
-            self.epsilon = sarsa.update_epsilon(self.model.epsilon, self.epsilon, 1000, True)
+            self.epsilon = sarsa.update_epsilon(self.model.epsilon, self.epsilon, self.model.rounds, True)
             # TODO: Change the maximum round value so that linear depreciates properly
 
             # update s to be sprime
