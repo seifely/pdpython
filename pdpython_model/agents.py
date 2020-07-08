@@ -207,18 +207,22 @@ class PDAgent(Agent):
 
         elif self.model.sarsa_spawn:
             choices = ["LEARN", "TFT"]
-
-            if len(choices) == 2:
-                check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
-                           42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
-                check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
-                           43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
-                if self.ID in check_a:
-                    strat = choices[0]
-                    return str(strat)
-                elif self.ID in check_b:
-                    strat = choices[1]
-                    return str(strat)
+            if self.model.sarsa_distro > 0:
+                weights = [self.model.sarsa_distro, 1-self.model.sarsa_distro]
+                strat = np.random.choice(choices, 1, replace=False, p=weights)
+                return str(strat[0])
+            else:
+                if len(choices) == 2:
+                    check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
+                               42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
+                    check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
+                               43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
+                    if self.ID in check_a:
+                        strat = choices[0]
+                        return str(strat)
+                    elif self.ID in check_b:
+                        strat = choices[1]
+                        return str(strat)
 
         else:
             if self.pickstrat == "RANDOM":

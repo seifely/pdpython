@@ -233,9 +233,6 @@ class PDModel(Model):
                  kNN_spawn=False,
                  kNN_testing=False,
                  kNN_training=False,
-                 sarsa_spawn=True,
-                 sarsa_training=True,
-                 sarsa_testing=True,
                  DD=1,
                  CC=1.5,
                  CD=-2,
@@ -251,6 +248,10 @@ class PDModel(Model):
                  alpha=0.1,
                  epsilon=0.99,
                  gamma=0.95,
+                 sarsa_distro=0.90,
+                 sarsa_spawn=True,
+                 sarsa_training=True,
+                 sarsa_testing=True,
                  ):
 
         # ---------- Model Parameters --------
@@ -281,6 +282,7 @@ class PDModel(Model):
         self.sarsa_spawn = sarsa_spawn
         self.sarsa_training = sarsa_training
         self.sarsa_testing = sarsa_testing
+        self.sarsa_distro = sarsa_distro
 
         self.alpha = alpha
         self.gamma = gamma

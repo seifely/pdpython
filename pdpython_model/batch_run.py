@@ -307,14 +307,16 @@ class PDModel(Model):
                  simplified_payoffs=False,
                  b=0,
                  c=0,
-                 batch_iterations = 2,  # wait what is this doing again
-                 learning_rate = 1,
-                 theta = 0.015,
+                 batch_iterations=2,  # wait what is this doing again
+                 learning_rate=1,
+                 theta=0.015,
                  init_ppD = 0.5,
+                 k=11,
+
                  sarsa_spawn=True,
                  sarsa_training=True,
                  sarsa_testing=True,
-                 k=11,
+                 sarsa_distro=0.90,
                  epsilon=0.99,
                  alpha=0.1,
                  gamma=0.95,
@@ -349,6 +351,7 @@ class PDModel(Model):
         self.sarsa_spawn = sarsa_spawn
         self.sarsa_training = sarsa_training
         self.sarsa_testing = sarsa_testing
+        self.sarsa_distro = sarsa_distro
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
@@ -402,7 +405,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('test_sarsa_2_no_%s' % (self.iteration_n), "a")
+        concatenator = ('test_sarsa_3_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -764,8 +767,8 @@ br_params = {"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
-                 max_steps=5000,
+                 iterations=1,
+                 max_steps=10,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
