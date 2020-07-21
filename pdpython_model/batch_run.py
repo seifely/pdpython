@@ -272,6 +272,11 @@ def track_params(model):
             model.theta,
             #model.learning_rate
             model.init_ppD,
+            model.k,
+            model.alpha,
+            model.gamma,
+            model.epsilon,
+            model.msize,
             )
 
 def get_average_payoffs(model):
@@ -293,7 +298,7 @@ class PDModel(Model):
     def __init__(self, height=8, width=8,
                  number_of_agents=64,
                  schedule_type="Simultaneous",
-                 rounds=5000,
+                 rounds=3000,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=False,
@@ -312,11 +317,12 @@ class PDModel(Model):
                  theta=0.015,
                  init_ppD = 0.5,
                  k=11,
+                 msize=7,
 
                  sarsa_spawn=True,
                  sarsa_training=True,
                  sarsa_testing=True,
-                 sarsa_distro=0.90,
+                 sarsa_distro=0,
                  epsilon=0.99,
                  alpha=0.1,
                  gamma=0.95,
@@ -347,6 +353,7 @@ class PDModel(Model):
         self.kNN_training = kNN_training
         self.kNN_accuracy = 0
         self.k = k
+        self.msize = msize,
 
         self.sarsa_spawn = sarsa_spawn
         self.sarsa_training = sarsa_training
@@ -405,7 +412,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('test_sarsa_3_no_%s' % (self.iteration_n), "a")
+        concatenator = ('alpha_sarsa_%s_no_%s' % (self.alpha, self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -747,7 +754,7 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=5000):
+    def run_model(self, rounds=3000):
         for i in range(self.rounds):
             self.step()
 
@@ -758,7 +765,10 @@ br_params = {"number_of_agents": [64],
                       ],
             #model.learning_rate
             "init_ppD": [0.5],
-             "k": [35]
+             "k": [35],
+             "alpha": [0.5],  # 0.25, 0.3, 0.35, 0.4, 0.45, ],
+             "gamma": [0.95],
+             "epsilon": [0.99]#, 0.1, 0.9, 0.8, 0.7, 0.6],
              }
 
 """ For collecting training data for kNN, please run one init_ppD at a time.
@@ -767,8 +777,8 @@ br_params = {"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
-                 max_steps=10,
+                 iterations=5,
+                 max_steps=3000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

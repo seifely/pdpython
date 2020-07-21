@@ -48,16 +48,16 @@ def output_sprime(current_state, observed_action):
     cstate.append(observed_action)
     return tuple(cstate)
 
-def update_epsilon(initial, current, max_round, linear):
+def decay_value(initial, current, max_round, linear):
     # Version WITHOUT simulated annealing, though that could be in V2
     if linear:
         increment = initial / max_round
-        new_epsilon = current - increment
-        return new_epsilon
+        new_value = current - increment
+        return new_value
     else:
         increment = current / 50        # any better value to use rather than arbitrary?
-        new_epsilon = current - increment
-        return new_epsilon
+        new_value = current - increment
+        return new_value
 
 
 def update_q(reward, gamma, alpha, oldQ, nextQ):

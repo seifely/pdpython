@@ -1540,8 +1540,8 @@ class PDAgent(Agent):
             #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
 
             # update epsilon
-            self.epsilon = sarsa.update_epsilon(self.model.epsilon, self.epsilon, self.model.rounds, True)
-            # TODO: Change the maximum round value so that linear depreciates properly
+            self.epsilon = sarsa.decay_value(self.model.epsilon, self.epsilon, self.model.rounds, True)
+            self.alpha = sarsa.decay_value(self.model.alpha, self.epsilon, self.model.rounds, True)
 
             # update s to be sprime
             for i in self.partner_IDs:
