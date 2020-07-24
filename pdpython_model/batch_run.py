@@ -267,6 +267,7 @@ def get_learn_cooperations(model):
         # print("vpp cooped", sum(agent_coops))
     return sum(agent_coops)
 
+
 def track_params(model):
     return (model.number_of_agents,
             model.theta,
@@ -299,9 +300,10 @@ class PDModel(Model):
                  number_of_agents=64,
                  schedule_type="Simultaneous",
                  rounds=3000,
-                 collect_data=True,
+                 collect_data=False,
                  agent_printing=False,
                  randspawn=False,
+
                  kNN_spawn=False,
                  kNN_training=False,
                  kNN_testing=False,
@@ -326,6 +328,7 @@ class PDModel(Model):
                  epsilon=0.99,
                  alpha=0.1,
                  gamma=0.95,
+                 export_q=True,
                  ):
 
         # ---------- Model Parameters --------
@@ -362,6 +365,7 @@ class PDModel(Model):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
+        self.export_q = export_q
 
 
         if self.kNN_training:
@@ -412,7 +416,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('alpha_sarsa_%s_no_%s' % (self.alpha, self.iteration_n), "a")
+        concatenator = ('gamma_sarsa_%s_no_%s' % (self.gamma, self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -711,6 +715,41 @@ class PDModel(Model):
                 self.grid.place_agent(pdagent, (x, y))
                 self.schedule.add(pdagent)
 
+    def export_q_tables(self, init):
+        qs = [a.qtable for a in self.schedule.agents]
+        # we need to print/save a list of the keys
+        # then print/save each
+        print('qs', qs)
+        qvals = []
+        for i in qs:
+            if i is not []:
+                # take each agent's qtable
+                # print('i', i)
+                for j in i:
+                    # take each item in that table
+                    temp_qs = []
+                    # print('j', j)
+                    item = i[j]
+                    for k in item:
+                        temp_qs.append(k)
+                        # append all the qvalues into one big list
+                    qvals.append(temp_qs)
+
+        print('qvals', qvals)
+        if init:
+            with open('{} qinit.csv'.format(self.filename), 'a', newline='') as csvfile:
+                fieldnames = ['q']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerow({'q': qvals})
+        else:
+            with open('{} qend.csv'.format(self.filename), 'a', newline='') as csvfile:
+                fieldnames = ['q']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerow({'q': qvals})
+
+
     def update_agent_ppds(self, ppds):
         with open("agent_ppds.p", "wb") as f:
             pickle.dump(ppds, f)
@@ -751,6 +790,21 @@ class PDModel(Model):
         self.get_highest_score()
         self.reset_values()
 
+        # if self.export_q:
+        #     if self.step_count == 1:
+        #         self.export_q_tables(True)
+        #     export intitial q tables
+        if self.step_count == self.rounds-1:
+            if self.export_q:
+                for j in self.memory_states:
+                    for k in range(2):
+                        with open('{} states_agent37.csv'.format(self.filename), 'a', newline='') as csvfile:
+                            fieldnames = ['state']
+                            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                            # writer.writeheader()
+                            writer.writerow({'state': j})
+
+
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
@@ -766,9 +820,9 @@ br_params = {"number_of_agents": [64],
             #model.learning_rate
             "init_ppD": [0.5],
              "k": [35],
-             "alpha": [0.5],  # 0.25, 0.3, 0.35, 0.4, 0.45, ],
+             "alpha": [0.1],
              "gamma": [0.95],
-             "epsilon": [0.99]#, 0.1, 0.9, 0.8, 0.7, 0.6],
+             "epsilon": [0.99],
              }
 
 """ For collecting training data for kNN, please run one init_ppD at a time.

@@ -226,7 +226,7 @@ class PDModel(Model):
                  number_of_agents=64,
                  schedule_type="Simultaneous",
                  rounds=1000,
-                 collect_data=True,
+                 collect_data=False,
                  #score_vis=False,
                  agent_printing=False,
                  randspawn=False,
@@ -244,14 +244,16 @@ class PDModel(Model):
                  theta=0.015,
                  init_ppD=0.5,
                  k=5,
+                 msize=7,
 
                  alpha=0.1,
                  epsilon=0.99,
                  gamma=0.95,
-                 sarsa_distro=0.90,
+                 sarsa_distro=0,
                  sarsa_spawn=True,
                  sarsa_training=True,
                  sarsa_testing=True,
+                 export_q=True,
                  ):
 
         # ---------- Model Parameters --------
@@ -278,6 +280,7 @@ class PDModel(Model):
         self.new_filenumber = 0
         self.kNN_accuracy = 0
         self.k = k
+        self.msize = msize
 
         self.sarsa_spawn = sarsa_spawn
         self.sarsa_training = sarsa_training
@@ -287,6 +290,7 @@ class PDModel(Model):
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
+        self.export_q = export_q
 
         # kNN Spawning
         if self.kNN_training:
@@ -682,6 +686,16 @@ class PDModel(Model):
         self.datacollector.collect(self)
         self.get_highest_score()
         self.reset_values()
+
+        if self.step_count == self.rounds-1:
+            if self.export_q:
+                for j in self.memory_states:
+                    for k in range(2):
+                        with open('{} states_agent37.csv'.format(self.filename), 'a', newline='') as csvfile:
+                            fieldnames = ['state']
+                            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                            # writer.writeheader()
+                            writer.writerow({'state': j})
 
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?

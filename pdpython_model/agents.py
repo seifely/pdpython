@@ -1371,6 +1371,36 @@ class PDAgent(Agent):
             commonest_move = sorted(move_counter, key=move_counter.get, reverse=True)
             self.common_move = commonest_move[:1]
 
+    def outputQtable(self, init):
+        # if I am the chosen one
+        qvalues = []
+        if self.ID == 37:
+            # get my qtable
+            for i in self.qtable:
+                pair = self.qtable[i]
+                for j in pair:
+                    qvalues.append(j)
+
+            # for each numerical value in it, append it to a new list
+            # for each item in that list, open up the csv and print it to it
+        if init:
+            for i in qvalues:
+                with open('{} qinit_agent37.csv'.format(self.model.filename), 'a', newline='') as csvfile:
+                    fieldnames = ['q']
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    # writer.writeheader()
+                    writer.writerow({'q': i})
+        else:
+            for i in qvalues:
+                with open('{} qend_agent37.csv'.format(self.model.filename), 'a', newline='') as csvfile:
+                    fieldnames = ['q']
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    # writer.writeheader()
+                    writer.writerow({'q': i})
+
+
+
+
     def outputData(self):
         self.output_data_to_model()
         if self.model.collect_data:
@@ -1471,6 +1501,7 @@ class PDAgent(Agent):
     def advance(self):
 
         if self.strategy == 'LEARN':
+
             self.check_partner()  # We took action a, what s prime did we end up in?
             # ----- WORKING MEMORY IS NOW S-PRIME -----
             round_payoffs = self.increment_score(self.payoffs) # Accept the reward for that s prime
@@ -1547,6 +1578,12 @@ class PDAgent(Agent):
             for i in self.partner_IDs:
                 self.oldstates[i] = self.working_memory[i]
 
+            if self.model.export_q:
+                if self.stepCount == 1:
+                    self.outputQtable(True)
+                elif self.stepCount == self.model.rounds - 1:
+                    self.outputQtable(False)
+
             self.outputData()
             self.stepCount += 1
 
@@ -1558,6 +1595,7 @@ class PDAgent(Agent):
                 return
 
         else:
+
             # self.move = self.next_move
             self.check_partner()  # Update Knowledge
             round_payoffs = self.increment_score(self.payoffs)
