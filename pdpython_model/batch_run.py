@@ -659,16 +659,19 @@ class PDModel(Model):
 
         elif self.memoryPaired:
             for i in state_list:
+                counter = 0
+                i = list(i)
                 current_value = 0
                 for j in i:
                     item = j[1]  # should hopefully index the opponent's move in each of the pairs
                     # print("Array", i, "Index", j, "Item", item)
                     if item == 'C':
-                        current_value = current_value + (1 * j)  # Slight bias towards cooperation
+                        current_value = current_value + (1 * counter)  # Should there be a slight bias towards C?
                     if item == 'D':
-                        current_value = current_value - (1 * j)
+                        current_value = current_value - (1 * counter)
                     if item == 0:
                         current_value = current_value
+                    counter += 1
                 state_value.append(current_value)
 
         return state_value

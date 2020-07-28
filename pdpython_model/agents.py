@@ -631,6 +631,8 @@ class PDAgent(Agent):
 
         state_value = state_values[index]
 
+        # TODO: This section is probably going to break to all hell when the new statemaker is used
+
         """" Now need to decide what the boundaries are for changing update value
             based on this state value that is returned... """
         # State values exist between values of 21 and -21, with a normal distribution of state values (i.e.
