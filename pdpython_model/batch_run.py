@@ -14,6 +14,7 @@ import statistics
 import sys
 import os
 import pickle
+from pdpython_model import statemaker
 
 
 def get_num_coop_agents(model):
@@ -319,7 +320,8 @@ class PDModel(Model):
                  theta=0.015,
                  init_ppD = 0.5,
                  k=11,
-                 msize=7,
+                 msize=3, # the n of objects in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
+                 memoryPaired=True,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
 
                  sarsa_spawn=True,
                  sarsa_training=True,
@@ -357,6 +359,7 @@ class PDModel(Model):
         self.kNN_accuracy = 0
         self.k = k
         self.msize = msize,
+        self.memoryPaired = memoryPaired
 
         self.sarsa_spawn = sarsa_spawn
         self.sarsa_training = sarsa_training
@@ -489,7 +492,7 @@ class PDModel(Model):
                 "Defections": lambda x: x.number_of_d
             })
 
-        self.memory_states = self.get_memory_states(['C', 'D'])
+        self.memory_states = statemaker.get_memory_states(['C', 'D'], self.msize, self.memoryPaired)
         self.state_values = self.state_evaluation(self.memory_states)
         self.firstgame = self.first_game_check()
         self.agent_ppds = {}
@@ -551,63 +554,66 @@ class PDModel(Model):
         #         writer.writeheader()
         #     writer.writerow({'stepcount': self.step_count, 'agent_strategy': self.agent_list})
 
-    def get_memory_states(self, behaviours):
-        """ Get a list of all possible states given n behaviour options and
-            r spaces in the agent's memory - CURRENTLY: 7  """
-        options = behaviours
-        permutations = []
-        for i1 in options:
-            for i2 in options:
-                for i3 in options:
-                    for i4 in options:
-                        for i5 in options:
-                            for i6 in options:
-                                for i7 in options:
-                                    permutations.append([i1, i2, i3, i4, i5, i6, i7])
-
-        # to generate the < step 7 states
-        permutations.append([0, 0, 0, 0, 0, 0, 0])
-        initial_state1 = [0, 0, 0, 0, 0, 0]
-        initial_state2 = [0, 0, 0, 0, 0]
-        initial_state3 = [0, 0, 0, 0]
-        initial_state4 = [0, 0, 0]
-        initial_state5 = [0, 0]
-        initial_state6 = [0]
-
-        for ii1 in options:
-            new = initial_state1 + [ii1]
-            permutations.append(new)
-        for ii2 in options:
-            for iii2 in options:
-                new = initial_state2 + [ii2] + [iii2]
-                permutations.append(new)
-        for ii3 in options:
-            for iii3 in options:
-                for iiii3 in options:
-                    new = initial_state3 + [ii3] + [iii3] + [iiii3]
-                    permutations.append(new)
-        for ii4 in options:
-            for iii4 in options:
-                for iiii4 in options:
-                    for iiiii4 in options:
-                        new = initial_state4 + [ii4] + [iii4] + [iiii4] + [iiiii4]
-                        permutations.append(new)
-        for ii5 in options:
-            for iii5 in options:
-                for iiii5 in options:
-                    for iiiii5 in options:
-                        for iiiiii5 in options:
-                            new = initial_state5 + [ii5] + [iii5] + [iiii5] + [iiiii5] + [iiiiii5]
-                            permutations.append(new)
-        for ii6 in options:
-            for iii6 in options:
-                for iiii6 in options:
-                    for iiiii6 in options:
-                        for iiiiii6 in options:
-                            for iiiiiii6 in options:
-                                new = initial_state6 + [ii6] + [iii6] + [iiii6] + [iiiii6] + [iiiiii6] + [iiiiiii6]
-                                permutations.append(new)
-        return permutations
+    # def get_memory_states(self, behaviours):
+    #     """ Get a list of all possible states given n behaviour options and
+    #         r spaces in the agent's memory - Size: msize  """
+    #     options = behaviours
+    #     permutations = []
+    #
+    #     if self.msize == 7:
+    #     for i1 in options:
+    #         for i2 in options:
+    #             for i3 in options:
+    #                 for i4 in options:
+    #                     for i5 in options:
+    #                         for i6 in options:
+    #                             for i7 in options:
+    #                                 permutations.append([i1, i2, i3, i4, i5, i6, i7])
+    #
+    #     # to generate the < step 7 states
+    #     permutations.append([0, 0, 0, 0, 0, 0, 0])
+    #
+    #     initial_state1 = [0, 0, 0, 0, 0, 0]
+    #     initial_state2 = [0, 0, 0, 0, 0]
+    #     initial_state3 = [0, 0, 0, 0]
+    #     initial_state4 = [0, 0, 0]
+    #     initial_state5 = [0, 0]
+    #     initial_state6 = [0]
+    #
+    #     for ii1 in options:
+    #         new = initial_state1 + [ii1]
+    #         permutations.append(new)
+    #     for ii2 in options:
+    #         for iii2 in options:
+    #             new = initial_state2 + [ii2] + [iii2]
+    #             permutations.append(new)
+    #     for ii3 in options:
+    #         for iii3 in options:
+    #             for iiii3 in options:
+    #                 new = initial_state3 + [ii3] + [iii3] + [iiii3]
+    #                 permutations.append(new)
+    #     for ii4 in options:
+    #         for iii4 in options:
+    #             for iiii4 in options:
+    #                 for iiiii4 in options:
+    #                     new = initial_state4 + [ii4] + [iii4] + [iiii4] + [iiiii4]
+    #                     permutations.append(new)
+    #     for ii5 in options:
+    #         for iii5 in options:
+    #             for iiii5 in options:
+    #                 for iiiii5 in options:
+    #                     for iiiiii5 in options:
+    #                         new = initial_state5 + [ii5] + [iii5] + [iiii5] + [iiiii5] + [iiiiii5]
+    #                         permutations.append(new)
+    #     for ii6 in options:
+    #         for iii6 in options:
+    #             for iiii6 in options:
+    #                 for iiiii6 in options:
+    #                     for iiiiii6 in options:
+    #                         for iiiiiii6 in options:
+    #                             new = initial_state6 + [ii6] + [iii6] + [iiii6] + [iiiii6] + [iiiiii6] + [iiiiiii6]
+    #                             permutations.append(new)
+    #     return permutations
 
     def set_ppds(self):
         """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,

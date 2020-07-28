@@ -49,7 +49,7 @@ class PDAgent(Agent):
         self.update_values = {}
         self.update_value = 0.015  # this is the value that will change each turn
         self.theta = 0.015  # uv we manipulate, stays static
-        self.delta = 7  # max memory size
+        self.delta = self.model.msize  # max memory size
         self.init_uv = self.model.theta
         # self.init_ppD = model.init_ppD  # this isn't actually used
 
