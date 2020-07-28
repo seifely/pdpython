@@ -124,7 +124,7 @@ def get_memory_states(behaviours, size, paired):
                 for i2 in options:
                     for i3 in options:
                         for i4 in options:
-                            permutations.append([(i1, i2), (i3, i4)])
+                            permutations.append(([i1, i2], [i3, i4]))
 
         if size == 6:
             for i1 in options:
@@ -133,7 +133,7 @@ def get_memory_states(behaviours, size, paired):
                         for i4 in options:
                             for i5 in options:
                                 for i6 in options:
-                                    permutations.append([(i1, i2), (i3, i4), (i5, i6)])
+                                    permutations.append(([i1, i2], [i3, i4], [i5, i6]))
 
         if size >= 8:
             for i1 in options:
@@ -144,19 +144,19 @@ def get_memory_states(behaviours, size, paired):
                                 for i6 in options:
                                     for i7 in options:
                                         for i8 in options:
-                                            permutations.append([(i1, i2), (i3, i4), (i5, i6), (i7, i8)])
+                                            permutations.append(([i1, i2], [i3, i4], [i5, i6], [i7, i8]))
 
 
-        permutations.append([(0, 0), (0, 0), (0, 0), (0, 0)])
-        print(permutations)
-        for i in permutations:
-            indx = permutations.index(i)
-            permutations[indx] = tuple(chunker(i, 2))
+        permutations.append([[0, 0], [0, 0], [0, 0], [0, 0]])
+        # print(permutations)
+        # for i in permutations:
+        #     indx = permutations.index(i)
+        #     permutations[indx] = tuple(chunker(i, 2))
 
         # then we need to add in initial states
-        initial_state1 = [(0,0), (0,0), (0,0)]
-        initial_state2 = [(0,0), (0,0)]
-        initial_state3 = [(0,0)]
+        initial_state1 = [[0,0], [0,0], [0,0]]
+        initial_state2 = [[0,0], [0,0]]
+        initial_state3 = [[0,0]]
 
         permu = []
         for i1 in options:

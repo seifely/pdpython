@@ -322,6 +322,7 @@ class PDModel(Model):
                  k=11,
                  msize=3, # the n of objects in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
                  memoryPaired=True,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
+                 learnFrom="us",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
 
                  sarsa_spawn=True,
                  sarsa_training=True,
@@ -369,6 +370,7 @@ class PDModel(Model):
         self.gamma = gamma
         self.epsilon = epsilon
         self.export_q = export_q
+        self.learnFrom = learnFrom
 
 
         if self.kNN_training:
@@ -457,7 +459,6 @@ class PDModel(Model):
                                          (5, 2), (6, 2), (7, 2)]
 
         self.agentIDs = list(range(1, (number_of_agents + 1)))
-
 
         # ----- Storage -----
 
@@ -641,18 +642,35 @@ class PDModel(Model):
         # if self.stepCount == 1:
 
         state_value = []
-        for i in state_list:
-            current_value = 0
-            for j in range(len(i)):
-                item = i[j]
-                # print("Array", i, "Index", j, "Item", item)
-                if item == 'C':
-                    current_value = current_value + (1 * j)  # Slight bias towards cooperation
-                if item == 'D':
-                    current_value = current_value - (1 * j)
-                if item == 0:
-                    current_value = current_value
-            state_value.append(current_value)
+        if not self.memoryPaired:
+
+            for i in state_list:
+                current_value = 0
+                for j in range(len(i)):
+                    item = i[j]
+                    # print("Array", i, "Index", j, "Item", item)
+                    if item == 'C':
+                        current_value = current_value + (1 * j)  # Slight bias towards cooperation
+                    if item == 'D':
+                        current_value = current_value - (1 * j)
+                    if item == 0:
+                        current_value = current_value
+                state_value.append(current_value)
+
+        elif self.memoryPaired:
+            for i in state_list:
+                current_value = 0
+                for j in i:
+                    item = j[1]  # should hopefully index the opponent's move in each of the pairs
+                    # print("Array", i, "Index", j, "Item", item)
+                    if item == 'C':
+                        current_value = current_value + (1 * j)  # Slight bias towards cooperation
+                    if item == 'D':
+                        current_value = current_value - (1 * j)
+                    if item == 0:
+                        current_value = current_value
+                state_value.append(current_value)
+
         return state_value
 
     def get_highest_score(self):

@@ -544,7 +544,18 @@ class PDAgent(Agent):
             """ Use the epsilon-greedy algorithm to select a move to play. """
             if not opponent_states:
                 for j in self.partner_IDs:
-                    opponent_states[j] = [0, 0, 0, 0, 0, 0, 0]
+                    blank_list = []
+                    if self.model.memoryPaired:
+                        # need to now vary the length of this depending on msize
+
+                        for n in range(self.delta):
+                            blank_list.append([0, 0])
+                    elif not self.model.memoryPaired:
+                        for n in range(self.delta):
+                            blank_list.append(0)
+
+                    opponent_states[j] = blank_list
+
 
             egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(opponent_states[id]))
             if egreedy == "C":
