@@ -331,7 +331,7 @@ class PDAgent(Agent):
         # print("agent", self.ID,"versus moves:", versus_moves)
         return versus_moves
 
-    def pick_move(self, strategy, payoffs, id, opponent_states):
+    def pick_move(self, strategy, payoffs, id, learning_state):
         """ given the payoff matrix, the strategy, and any other inputs (communication, trust perception etc.)
             calculate the expected utility of each move, and then pick the highest"""
         """AT THE MOMENT, THIS IS A GENERAL ONCE-A-ROUND FUNCTION, AND ISN'T PER PARTNER - THIS NEEDS TO CHANGE """
@@ -542,7 +542,7 @@ class PDAgent(Agent):
 
         elif strategy == "LEARN":
             """ Use the epsilon-greedy algorithm to select a move to play. """
-            if not opponent_states:
+            if not learning_state:
                 for j in self.partner_IDs:
                     blank_list = []
                     if self.model.memoryPaired:
@@ -554,10 +554,10 @@ class PDAgent(Agent):
                         for n in range(self.delta):
                             blank_list.append(0)
 
-                    opponent_states[j] = blank_list
+                    learning_state[j] = blank_list
 
 
-            egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(opponent_states[id]))
+            egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]))
             if egreedy == "C":
                 self.number_of_c += 1
             elif egreedy == "D":
@@ -683,8 +683,8 @@ class PDAgent(Agent):
                     partner_strategy = partner.strategy
                     partner_move = partner.itermove_result[self.ID]
                     partner_moves = partner.previous_moves
-                    # ******** this could either be redundant or MORE EFFICIENT than the current way of doing things -
-                    # this is accessing the other agent's own record of its moves
+
+                    my_move = self.itermove_result[partner_ID]
 
                     # Wanna add each neighbour's move, score etc. to the respective memory banks
                     if self.partner_latest_move.get(partner_ID) is None:
@@ -728,35 +728,63 @@ class PDAgent(Agent):
                     """
                     current_uv = self.update_value
                     if self.strategy == "VPP" or "LEARN":
-                        if self.working_memory.get(partner_ID) is None:
-                            self.working_memory[partner_ID] = [0, 0, 0, 0, 0, 0, partner_move]  # initialise with first value if doesn't exist
-                        else:
-                            current_partner = self.working_memory.pop(partner_ID)
+                        if self.model.learnFrom == "them" or "me":
+                            if self.working_memory.get(partner_ID) is None:
+                                zeroes = []
+                                for j in range(self.delta-1):
+                                    zeroes.append(0)
+                                zeroes.append(partner_move)
+                                self.working_memory[partner_ID] = zeroes  # initialise with first value if doesn't exist
+                            else:
+                                current_state = self.working_memory.pop(partner_ID)
 
-                            # first, check if it has more than three values
-                            if len(current_partner) < self.delta:  # if list hasn't hit delta, add in new move
-                                current_partner.append(partner_move)
-                            elif len(current_partner) == self.delta:
-                                current_partner.pop(0)
-                                current_partner.append(partner_move)  # we have the updated move list for that partner here
-                                current_uv = self.update_values[partner_ID]
-                                # for now, let's add the evaluation of a partner's treatment of us here
-                                # self.update_values[partner_ID] = self.change_update_value(current_partner, current_uv)
-                                #     print("Gonna update my UV!", self.update_value)
+                                # first, check if it has more than three values
+                                if len(current_state) < self.delta:  # if list hasn't hit delta, add in new move
+                                    if self.model.learnFrom == "them":
+                                        current_state.append(partner_move)
+                                    elif self.model.learnFrom == "me":
+                                        current_state.append(my_move)
+                                elif len(current_state) == self.delta:
+                                    current_state.pop(0)
+                                    if self.model.learnFrom == "them":
+                                        current_state.append(partner_move)  # we have the updated move list for that partner here
+                                        current_uv = self.update_values[partner_ID]
 
-                                self.update_value = self.update_value + self.change_update_value(current_partner)
-                            # print('My current partner history is now:', current_partner)
-                            self.working_memory[partner_ID] = current_partner  # re-instantiate the memory to the bank
+                                        self.update_value = self.update_value + self.change_update_value(current_state)
+                                    elif self.model.learnFrom == "me":
+                                        current_state.append(my_move)
+
+                                # print('My current partner history is now:', current_state)
+                                self.working_memory[partner_ID] = current_state  # re-instantiate the memory to the bank
+
+                        elif self.model.learnFrom == "us":
+
+                            if self.working_memory.get(partner_ID) is None:
+                                zeroes = []
+                                for j in range(self.delta-1):
+                                    zeroes.append([0,0])
+                                zeroes.append([my_move, partner_move])
+                                self.working_memory[partner_ID] = zeroes
+                            else:
+                                current_state = self.working_memory.pop(partner_ID)
+
+                                if len(current_state) < self.delta:
+                                    current_state.append([my_move, partner_move])
+                                elif len(current_state) == self.delta:
+                                    current_state.pop(0)
+                                    current_state.append([my_move, partner_move])
+
+                                # self.update_value = self.update_value + self.change_update_value(current_state)
+                                # TODO: Change the above so it doesn't need to work on just 7-count opponent values
+
+                    """" ======================================================================================== """
 
                     # First, check if we have a case file on them in each memory slot
                     if self.partner_moves.get(partner_ID) is None:  # if we don't have one for this partner, make one
                         self.partner_moves[partner_ID] = []
-                        # print("partner moves dict:", self.partner_moves)
                         self.partner_moves[partner_ID].append(partner_move)
-                        # print("partner moves dict2:", self.partner_moves)
                     else:
                         self.partner_moves[partner_ID].append(partner_move)
-                        # print("My partner's moves have been:", self.partner_moves)
                         """ We should repeat the above process for the other memory fields too, like 
                         partner's gathered utility """
 
@@ -1115,6 +1143,8 @@ class PDAgent(Agent):
         self.update_value = self.init_uv
         self.mutual_c_outcome = 0
 
+    # TODO: Move all the kNN stuff to a separate script that we just reference
+
     def knn_decision(self, partner_ids, partner_utils, partner_selfcoops, partner_oppcoops, partner_mutcoops, ppds):
 
         """ ppds needs to be self.model.agent_ppds"""
@@ -1129,7 +1159,6 @@ class PDAgent(Agent):
 
         for i in partner_ids:
             # training_data_list = training_data
-            # print("HELLA", len(self.model.training_data))
             partner_index = partner_ids.index(i)
             game_utility = partner_utils[i]
             game_selfcoops = partner_selfcoops[i]
@@ -1387,7 +1416,7 @@ class PDAgent(Agent):
     def outputQtable(self, init):
         # if I am the chosen one
         qvalues = []
-        if self.ID == 37:
+        if self.ID == self.model.chosenOne:
             # get my qtable
             for i in self.qtable:
                 pair = self.qtable[i]
@@ -1412,8 +1441,6 @@ class PDAgent(Agent):
                     writer.writerow({'q': i})
 
 
-
-
     def outputData(self):
         self.output_data_to_model()
         if self.model.collect_data:
@@ -1428,7 +1455,16 @@ class PDAgent(Agent):
             self.set_defaults(self.partner_IDs)
             self.get_IDs()
             for i in self.partner_IDs:
-                self.oldstates[i] = [0, 0, 0, 0, 0, 0, 0]
+                if self.model.learnFrom == 'me' or 'them':
+                    zeroes = []
+                    for j in range(self.delta):
+                        zeroes.append(0)
+                    self.oldstates[i] = zeroes
+                elif self.model.learnFrom == 'us':
+                    zeroes = []
+                    for j in range(self.delta):
+                        zeroes.append([0,0])
+                    self.oldstates[i] = zeroes
 
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
@@ -1529,7 +1565,6 @@ class PDAgent(Agent):
             self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory)
 
             # update the Q for the CURRENT sprime
-            # TODO: what we need for this is the OLD state, pre checking the partner
 
             for i in self.partner_IDs:
                 s = self.oldstates[i]           # the state I used to be in
@@ -1539,7 +1574,8 @@ class PDAgent(Agent):
                 aprime = self.pp_aprime[i]      # the action I will take next
 
                 oldQValues = self.qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES
-                if a == 'C':
+
+                if a == 'C':  # This still works because it's keyed off the itermove_result and not part of the state
                     idx = 0
                 elif a == 'D':
                     idx = 1

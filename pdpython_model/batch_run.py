@@ -323,6 +323,7 @@ class PDModel(Model):
                  msize=3, # the n of objects in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
                  memoryPaired=True,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
                  learnFrom="us",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
+                 chosenOne=37,
 
                  sarsa_spawn=True,
                  sarsa_training=True,
@@ -371,6 +372,7 @@ class PDModel(Model):
         self.epsilon = epsilon
         self.export_q = export_q
         self.learnFrom = learnFrom
+        self.chosenOne = chosenOne
 
 
         if self.kNN_training:
