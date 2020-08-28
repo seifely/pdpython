@@ -296,11 +296,11 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=8, width=8,
-                 number_of_agents=64,
+    def __init__(self, height=5, width=5,
+                 number_of_agents=25,
                  schedule_type="Simultaneous",
-                 rounds=3000,
-                 collect_data=False,
+                 rounds=10,
+                 collect_data=True,
                  agent_printing=False,
                  randspawn=False,
 
@@ -314,7 +314,7 @@ class PDModel(Model):
                  simplified_payoffs=False,
                  b=0,
                  c=0,
-                 batch_iterations=2,  # wait what is this doing again
+                 # batch_iterations=2,  # wait what is this doing again
                  learning_rate=1,
                  theta=0.015,
                  init_ppD = 0.5,
@@ -329,6 +329,7 @@ class PDModel(Model):
                  alpha=0.1,
                  gamma=0.95,
                  export_q=True,
+                 chosenOne=14,
                  ):
 
         # ---------- Model Parameters --------
@@ -342,7 +343,7 @@ class PDModel(Model):
         self.DC = DC
         self.b = b
         self.c = c
-        self.batch_iterations = batch_iterations
+        # self.batch_iterations = batch_iterations
         self.theta = theta
         self.init_ppD = init_ppD
         self.learning_rate = learning_rate
@@ -366,6 +367,7 @@ class PDModel(Model):
         self.gamma = gamma
         self.epsilon = epsilon
         self.export_q = export_q
+        self.chosenOne = chosenOne
 
 
         if self.kNN_training:
@@ -391,12 +393,6 @@ class PDModel(Model):
                                              25: "WSLS",
                                              35: "WSLS", 38: "WSLS", 41: "WSLS"}
 
-        # self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
-        # self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
-        # self.experimental_vpp = [41, 74, 50, 83, 26, 59, 92]
-        # self.experimental_wsls = [30, 63, 96, 39, 72, 48, 81]
-        # self.experimental_tft = [52, 85, 28, 61, 94, 37, 70]
-
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader
             rows = []
@@ -416,7 +412,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('gamma_sarsa_%s_no_%s' % (self.gamma, self.iteration_n), "a")
+        concatenator = ('5x5_20k-10_distro_%s_alpha_%s_sarsa_no_%s' % (self.sarsa_distro, self.alpha, self.iteration_n), "a")   # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -698,6 +694,7 @@ class PDModel(Model):
         if not self.randspawn:
             for i in range(self.number_of_agents):
                 """This is for adding agents in sequentially."""
+                # print("n agents:", self.number_of_agents, "len coords:", len(self.coordinates))
                 x, y = self.coordinates.pop(0)
                 # print("x, y:", x, y)
                 # x, y = self.grid.find_empty()
@@ -808,21 +805,34 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=3000):
+    def run_model(self, rounds=20000):
         for i in range(self.rounds):
             self.step()
 
 
 # parameter lists for each parameter to be tested in batch run
-br_params = {"number_of_agents": [64],
+br_params = {# "number_of_agents": [64],
             "theta": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
             "init_ppD": [0.5],
              "k": [35],
              "alpha": [0.1],
-             "gamma": [0.95],
+             "gamma": [#0.15, 0.25, 0.35,
+                        #0.45,
+                        #0.55, 0.65, 0.75, 0.85,
+                        0.95
+                        ],
              "epsilon": [0.99],
+             "sarsa_distro": [0,
+                             #0.1,
+                              #0.25,
+                             # 0.3, 0.4,
+                              #0.5,   # TODO: --- and then everything for 0.5 gamma onwards
+                              #0.6,
+                              #0.75,
+                              # 0.8, 0.9
+                              ],
              }
 
 """ For collecting training data for kNN, please run one init_ppD at a time.
@@ -831,8 +841,8 @@ br_params = {"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=5,
-                 max_steps=3000,
+                 iterations=10,
+                 max_steps=20000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

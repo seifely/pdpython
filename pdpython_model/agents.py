@@ -1374,7 +1374,7 @@ class PDAgent(Agent):
     def outputQtable(self, init):
         # if I am the chosen one
         qvalues = []
-        if self.ID == 37:
+        if self.ID == self.model.chosenOne:
             # get my qtable
             for i in self.qtable:
                 pair = self.qtable[i]
@@ -1385,14 +1385,14 @@ class PDAgent(Agent):
             # for each item in that list, open up the csv and print it to it
         if init:
             for i in qvalues:
-                with open('{} qinit_agent37.csv'.format(self.model.filename), 'a', newline='') as csvfile:
+                with open('{} qinit_agentChosen.csv'.format(self.model.filename), 'a', newline='') as csvfile:
                     fieldnames = ['q']
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     # writer.writeheader()
                     writer.writerow({'q': i})
         else:
             for i in qvalues:
-                with open('{} qend_agent37.csv'.format(self.model.filename), 'a', newline='') as csvfile:
+                with open('{} qend_agentChosen.csv'.format(self.model.filename), 'a', newline='') as csvfile:
                     fieldnames = ['q']
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     # writer.writeheader()
