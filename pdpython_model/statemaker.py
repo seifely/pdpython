@@ -7,32 +7,31 @@ def get_memory_states(behaviours, size, paired):
         r spaces in the agent's memory - Size: Number of Objects in That Memory  """
     options = behaviours
     permutations = []
-
     if not paired:
 
         if size == 1:
             for i1 in options:
                 permutations.append([i1])
 
-        if size == 2:
+        elif size == 2:
             for i1 in options:
                 for i2 in options:
                     permutations.append([i1, i2])
 
-        if size == 3:
+        elif size == 3:
             for i1 in options:
                 for i2 in options:
                     for i3 in options:
                         permutations.append([i1, i2, i3])
 
-        if size == 4:
+        elif size == 4:
             for i1 in options:
                 for i2 in options:
                     for i3 in options:
                         for i4 in options:
                             permutations.append([i1, i2, i3, i4])
 
-        if size == 5:
+        elif size == 5:
             for i1 in options:
                 for i2 in options:
                     for i3 in options:
@@ -40,7 +39,7 @@ def get_memory_states(behaviours, size, paired):
                             for i5 in options:
                                 permutations.append([i1, i2, i3, i4, i5])
 
-        if size == 6:
+        elif size == 6:
             for i1 in options:
                 for i2 in options:
                     for i3 in options:
@@ -49,7 +48,7 @@ def get_memory_states(behaviours, size, paired):
                                 for i6 in options:
                                     permutations.append([i1, i2, i3, i4, i5, i6])
 
-        if size >= 7:
+        elif size >= 7:
             for i1 in options:
                 for i2 in options:
                     for i3 in options:
@@ -61,13 +60,19 @@ def get_memory_states(behaviours, size, paired):
 
         # to generate the < step 7 states
         permutations.append([0, 0, 0, 0, 0, 0, 0])
+        permutations.append([0, 0, 0, 0, 0, 0])
+        permutations.append([0, 0, 0, 0, 0])
+        permutations.append([0, 0, 0, 0])
+        permutations.append([0, 0, 0])
+        permutations.append([0, 0])
+        permutations.append([0,])
 
         initial_state1 = [0, 0, 0, 0, 0, 0]
         initial_state2 = [0, 0, 0, 0, 0]
         initial_state3 = [0, 0, 0, 0]
         initial_state4 = [0, 0, 0]
         initial_state5 = [0, 0]
-        initial_state6 = [0]
+        initial_state6 = [0,]
 
         for ii1 in options:
             new = initial_state1 + [ii1]

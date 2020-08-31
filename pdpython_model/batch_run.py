@@ -297,11 +297,11 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=8, width=8,
-                 number_of_agents=64,
+    def __init__(self, height=4, width=4,
+                 number_of_agents=16,
                  schedule_type="Simultaneous",
-                 rounds=3000,
-                 collect_data=False,
+                 rounds=2500,
+                 collect_data=True,
                  agent_printing=False,
                  randspawn=False,
 
@@ -320,10 +320,10 @@ class PDModel(Model):
                  theta=0.015,
                  init_ppD = 0.5,
                  k=11,
-                 msize=3, # the n of objects in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
+                 msize=1,  # the n of obj in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
                  memoryPaired=True,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
                  learnFrom="us",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
-                 chosenOne=37,
+                 chosenOne=7,
 
                  sarsa_spawn=True,
                  sarsa_training=True,
@@ -360,7 +360,7 @@ class PDModel(Model):
         self.kNN_training = kNN_training
         self.kNN_accuracy = 0
         self.k = k
-        self.msize = msize,
+        self.msize = msize
         self.memoryPaired = memoryPaired
 
         self.sarsa_spawn = sarsa_spawn
@@ -423,7 +423,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('gamma_sarsa_%s_no_%s' % (self.gamma, self.iteration_n), "a")
+        concatenator = ('memorytester2_sarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -626,7 +626,7 @@ class PDModel(Model):
         if self.kNN_spawn:
             n_of_a = 47
         else:
-            n_of_a = 64
+            n_of_a = self.number_of_agents
 
         if self.firstgame:
             for i in range(n_of_a):
@@ -663,9 +663,12 @@ class PDModel(Model):
             for i in state_list:
                 counter = 0
                 i = list(i)
+                print(i)
                 current_value = 0
                 for j in i:
-                    item = j[1]  # should hopefully index the opponent's move in each of the pairs
+                    # item = i[1]  # should hopefully index the opponent's move in each of the pairs
+                    # TODO: I don't think state_evaluation currently affects anything but we will see
+                    item = j
                     # print("Array", i, "Index", j, "Item", item)
                     if item == 'C':
                         current_value = current_value + (1 * counter)  # Should there be a slight bias towards C?
@@ -837,13 +840,13 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=3000):
+    def run_model(self, rounds=5000):
         for i in range(self.rounds):
             self.step()
 
 
 # parameter lists for each parameter to be tested in batch run
-br_params = {"number_of_agents": [64],
+br_params = {#"number_of_agents": [64],
             "theta": [0.015, #0.01, 0.015, 0.02
                       ],
             #model.learning_rate
@@ -860,8 +863,8 @@ br_params = {"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=5,
-                 max_steps=3000,
+                 iterations=10,
+                 max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
