@@ -152,21 +152,25 @@ def get_memory_states(behaviours, size, paired):
                                             permutations.append(([i1, i2], [i3, i4], [i5, i6], [i7, i8]))
 
 
-        permutations.append([[0, 0], [0, 0], [0, 0], [0, 0]])
+        permutations.append([(0, 0), (0, 0), (0, 0), (0, 0)])
+        permutations.append([(0,0),])
+        permutations.append([0,0])
+        permutations.append([(0,0), (0,0)])
+        permutations.append([(0,0), (0,0), (0,0)])
         # print(permutations)
         # for i in permutations:
         #     indx = permutations.index(i)
         #     permutations[indx] = tuple(chunker(i, 2))
 
         # then we need to add in initial states
-        initial_state1 = [[0,0], [0,0], [0,0]]
-        initial_state2 = [[0,0], [0,0]]
-        initial_state3 = [[0,0]]
+        initial_state1 = [(0,0), (0,0), (0,0)]
+        initial_state2 = [(0,0), (0,0)]
+        initial_state3 = [(0,0)]
 
         permu = []
         for i1 in options:
             for i2 in options:
-                permu.append([i1, i2])
+                permu.append((i1, i2))
 
         for ii1 in permu:
             new = initial_state1 + [ii1]

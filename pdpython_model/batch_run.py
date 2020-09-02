@@ -663,7 +663,7 @@ class PDModel(Model):
             for i in state_list:
                 counter = 0
                 i = list(i)
-                print(i)
+                # print(i)
                 current_value = 0
                 for j in i:
                     # item = i[1]  # should hopefully index the opponent's move in each of the pairs

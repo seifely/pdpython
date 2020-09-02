@@ -549,7 +549,7 @@ class PDAgent(Agent):
                         # need to now vary the length of this depending on msize
 
                         for n in range(self.delta):
-                            blank_list.append([0, 0])
+                            blank_list.append((0, 0))
                     elif not self.model.memoryPaired:
                         for n in range(self.delta):
                             blank_list.append(0)
@@ -728,7 +728,7 @@ class PDAgent(Agent):
                     """
                     current_uv = self.update_value
                     if self.strategy == "VPP" or "LEARN":
-                        if self.model.learnFrom == "them" or "me":
+                        if self.model.learnFrom != "us":
                             if self.working_memory.get(partner_ID) is None:
                                 zeroes = []
                                 for j in range(self.delta-1):
@@ -758,21 +758,24 @@ class PDAgent(Agent):
                                 self.working_memory[partner_ID] = current_state  # re-instantiate the memory to the bank
 
                         elif self.model.learnFrom == "us":
-
                             if self.working_memory.get(partner_ID) is None:
                                 zeroes = []
-                                for j in range(self.delta-1):
-                                    zeroes.append([0,0])
-                                zeroes.append([my_move, partner_move])
+                                if self.delta > 1:
+                                    for j in range(self.delta-1):
+                                        zeroes.append((0,0))
+                                # print('mm', my_move, 'pm', partner_move)
+                                zeroes.append((my_move, partner_move))
                                 self.working_memory[partner_ID] = zeroes
                             else:
                                 current_state = self.working_memory.pop(partner_ID)
-
+                                # print('mmm', my_move, 'pmm', partner_move)
+                                # print('len cs:', len(current_state), 'del', self.delta)
                                 if len(current_state) < self.delta:
-                                    current_state.append([my_move, partner_move])
+                                    current_state.append((my_move, partner_move))
                                 elif len(current_state) == self.delta:
                                     current_state.pop(0)
-                                    current_state.append([my_move, partner_move])
+                                    current_state.append((my_move, partner_move))
+                                self.working_memory[partner_ID] = current_state
 
                                 # self.update_value = self.update_value + self.change_update_value(current_state)
                                 # TODO: Change the above so it doesn't need to work on just 7-count opponent values
@@ -1455,15 +1458,20 @@ class PDAgent(Agent):
             self.set_defaults(self.partner_IDs)
             self.get_IDs()
             for i in self.partner_IDs:
-                if self.model.learnFrom == 'me' or 'them':
+                if self.model.learnFrom == "me":
                     zeroes = []
                     for j in range(self.delta):
                         zeroes.append(0)
                     self.oldstates[i] = zeroes
-                elif self.model.learnFrom == 'us':
+                elif self.model.learnFrom == "them":
                     zeroes = []
                     for j in range(self.delta):
-                        zeroes.append([0,0])
+                        zeroes.append(0)
+                    self.oldstates[i] = zeroes
+                elif self.model.learnFrom == "us":
+                    zeroes = []
+                    for j in range(self.delta):
+                        zeroes.append((0,0))
                     self.oldstates[i] = zeroes
 
             if self.strategy is None or 0 or []:
@@ -1573,6 +1581,12 @@ class PDAgent(Agent):
                 reward = self.pp_payoff[i]      # the reward I observed
                 aprime = self.pp_aprime[i]      # the action I will take next
 
+                # print('ostates=', self.oldstates)
+                # print('sstates=', self.itermove_result)
+                # print('sprimes=', self.working_memory)
+                if self.delta == 1:
+                    if self.model.memoryPaired:
+                        s = s[0]
                 oldQValues = self.qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES
 
                 if a == 'C':  # This still works because it's keyed off the itermove_result and not part of the state
@@ -1580,6 +1594,9 @@ class PDAgent(Agent):
                 elif a == 'D':
                     idx = 1
 
+                if self.delta == 1:
+                    if self.model.memoryPaired:
+                        sprime = sprime[0]
                 newQValues = self.qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?
                 if aprime == 'C':
                     idxprime = 0

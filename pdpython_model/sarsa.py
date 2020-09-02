@@ -9,6 +9,7 @@ def init_qtable(states, n_actions):
         vu = []
         for j in range(n_actions):
             vu.append(random.uniform(0.0, 1.0))
+        # print('indx=', indx, 'vu=', vu)
         iqtable[indx] = vu
 
     return iqtable
@@ -23,8 +24,10 @@ def egreedy_action(e, qtable, current_state):
         return random.choice(["C", "D"])
     else:
         # index qtable by current_state
-        # print('my state:', current_state)
-        current = qtable[current_state]
+        if len(current_state) == 1:
+            current_state = current_state[0]
+        print('my state:', current_state)
+        current = qtable[tuple(current_state)]
         # print('qvalues:', current)
         # pick the action with the highest Q value - if indx:0, C, if indx:1, D
         if current[0] > current[1]:
