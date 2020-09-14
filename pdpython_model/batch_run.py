@@ -300,7 +300,7 @@ class PDModel(Model):
     def __init__(self, height=4, width=4,
                  number_of_agents=16,
                  schedule_type="Simultaneous",
-                 rounds=2500,
+                 rounds=500,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=False,
@@ -321,8 +321,8 @@ class PDModel(Model):
                  init_ppD = 0.5,
                  k=11,
                  msize=1,  # the n of obj in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
-                 memoryPaired=True,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
-                 learnFrom="us",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
+                 memoryPaired=False,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
+                 learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
                  chosenOne=7,
 
                  sarsa_spawn=True,
@@ -423,7 +423,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('memorytester2_sarsa_no_%s' % (self.iteration_n), "a")
+        concatenator = ('tft_match_gamma_%s_alpha_%s_sarsa_no_%s' % (self.gamma, self.alpha, self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -855,6 +855,7 @@ br_params = {#"number_of_agents": [64],
              "alpha": [0.1],
              "gamma": [0.95],
              "epsilon": [0.99],
+             #"sarsa_distro": [0.1, 0.25, 0.5, 0.75],
              }
 
 """ For collecting training data for kNN, please run one init_ppD at a time.

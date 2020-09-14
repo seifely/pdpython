@@ -557,7 +557,7 @@ class PDAgent(Agent):
                     learning_state[j] = blank_list
 
 
-            egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]))
+            egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]), self.model.memoryPaired)
             if egreedy == "C":
                 self.number_of_c += 1
             elif egreedy == "D":

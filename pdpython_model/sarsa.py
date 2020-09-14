@@ -15,7 +15,7 @@ def init_qtable(states, n_actions):
     return iqtable
 
 
-def egreedy_action(e, qtable, current_state):
+def egreedy_action(e, qtable, current_state, paired):
     """ Qtable should be a dict keyed by the states - tuples of 7 values. """
 
     p = random.random()
@@ -25,8 +25,9 @@ def egreedy_action(e, qtable, current_state):
     else:
         # index qtable by current_state
         if len(current_state) == 1:
-            current_state = current_state[0]
-        print('my state:', current_state)
+            if paired:
+                current_state = current_state[0]
+        # print('my state:', current_state)
         current = qtable[tuple(current_state)]
         # print('qvalues:', current)
         # pick the action with the highest Q value - if indx:0, C, if indx:1, D
