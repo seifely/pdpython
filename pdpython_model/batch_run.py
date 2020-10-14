@@ -297,10 +297,10 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=4, width=4,
-                 number_of_agents=16,
+    def __init__(self, height=6, width=6,    # even numbers are checkerboard fair
+                 number_of_agents=36,
                  schedule_type="Simultaneous",
-                 rounds=500,
+                 rounds=5000,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=False,
@@ -325,10 +325,11 @@ class PDModel(Model):
                  learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
                  chosenOne=7,
 
-                 sarsa_spawn=True,
+                 sarsa_spawn=True,  # should mean checkerboard
                  sarsa_training=True,
                  sarsa_testing=True,
                  sarsa_distro=0,
+                 sarsa_oppo="TFT",
                  epsilon=0.99,
                  alpha=0.1,
                  gamma=0.95,
@@ -367,6 +368,7 @@ class PDModel(Model):
         self.sarsa_training = sarsa_training
         self.sarsa_testing = sarsa_testing
         self.sarsa_distro = sarsa_distro
+        self.sarsa_oppo = sarsa_oppo
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
@@ -423,7 +425,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('tft_match_gamma_%s_alpha_%s_sarsa_no_%s' % (self.gamma, self.alpha, self.iteration_n), "a")
+        concatenator = ('pls_defect_%s_sarsa_no_%s' % (self.sarsa_oppo, self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -855,8 +857,18 @@ br_params = {#"number_of_agents": [64],
              "alpha": [0.1],
              "gamma": [0.95],
              "epsilon": [0.99],
-             #"sarsa_distro": [0.1, 0.25, 0.5, 0.75],
+             "sarsa_distro": [0],
+             #"CC": [1.5, 1.75, 1.9, 1.25],
+             #"CC": [3],
+             #"DD": [1],
+             #"DC": [5],
+             #"CD": [0],
+             #"DD": [1],
+             #'"DC": [2],
+             #"CD": [0, -2, -4],
+             "sarsa_oppo": ["DEVIL", "ANGEL"],
              }
+
 
 """ For collecting training data for kNN, please run one init_ppD at a time.
     Otherwise, it doesn't export the ppD variable correctly to the pickle! """
@@ -865,7 +877,7 @@ br_params = {#"number_of_agents": [64],
 br = BatchRunner(PDModel,
                  br_params,
                  iterations=10,
-                 max_steps=5000,
+                 max_steps=10000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

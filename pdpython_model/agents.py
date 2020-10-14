@@ -206,7 +206,7 @@ class PDAgent(Agent):
                 return str(strat)
 
         elif self.model.sarsa_spawn:
-            choices = ["LEARN", "TFT"]
+            choices = ["LEARN", self.model.sarsa_oppo]
             if self.model.sarsa_distro > 0:
                 weights = [self.model.sarsa_distro, 1-self.model.sarsa_distro]
                 strat = np.random.choice(choices, 1, replace=False, p=weights)
@@ -220,7 +220,7 @@ class PDAgent(Agent):
                                43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
                     elif self.model.width == 3:
                         check_a = [1, 3, 5, 7, 9]
-                        check_b = [2, 4, 6, 8,]
+                        check_b = [2, 4, 6, 8]
                     elif self.model.width == 4:
                         check_a = [1, 3, 6, 8, 9, 11, 14, 16]
                         check_b = [2, 4, 5, 7, 10, 12, 13, 15]
