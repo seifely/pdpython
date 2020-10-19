@@ -102,9 +102,9 @@ class PDAgent(Agent):
         self.pp_payoff = {}
         self.oldstates = {}
 
-        self.epsilon = self.model.epsilon
-        self.alpha = self.model.alpha
-        self.gamma = self.model.gamma
+        self.epsilon = copy.deepcopy(self.model.epsilon)
+        self.alpha = copy.deepcopy(self.model.alpha)
+        self.gamma = copy.deepcopy(self.model.gamma)
 
         # Per Partner Q Tables
         self.qtable = []
@@ -1506,7 +1506,7 @@ class PDAgent(Agent):
 
                 if self.strategy == 'LEARN':
                     # Initialise the q tables and states on the first turn
-                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
+                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
                     self.states = copy.deepcopy(self.model.memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
@@ -1524,7 +1524,7 @@ class PDAgent(Agent):
 
                 if self.strategy == 'LEARN':
                     # Initialise the q tables and states on the first turn
-                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2)
+                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
                     self.states = copy.deepcopy(self.model.memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
@@ -1584,7 +1584,7 @@ class PDAgent(Agent):
 
             self.check_partner()  # We took action a, what s prime did we end up in?
             # ----- WORKING MEMORY IS NOW S-PRIME -----
-            round_payoffs = self.increment_score(self.payoffs) # Accept the reward for that s prime
+            round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime
 
             # update the sprimes (the states we have found ourselves in)
             # for i in self.working_memory:
@@ -1660,8 +1660,8 @@ class PDAgent(Agent):
             #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
 
             # update epsilon
-            self.epsilon = sarsa.decay_value(self.model.epsilon, self.epsilon, self.model.rounds, True)
-            self.alpha = sarsa.decay_value(self.model.alpha, self.epsilon, self.model.rounds, True)
+            self.epsilon = sarsa.decay_value(self.model.epsilon, self.epsilon, self.model.rounds, True, 0.1)
+            self.alpha = sarsa.decay_value(self.model.alpha, self.alpha, self.model.rounds, True, 0.001)
 
             # update s to be sprime
             for i in self.partner_IDs:

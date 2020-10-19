@@ -1,14 +1,17 @@
 import random
 
 
-def init_qtable(states, n_actions):
+def init_qtable(states, n_actions, zeroes):
     iqtable = {}   # does this want to be a list or a dict?
 
     for i in states:
         indx = tuple(i)
         vu = []
         for j in range(n_actions):
-            vu.append(random.uniform(0.0, 1.0))
+            if zeroes:
+                vu.append(0)
+            else:
+                vu.append(random.uniform(0.0, 1.0))
         # print('indx=', indx, 'vu=', vu)
         iqtable[indx] = vu
 
@@ -33,8 +36,10 @@ def egreedy_action(e, qtable, current_state, paired):
         # pick the action with the highest Q value - if indx:0, C, if indx:1, D
         if current[0] > current[1]:
             return "C"
-        else:  # this might need to be an elif, but with two behaviours it's fine
+        elif current[1] > current[0]:  # this might need to be an elif, but with two behaviours it's fine
             return "D"
+        else:
+            return random.choice(["C", "D"])
 
 
 def sarsa_decision(alpha, epsilon, gamma):
@@ -52,16 +57,22 @@ def output_sprime(current_state, observed_action):
     cstate.append(observed_action)
     return tuple(cstate)
 
-def decay_value(initial, current, max_round, linear):
+def decay_value(initial, current, max_round, linear, floor):
     # Version WITHOUT simulated annealing, though that could be in V2
     if linear:
         increment = initial / max_round
         new_value = current - increment
-        return new_value
+        if new_value > floor:
+            return floor
+        else:
+            return new_value
     else:
         increment = current / 50        # any better value to use rather than arbitrary?
         new_value = current - increment
-        return new_value
+        if new_value > floor:
+            return floor
+        else:
+            return new_value
 
 
 def update_q(reward, gamma, alpha, oldQ, nextQ):
