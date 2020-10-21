@@ -1661,7 +1661,7 @@ class PDAgent(Agent):
 
             # update epsilon
             self.epsilon = sarsa.decay_value(self.model.epsilon, self.epsilon, self.model.rounds, True, 0.1)
-            self.alpha = sarsa.decay_value(self.model.alpha, self.alpha, self.model.rounds, True, 0.001)
+            self.alpha = sarsa.decay_value(self.model.alpha, self.alpha, self.model.rounds, True, 0.01)
 
             # update s to be sprime
             for i in self.partner_IDs:

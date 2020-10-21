@@ -62,7 +62,7 @@ def decay_value(initial, current, max_round, linear, floor):
     if linear:
         increment = initial / max_round
         new_value = current - increment
-        if new_value > floor:
+        if new_value < floor:
             return floor
         else:
             return new_value

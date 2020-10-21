@@ -425,7 +425,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('pls_defect2_%s_sarsa_no_%s' % (self.sarsa_oppo, self.iteration_n), "a")
+        concatenator = ('pls_defect2_alphafloor_%s_sarsa_no_%s' % (self.sarsa_oppo, self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -866,7 +866,8 @@ br_params = {#"number_of_agents": [64],
              #"DD": [1],
              #'"DC": [2],
              #"CD": [0, -2, -4],
-             "sarsa_oppo": ["DEVIL", "ANGEL", "TFT"],
+             #"sarsa_oppo": ["DEVIL", "ANGEL", "TFT"],
+             "sarsa_oppo": ["LEARN"],
              }
 
 
@@ -876,7 +877,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=10,
+                 iterations=3,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
