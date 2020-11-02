@@ -50,6 +50,12 @@ class PDAgent(Agent):
         self.update_value = 0.015  # this is the value that will change each turn
         self.theta = 0.015  # uv we manipulate, stays static
         self.delta = self.model.msize  # max memory size
+        if self.model.memoryPaired:
+            if self.model.memoryPaired == 1:
+                self.delta = 1
+            else:
+                self.delta = int(self.model.msize / 2)
+
         self.init_uv = self.model.theta
         # self.init_ppD = model.init_ppD  # this isn't actually used
 
@@ -239,7 +245,7 @@ class PDAgent(Agent):
                         check_a = [1, 4]
                         check_b = [2, 3]
 
-                    print("My ID is:", self.ID, "and my coordinates are", self)
+                    # print("My ID is:", self.ID, "and my coordinates are", self)
                     if self.ID in check_a:
                         strat = choices[0]
                         return str(strat)
@@ -1098,7 +1104,7 @@ class PDAgent(Agent):
                               'uv_%d' % self.ID,
                               'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
                               'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID,'avp4_%d' % self.ID,
-                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID]
+                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID]
             #     'p1', 'p2', 'p3', 'p4'
             else:
                 fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
@@ -1110,7 +1116,8 @@ class PDAgent(Agent):
                               'm4_%d' % self.ID, 'uv_%d' % self.ID,
                               'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
                               'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
-                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID]
+                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID]
+
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             # moves = []
@@ -1141,7 +1148,8 @@ class PDAgent(Agent):
                      'mutC_%d' % self.ID: self.mutual_c_outcome, 'simP_%d' % self.ID: self.similar_partners,
                      'avp1_%d' % self.ID: avpay_partner_1, 'avp2_%d' % self.ID: avpay_partner_2,
                      'avp3_%d' % self.ID: avpay_partner_3, 'avp4_%d' % self.ID: avpay_partner_4,
-                     'globav_%d' % self.ID: self.globalAvPayoff, 'epsilon_%d' % self.ID: self.epsilon})
+                     'globav_%d' % self.ID: self.globalAvPayoff, 'epsilon_%d' % self.ID: self.epsilon,
+                     'alpha_%d' % self.ID: self.alpha})
             #
             else:
                 writer.writerow(
@@ -1160,7 +1168,8 @@ class PDAgent(Agent):
                      'simP_%d' % self.ID: self.similar_partners,
                      'avp1_%d' % self.ID: avpay_partner_1, 'avp2_%d' % self.ID: avpay_partner_2,
                      'avp3_%d' % self.ID: avpay_partner_3, 'avp4_%d' % self.ID: avpay_partner_4,
-                     'globav_%d' % self.ID: self.globalAvPayoff, 'epsilon_%d' % self.ID: self.epsilon})
+                     'globav_%d' % self.ID: self.globalAvPayoff, 'epsilon_%d' % self.ID: self.epsilon,
+                     'alpha_%d' % self.ID: self.alpha})
 
     def reset_values(self):
         """ Resets relevant global variables to default values. """
@@ -1660,8 +1669,8 @@ class PDAgent(Agent):
             #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
 
             # update epsilon
-            self.epsilon = sarsa.decay_value(self.model.epsilon, self.epsilon, self.model.rounds, True, 0.1)
-            self.alpha = sarsa.decay_value(self.model.alpha, self.alpha, self.model.rounds, True, 0.01)
+            self.epsilon = sarsa.decay_value(self.model.epsilon, self.epsilon, self.model.rounds, True, self.model.epsilon_floor)
+            self.alpha = sarsa.decay_value(self.model.alpha, self.alpha, self.model.rounds, True, self.model.alpha_floor)
 
             # update s to be sprime
             for i in self.partner_IDs:

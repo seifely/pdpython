@@ -334,6 +334,8 @@ class PDModel(Model):
                  alpha=0.1,
                  gamma=0.95,
                  export_q=True,
+                 alpha_floor=0.01,
+                 epsilon_floor=0.05,
                  ):
 
         # ---------- Model Parameters --------
@@ -375,6 +377,8 @@ class PDModel(Model):
         self.export_q = export_q
         self.learnFrom = learnFrom
         self.chosenOne = chosenOne
+        self.alpha_floor = alpha_floor
+        self.epsilon_floor = epsilon_floor
 
 
         if self.kNN_training:
@@ -425,7 +429,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('pls_defect2_alphafloor_%s_sarsa_no_%s' % (self.sarsa_oppo, self.iteration_n), "a")
+        concatenator = ('wave3_m_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -859,15 +863,19 @@ br_params = {#"number_of_agents": [64],
              "epsilon": [0.99],
              "sarsa_distro": [0],
              #"CC": [1.5, 1.75, 1.9, 1.25],
-             #"CC": [3],
              #"DD": [1],
              #"DC": [5],
              #"CD": [0],
-             #"DD": [1],
-             #'"DC": [2],
-             #"CD": [0, -2, -4],
-             #"sarsa_oppo": ["DEVIL", "ANGEL", "TFT"],
-             "sarsa_oppo": ["LEARN"],
+             "sarsa_oppo": ["TFT",
+                            #"ANGEL", "DEVIL", "LEARN", "VPP"
+                            #"WSLS", "iWSLS"
+                            ],
+             "learnFrom": ["us"],
+             "memoryPaired": [True],
+             "msize": [#1,
+                       #4,
+                       7
+                       ],
              }
 
 
@@ -877,7 +885,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
+                 iterations=5,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

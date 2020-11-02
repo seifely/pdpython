@@ -8,13 +8,16 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="pdpython" />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="535">
-              <caret line="64" column="22" selection-start-line="64" selection-start-column="22" selection-end-line="64" selection-end-column="22" />
+            <state relative-caret-position="51">
+              <caret line="3" selection-start-line="3" selection-end-line="18" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -22,8 +25,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/statemaker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2652">
-              <caret line="156" column="34" selection-start-line="156" selection-start-column="34" selection-end-line="156" selection-end-column="34" />
+            <state relative-caret-position="337">
+              <caret line="173" column="87" selection-start-line="173" selection-start-column="87" selection-end-line="173" selection-end-column="87" />
             </state>
           </provider>
         </entry>
@@ -31,8 +34,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="28135">
-              <caret line="1663" column="101" selection-start-line="1663" selection-start-column="101" selection-end-line="1663" selection-end-column="101" />
+            <state relative-caret-position="273">
+              <caret line="56" column="52" selection-start-line="56" selection-start-column="52" selection-end-line="56" selection-end-column="52" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -43,7 +46,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
+            <state relative-caret-position="133">
               <caret line="37" selection-start-line="37" selection-end-line="37" />
               <folding>
                 <element signature="e#0#65#0" expanded="true" />
@@ -52,11 +55,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="365">
-              <caret line="869" column="34" selection-start-line="869" selection-start-column="34" selection-end-line="869" selection-end-column="34" />
+            <state relative-caret-position="204">
+              <caret line="303" column="34" selection-start-line="303" selection-start-column="34" selection-end-line="303" selection-end-column="34" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -84,21 +87,10 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>memoryTyp</find>
-      <find>opponent_states</find>
-      <find>self.working_memory</find>
-      <find>outcome</find>
-      <find>self.olds</find>
-      <find>self.delta</find>
-      <find>if si</find>
-      <find>get_memory</find>
-      <find>self.msize</find>
-      <find>64</find>
       <find>tuple(s)</find>
       <find>oldstat</find>
       <find>size</find>
       <find>state_eva</find>
-      <find>vu</find>
       <find>self.working</find>
       <find>egre</find>
       <find>tuple(s</find>
@@ -114,6 +106,17 @@
       <find>56</find>
       <find>55</find>
       <find>decay</find>
+      <find>My ID is:</find>
+      <find>iWSLS</find>
+      <find>2000</find>
+      <find>vu</find>
+      <find>tuple</find>
+      <find>[i1, i2]</find>
+      <find>iter_pick</find>
+      <find>iter_pick_next</find>
+      <find>self.working_memory</find>
+      <find>current</find>
+      <find>self.delta</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -123,11 +126,11 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/pdpython_model/model.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/statemaker.py" />
         <option value="$PROJECT_DIR$/pdpython_model/server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/sarsa.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/statemaker.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
       </list>
     </option>
   </component>
@@ -142,6 +145,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -158,7 +162,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -283,12 +286,12 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15226555" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49919742" visible="true" weight="0.15226555" />
+      <window_info id="Structure" order="1" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
+      <window_info id="Favorites" order="2" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32827735" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49947312" weight="0.30119178" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49947312" visible="true" weight="0.30119178" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -350,33 +353,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/statemaker.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2652">
-          <caret line="156" column="34" selection-start-line="156" selection-start-column="34" selection-end-line="156" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="28135">
-          <caret line="1663" column="101" selection-start-line="1663" selection-start-column="101" selection-end-line="1663" selection-end-column="101" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="37" selection-start-line="37" selection-end-line="37" />
-          <folding>
-            <element signature="e#0#65#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/run.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -384,20 +360,47 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
-          <caret line="869" column="34" selection-start-line="869" selection-start-column="34" selection-end-line="869" selection-end-column="34" />
+        <state relative-caret-position="133">
+          <caret line="37" selection-start-line="37" selection-end-line="37" />
           <folding>
-            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#0#65#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="535">
-          <caret line="64" column="22" selection-start-line="64" selection-start-column="22" selection-end-line="64" selection-end-column="22" />
+        <state relative-caret-position="51">
+          <caret line="3" selection-start-line="3" selection-end-line="18" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="56" column="52" selection-start-line="56" selection-start-column="52" selection-end-line="56" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/statemaker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="173" column="87" selection-start-line="173" selection-start-column="87" selection-end-line="173" selection-end-column="87" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="303" column="34" selection-start-line="303" selection-start-column="34" selection-end-line="303" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

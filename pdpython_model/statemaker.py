@@ -122,25 +122,57 @@ def get_memory_states(behaviours, size, paired):
         if size == 2:
             for i1 in options:
                 for i2 in options:
-                    permutations.append([i1, i2])
+                    permutations.append((i1, i2))
 
         if size == 4:
             for i1 in options:
                 for i2 in options:
+                    permutations.append((i1, i2))
+
+            for i1 in options:
+                for i2 in options:
                     for i3 in options:
                         for i4 in options:
-                            permutations.append(([i1, i2], [i3, i4]))
+                            permutations.append(((i1, i2), (i3, i4)))
 
         if size == 6:
+            for i1 in options:
+                for i2 in options:
+                    permutations.append((i1, i2))
+
+            for i1 in options:
+                for i2 in options:
+                    for i3 in options:
+                        for i4 in options:
+                            permutations.append(((i1, i2), (i3, i4)))
+
             for i1 in options:
                 for i2 in options:
                     for i3 in options:
                         for i4 in options:
                             for i5 in options:
                                 for i6 in options:
-                                    permutations.append(([i1, i2], [i3, i4], [i5, i6]))
+                                    permutations.append(((i1, i2), (i3, i4), (i5, i6)))
 
         if size >= 8:
+            for i1 in options:
+                for i2 in options:
+                    permutations.append((i1, i2))
+
+            for i1 in options:
+                for i2 in options:
+                    for i3 in options:
+                        for i4 in options:
+                            permutations.append(((i1, i2), (i3, i4)))
+
+            for i1 in options:
+                for i2 in options:
+                    for i3 in options:
+                        for i4 in options:
+                            for i5 in options:
+                                for i6 in options:
+                                    permutations.append(((i1, i2), (i3, i4), (i5, i6)))
+
             for i1 in options:
                 for i2 in options:
                     for i3 in options:
@@ -149,7 +181,7 @@ def get_memory_states(behaviours, size, paired):
                                 for i6 in options:
                                     for i7 in options:
                                         for i8 in options:
-                                            permutations.append(([i1, i2], [i3, i4], [i5, i6], [i7, i8]))
+                                            permutations.append(((i1, i2), (i3, i4), (i5, i6), (i7, i8)))
 
 
         permutations.append([(0, 0), (0, 0), (0, 0), (0, 0)])

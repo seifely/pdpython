@@ -12,7 +12,8 @@ def init_qtable(states, n_actions, zeroes):
                 vu.append(0)
             else:
                 vu.append(random.uniform(0.0, 1.0))
-        # print('indx=', indx, 'vu=', vu)
+
+        #print('indx=', indx, 'vu=', vu)
         iqtable[indx] = vu
 
     return iqtable
@@ -63,7 +64,10 @@ def decay_value(initial, current, max_round, linear, floor):
         increment = initial / max_round
         new_value = current - increment
         if new_value < floor:
-            return floor
+            if floor > 0:
+                return floor
+            else:
+                return new_value
         else:
             return new_value
     else:
