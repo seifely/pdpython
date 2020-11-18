@@ -429,7 +429,7 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('wave3_m_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
+        concatenator = ('wave3_neutrallonger_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -861,20 +861,22 @@ br_params = {#"number_of_agents": [64],
              "alpha": [0.1],
              "gamma": [0.95],
              "epsilon": [0.99],
-             "sarsa_distro": [0],
-             #"CC": [1.5, 1.75, 1.9, 1.25],
+             #"sarsa_distro": [0.25, 0.50, 0.75],
+             #"CC": [3],
              #"DD": [1],
              #"DC": [5],
              #"CD": [0],
-             "sarsa_oppo": ["TFT",
-                            #"ANGEL", "DEVIL", "LEARN", "VPP"
-                            #"WSLS", "iWSLS"
+             "sarsa_oppo": [#"TFT",
+                            #"ANGEL", "DEVIL", "LEARN",
+                            "VPP",
+                            #"WSLS",
+                            #"iWSLS"
                             ],
-             "learnFrom": ["us"],
-             "memoryPaired": [True],
-             "msize": [#1,
+             "learnFrom": ["them"],
+             "memoryPaired": [False],
+             "msize": [1,
                        #4,
-                       7
+                       #7
                        ],
              }
 

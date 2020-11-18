@@ -206,16 +206,18 @@ def get_memory_states(behaviours, size, paired):
 
         for ii1 in permu:
             new = initial_state1 + [ii1]
-            permutations.append(new)
+            permutations.append(tuple(new))
+
         for ii2 in permu:
             for iii2 in permu:
                 new = initial_state2 + [ii2] + [iii2]
-                permutations.append(new)
+                permutations.append(tuple(new))
+
         for ii3 in permu:
             for iii3 in permu:
                 for iiii3 in permu:
                     new = initial_state3 + [ii3] + [iii3] + [iiii3]
-                    permutations.append(new)
+                    permutations.append(tuple(new))
 
     return permutations
 

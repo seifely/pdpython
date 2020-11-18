@@ -51,10 +51,15 @@ class PDAgent(Agent):
         self.theta = 0.015  # uv we manipulate, stays static
         self.delta = self.model.msize  # max memory size
         if self.model.memoryPaired:
-            if self.model.memoryPaired == 1:
+            if self.model.msize == 1:
                 self.delta = 1
-            else:
-                self.delta = int(self.model.msize / 2)
+            if self.model.msize == 7:
+                self.delta = 4
+            #if self.model.msize == 2:
+                #self.delta = 1
+            #TODO: Figure out a consistent memory size metric
+
+        #print('delta:', self.delta)
 
         self.init_uv = self.model.theta
         # self.init_ppD = model.init_ppD  # this isn't actually used
