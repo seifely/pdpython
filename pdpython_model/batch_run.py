@@ -399,9 +399,9 @@ class PDModel(Model):
                  learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
                  chosenOne=7,
 
-                 sarsa_spawn=True,  # should mean checkerboard
-                 sarsa_training=True,
-                 sarsa_testing=True,
+                 sarsa_spawn=False,  # should mean checkerboard
+                 sarsa_training=False,          #TODO: THESE VARIABLES HAVE BEEN TURNED OFF FOR MOODY SARSA TESTING
+                 sarsa_testing=False,
                  sarsa_distro=0,
                  sarsa_oppo="TFT",
                  epsilon=0.99,
@@ -425,7 +425,7 @@ class PDModel(Model):
                  moody_msize=1,  # the n of obj in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
                  moody_memoryPaired=False,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
                  moody_learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
-                 moody_chosenOne=7,
+                 moody_chosenOne=6,
 
                  ):
 
@@ -536,7 +536,12 @@ class PDModel(Model):
             writer.writerow(self.new_filenumber)
 
         # self.iteration_n needs to be pulled from a csv file and then deleted from said csv file
-        concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
+        if self.sarsa_spawn:
+            concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
+        elif self.moody_sarsa_spawn:
+            concatenator = ('testing_%s_%s_%s_moodysarsa_no_%s' % (self.moody_msize, self.moody_learnFrom, self.moody_sarsa_oppo, self.iteration_n), "a")
+        else:
+            concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
 
         self.filename = ('%s model output.csv' % (self.exp_n), "a")
@@ -907,7 +912,7 @@ class PDModel(Model):
                 self.grid.place_agent(pdagent, (x, y))
                 self.schedule.add(pdagent)
 
-    def export_q_tables(self, init):                                    # Does this need a moody counterpart? =============================
+    def export_q_tables(self, init):                                    #TODO: Does this need a moody counterpart? =============================
         qs = [a.qtable for a in self.schedule.agents]
         # we need to print/save a list of the keys
         # then print/save each
@@ -1016,28 +1021,24 @@ class PDModel(Model):
 
 # parameter lists for each parameter to be tested in batch run
 br_params = {#"number_of_agents": [64],
-            "theta": [0.015, #0.01, 0.015, 0.02
-                      ],
-            #model.learning_rate
-            "init_ppD": [0.5],
-             "k": [35],
-             "alpha": [0.1],
-             "gamma": [0.95],
-             "epsilon": [0.99],
+             #"theta": [0.015, #0.01, 0.015, 0.02],
+             #model.learning_rate
+             #"init_ppD": [0.5],
+             #"k": [35],
+             #"alpha": [0.1],
+             #"gamma": [0.95],
+             #"epsilon": [0.99],
              #"sarsa_distro": [0.25, 0.50, 0.75],
              #"CC": [3],
              #"DD": [1],
              #"DC": [5],
              #"CD": [0],
-             "sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
-                            "MOODYLEARN"],
+             #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
+                            #"MOODYLEARN"],
 
              #"learnFrom": ["them"],
              #"memoryPaired": [False],
-             "msize": [1,
-                       #4,
-                       #7
-                       ],
+             #"msize": [1,4,7],
 
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
@@ -1048,6 +1049,10 @@ br_params = {#"number_of_agents": [64],
                        #4,
                        #7
                        ],
+             "moody_sarsa_oppo": ["TFT",
+                            # "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
+                            #"MOODYLEARN"
+                                  ],
              }
 
 

@@ -7,6 +7,7 @@ import pickle
 from scipy.spatial import distance as dst
 import copy
 from pdpython_model import sarsa
+from pdpython_model import sarsa_moody
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
@@ -16,9 +17,13 @@ from pdpython_model import sarsa
     VPP - Variable Personal Probability. Agent changes own likelihood that it will defect in response to defection.
     ANGEL - Always co-operate.
     DEVIL - Always defect.
+    
+    LEARN - SARSA strategy for learning.
+    MOODYLEARN - A moody SARSA variant for learning.
 
     TFT - The classic Tit for Tat strategy.
-    WSLS - Win Stay Lose Switch """
+    WSLS - Win Stay Lose Switch.
+    iWSLS - An alternative implementation of WSLS for comparison."""
 
 
 class PDAgent(Agent):
@@ -49,7 +54,9 @@ class PDAgent(Agent):
         self.update_values = {}
         self.update_value = 0.015  # this is the value that will change each turn
         self.theta = 0.015  # uv we manipulate, stays static
+
         self.delta = self.model.msize  # max memory size
+        self.moody_delta = self.model.moody_msize  # max memory size for moody
         if self.model.memoryPaired:
             if self.model.msize == 1:
                 self.delta = 1
@@ -57,6 +64,14 @@ class PDAgent(Agent):
                 self.delta = 4
             #if self.model.msize == 2:
                 #self.delta = 1
+            #TODO: Figure out a consistent memory size metric
+        if self.model.moody_memoryPaired:
+            if self.model.moody_msize == 1:
+                self.moody_delta = 1
+            if self.model.moody_msize == 7:
+                self.moody_delta = 4
+            #if self.model.moody_msize == 2:
+                #self.moody_delta = 1
             #TODO: Figure out a consistent memory size metric
 
         #print('delta:', self.delta)
@@ -119,6 +134,21 @@ class PDAgent(Agent):
 
         # Per Partner Q Tables
         self.qtable = []
+
+        # ----------------------- MOODY SARSA GLOBALS ---------------------------
+
+        self.moody_states = []
+        self.moody_pp_sprime = {}
+        self.moody_pp_aprime = {}
+        self.moody_pp_payoff = {}
+        self.moody_oldstates = {}
+
+        self.moody_epsilon = copy.deepcopy(self.model.moody_epsilon)
+        self.moody_alpha = copy.deepcopy(self.model.moody_alpha)
+        self.moody_gamma = copy.deepcopy(self.model.moody_gamma)
+
+        # Per Partner Q Tables
+        self.moody_qtable = []
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
@@ -225,6 +255,48 @@ class PDAgent(Agent):
             else:
                 if len(choices) == 2:
                     if self.model.width == 8:
+                        check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
+                               42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
+                        check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
+                               43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
+                    elif self.model.width == 3:
+                        check_a = [1, 3, 5, 7, 9]
+                        check_b = [2, 4, 6, 8]
+                    elif self.model.width == 4:
+                        check_a = [1, 3, 6, 8, 9, 11, 14, 16]
+                        check_b = [2, 4, 5, 7, 10, 12, 13, 15]
+                    elif self.model.width == 5:
+                        check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
+                        check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+                    elif self.model.width == 6:
+                        check_a = [1, 3, 5, 8, 10, 12, 13, 15, 17, 20, 22, 24, 25, 27, 29, 32, 34, 36]
+                        check_b = [2, 4, 6, 7, 9, 11, 14, 16, 18, 19, 21, 23, 26, 28, 30, 31, 33, 35]
+                    elif self.model.width == 7:
+                        check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35,
+                                   37, 39, 41, 43, 45, 47, 49]
+                        check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36,
+                                   38, 40, 42, 44, 46, 48]
+                    elif self.model.width == 2:
+                        check_a = [1, 4]
+                        check_b = [2, 3]
+
+                    # print("My ID is:", self.ID, "and my coordinates are", self)
+                    if self.ID in check_a:
+                        strat = choices[0]
+                        return str(strat)
+                    elif self.ID in check_b:
+                        strat = choices[1]
+                        return str(strat)
+
+        elif self.model.moody_sarsa_spawn:
+            choices = ["MOODYLEARN", self.model.moody_sarsa_oppo]
+            if self.model.sarsa_distro > 0:                                                               # THIS SECTION ISN'T SET TO MOODY_ --> might need changing in future
+                weights = [self.model.sarsa_distro, 1-self.model.sarsa_distro]
+                strat = np.random.choice(choices, 1, replace=False, p=weights)
+                return str(strat[0])
+            else:
+                if len(choices) == 2:
+                    if self.model.width == 8:                                                             # THESE COORDINATES SHOULD BE CORRECT, JUST SPAWN NORMAL SARSA IN AS AN OPPONENT TYPE
                         check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
                                42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
                         check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
@@ -598,6 +670,30 @@ class PDAgent(Agent):
                 self.number_of_d += 1
             return egreedy
 
+        elif strategy == "MOODYLEARN":
+            """ Use the epsilon-greedy algorithm to select a move to play. """
+            if not learning_state:
+                for j in self.partner_IDs:
+                    blank_list = []
+                    if self.model.moody_memoryPaired:
+                        # need to now vary the length of this depending on msize
+
+                        for n in range(self.moody_delta):
+                            blank_list.append((0, 0))
+                    elif not self.model.moody_memoryPaired:
+                        for n in range(self.moody_delta):
+                            blank_list.append(0)
+
+                    learning_state[j] = blank_list
+
+
+            egreedy = sarsa.egreedy_action(self.moody_epsilon, self.moody_qtable, tuple(learning_state[id]), self.model.moody_memoryPaired)
+            if egreedy == "C":
+                self.number_of_c += 1
+            elif egreedy == "D":
+                self.number_of_d += 1
+            return egreedy
+
     def change_update_value(self, partner_behaviour):
         """ Produce a [new update value] VALUE BY WHICH TO ALTER THE CURRENT UV given the current uv and the
         behaviour that partner has shown.
@@ -814,6 +910,59 @@ class PDAgent(Agent):
                                 # self.update_value = self.update_value + self.change_update_value(current_state)
                                 # TODO: Change the above so it doesn't need to work on just 7-count opponent values
 
+                    if self.strategy == "MOODYLEARN":
+                        if self.model.moody_learnFrom != "us":
+                            if self.working_memory.get(partner_ID) is None:
+                                zeroes = []
+                                for j in range(self.moody_delta-1):
+                                    zeroes.append(0)
+                                zeroes.append(partner_move)
+                                self.working_memory[partner_ID] = zeroes  # initialise with first value if doesn't exist
+                            else:
+                                current_state = self.working_memory.pop(partner_ID)
+
+                                # first, check if it has more than three values
+                                if len(current_state) < self.moody_delta:  # if list hasn't hit delta, add in new move
+                                    if self.model.moody_learnFrom == "them":
+                                        current_state.append(partner_move)
+                                    elif self.model.moody_learnFrom == "me":
+                                        current_state.append(my_move)
+                                elif len(current_state) == self.moody_delta:
+                                    current_state.pop(0)
+                                    if self.model.moody_learnFrom == "them":
+                                        current_state.append(partner_move)  # we have the updated move list for that partner here
+                                        current_uv = self.update_values[partner_ID]
+
+                                        self.update_value = self.update_value + self.change_update_value(current_state)
+                                    elif self.model.moody_learnFrom == "me":
+                                        current_state.append(my_move)
+
+                                # print('My current partner history is now:', current_state)
+                                self.working_memory[partner_ID] = current_state  # re-instantiate the memory to the bank
+
+                        elif self.model.moody_learnFrom == "us":
+                            if self.working_memory.get(partner_ID) is None:
+                                zeroes = []
+                                if self.moody_delta > 1:
+                                    for j in range(self.moody_delta-1):
+                                        zeroes.append((0,0))
+                                # print('mm', my_move, 'pm', partner_move)
+                                zeroes.append((my_move, partner_move))
+                                self.working_memory[partner_ID] = zeroes
+                            else:
+                                current_state = self.working_memory.pop(partner_ID)
+                                # print('mmm', my_move, 'pmm', partner_move)
+                                # print('len cs:', len(current_state), 'del', self.delta)
+                                if len(current_state) < self.moody_delta:
+                                    current_state.append((my_move, partner_move))
+                                elif len(current_state) == self.moody_delta:
+                                    current_state.pop(0)
+                                    current_state.append((my_move, partner_move))
+                                self.working_memory[partner_ID] = current_state
+
+                                # self.update_value = self.update_value + self.change_update_value(current_state)
+                                # TODO: Change the above so it doesn't need to work on just 7-count opponent values
+
                     """" ======================================================================================== """
 
                     # First, check if we have a case file on them in each memory slot
@@ -860,7 +1009,7 @@ class PDAgent(Agent):
             # print("My individual average payoff for partner", i, "is ", self.indivAvPayoff[i])
 
             # ------- Here is where we change variables based on the outcome -------
-            if self.strategy == "VEV" or "RANDOM" or "VPP" or "LEARN":
+            if self.strategy == "VEV" or "RANDOM" or "VPP" or "LEARN" or "MOODYLEARN":
                 if self.ppD_partner[i] < 1 and self.ppD_partner[i] > 0:
 
                     # if this_partner_move == "D":
@@ -1092,6 +1241,8 @@ class PDAgent(Agent):
             strategy_code = 7
         elif self.strategy == "LEARN":
             strategy_code = 8
+        elif self.strategy == "MOODYLEARN":
+            strategy_code = 9
 
         """ The above will error catch for when agents don't have those values, and will still let us print 
             to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
@@ -1480,6 +1631,34 @@ class PDAgent(Agent):
                     # writer.writeheader()
                     writer.writerow({'q': i})
 
+    def outputQtables(self, init):
+        # if I am the chosen one
+        #TODO: FIX THIS SO IT OUTPUTS THE MULTIPLE Q TABLES THAT MOODY SARSA WILL HAVE
+        qvalues = []
+        if self.ID == self.model.moody_chosenOne:
+            # get my qtable
+            for i in self.qtable:
+                pair = self.qtable[i]
+                for j in pair:
+                    qvalues.append(j)
+
+            # for each numerical value in it, append it to a new list
+            # for each item in that list, open up the csv and print it to it
+        if init:
+            for i in qvalues:
+                with open('{} qinit_agent6.csv'.format(self.model.filename), 'a', newline='') as csvfile:
+                    fieldnames = ['q']
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    # writer.writeheader()
+                    writer.writerow({'q': i})
+        else:
+            for i in qvalues:
+                with open('{} qend_agent6.csv'.format(self.model.filename), 'a', newline='') as csvfile:
+                    fieldnames = ['q']
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    # writer.writeheader()
+                    writer.writerow({'q': i})
+
 
     def outputData(self):
         self.output_data_to_model()
@@ -1495,21 +1674,39 @@ class PDAgent(Agent):
             self.set_defaults(self.partner_IDs)
             self.get_IDs()
             for i in self.partner_IDs:
-                if self.model.learnFrom == "me":
-                    zeroes = []
-                    for j in range(self.delta):
-                        zeroes.append(0)
-                    self.oldstates[i] = zeroes
-                elif self.model.learnFrom == "them":
-                    zeroes = []
-                    for j in range(self.delta):
-                        zeroes.append(0)
-                    self.oldstates[i] = zeroes
-                elif self.model.learnFrom == "us":
-                    zeroes = []
-                    for j in range(self.delta):
-                        zeroes.append((0,0))
-                    self.oldstates[i] = zeroes
+                if self.strategy == "LEARN":
+                    if self.model.learnFrom == "me":
+                        zeroes = []
+                        for j in range(self.delta):
+                            zeroes.append(0)
+                        self.oldstates[i] = zeroes
+                    elif self.model.learnFrom == "them":
+                        zeroes = []
+                        for j in range(self.delta):
+                            zeroes.append(0)
+                        self.oldstates[i] = zeroes
+                    elif self.model.learnFrom == "us":
+                        zeroes = []
+                        for j in range(self.delta):
+                            zeroes.append((0,0))
+                        self.oldstates[i] = zeroes
+
+                if self.strategy == "MOODYLEARN":
+                    if self.model.moody_learnFrom == "me":
+                        zeroes = []
+                        for j in range(self.moody_delta):
+                            zeroes.append(0)
+                        self.moody_oldstates[i] = zeroes
+                    elif self.model.moody_learnFrom == "them":
+                        zeroes = []
+                        for j in range(self.moody_delta):
+                            zeroes.append(0)
+                        self.moody_oldstates[i] = zeroes
+                    elif self.model.moody_learnFrom == "us":
+                        zeroes = []
+                        for j in range(self.moody_delta):
+                            zeroes.append((0,0))
+                        self.moody_oldstates[i] = zeroes
 
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
@@ -1522,6 +1719,10 @@ class PDAgent(Agent):
                     # Initialise the q tables and states on the first turn
                     self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
                     self.states = copy.deepcopy(self.model.memory_states)
+                if self.strategy == 'MOODYLEARN':
+                    # Initialise the q tables and states on the first turn
+                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                    self.states = copy.deepcopy(self.model.moody_memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
@@ -1540,6 +1741,10 @@ class PDAgent(Agent):
                     # Initialise the q tables and states on the first turn
                     self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
                     self.states = copy.deepcopy(self.model.memory_states)
+                if self.strategy == 'MOODYLEARN':
+                    # Initialise the q tables and states on the first turn
+                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                    self.states = copy.deepcopy(self.model.moody_memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
@@ -1560,6 +1765,12 @@ class PDAgent(Agent):
                     if self.pp_aprime:
                         self.itermove_result = copy.deepcopy(self.pp_aprime)
                         # TODO: Do I then need to wipe the aprime dict?
+                elif self.strategy == 'MOODYLEARN':
+                    # if self.pp_aprime exists, itermove_result = copy.deepcopy(self.pp_aprime)
+                    # clear next_action?
+                    if self.moody_pp_aprime:
+                        self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
+                        # TODO: Do I then need to wipe the aprime dict?
                 else:
                     self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
@@ -1574,6 +1785,10 @@ class PDAgent(Agent):
                 if self.strategy == 'LEARN':
                     if self.pp_aprime:
                         self.itermove_result = copy.deepcopy(self.pp_aprime)
+                        # TODO: Do I then need to wipe the aprime dict?
+                elif self.strategy == 'MOODYLEARN':
+                    if self.moody_pp_aprime:
+                        self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
                         # TODO: Do I then need to wipe the aprime dict?
                 else:
                     self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
@@ -1595,7 +1810,6 @@ class PDAgent(Agent):
     def advance(self):
 
         if self.strategy == 'LEARN':
-
             self.check_partner()  # We took action a, what s prime did we end up in?
             # ----- WORKING MEMORY IS NOW S-PRIME -----
             round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime
@@ -1686,6 +1900,109 @@ class PDAgent(Agent):
                     self.outputQtable(True)
                 elif self.stepCount == self.model.rounds - 1:
                     self.outputQtable(False)
+
+            self.outputData()
+            self.stepCount += 1
+
+            if round_payoffs is not None:
+                if self.printing:
+                    print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
+                self.score += round_payoffs
+                # print("My total overall score is:", self.score)
+                return
+
+        elif self.strategy == 'MOODYLEARN':
+            self.check_partner()  # We took action a, what s prime did we end up in?
+            # ----- WORKING MEMORY IS NOW S-PRIME -----
+            round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime  #TODO: MIGHT NEED A MOODY INCREMENT_SCORE
+
+            # update the sprimes (the states we have found ourselves in)
+            # for i in self.working_memory:
+            #     state = self.working_memory[i]
+            #     obs = self.partner_latest_move[i]
+            #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
+
+            # get aprimes (next actions to do)
+            self.moody_pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory)
+
+            # update the Q for the CURRENT sprime
+
+            for i in self.partner_IDs:
+                s = self.moody_oldstates[i]           # the state I used to be in
+                a = self.itermove_result[i]     # the action I took
+                sprime = self.working_memory[i] # the state I found myself in
+                reward = self.moody_pp_payoff[i]      # the reward I observed
+                aprime = self.moody_pp_aprime[i]      # the action I will take next
+
+                # print('ostates=', self.oldstates)
+                # print('sstates=', self.itermove_result)
+                # print('sprimes=', self.working_memory)
+                if self.moody_delta == 1:
+                    if self.model.moody_memoryPaired:
+                        s = s[0]
+                oldQValues = self.moody_qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES     #TODO: THIS IS THE BIT THAT'S GONNA CHANGE FOR MULTIPLE Q TABLES
+
+                if a == 'C':  # This still works because it's keyed off the itermove_result and not part of the state
+                    idx = 0
+                elif a == 'D':
+                    idx = 1
+                #TODO: BASICALLY, WE'RE GONNA NEED TO DO THIS SECTION X TIMES, ONCE FOR EACH PARTNER    ->>>> HANG ON, WE DO THIS PART X TIMES ANYWAY, WE JUST NEED TO KEY QTABLES BY PARTNER ID_(KEY COULD BE [MYIDTHEIRID, e.g. 3432]
+
+                if self.moody_delta == 1:
+                    if self.model.moody_memoryPaired:
+                        sprime = sprime[0]  #TODO: WILL WE NEED 4 SPRIMES? - OR WAIT, ========= DO WE DO THIS WHOLE SECTION PER PARTNER?=====
+                newQValues = self.moody_qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?  #TODO: SEE ONE TODO ABOVE -> THIS IS GONNA CHANGE FROM MOODY_QTABLE TO ID_QTABLE, POSSIBLY
+                if aprime == 'C':
+                    idxprime = 0
+                elif aprime == 'D':
+                    idxprime = 1
+
+                Qsa = oldQValues[idx]
+                Qsaprime = newQValues[idxprime]
+
+                # update the Q value for the old state and old action
+
+                newQsa = sarsa_moody.update_q(reward, self.moody_gamma, self.moody_alpha, Qsa, Qsaprime)
+                # print('My old Q for this partner was:', Qsa, 'and my new Q is:', newQsa)
+                # then put newQ in the Qtable[s] at index idx
+                change = self.moody_qtable[tuple(s)]
+                change[idx] = newQsa
+                self.moody_qtable[tuple(s)] = change
+
+
+            # for i in self.working_memory:
+            #     state = self.working_memory[i]
+            #     my_move = self.itermove_result[i]
+            #     reward = self.pp_payoff[i]  # the unmanipulated value
+            #
+            #     # for the states I'm in, update the relevant q value
+            #     # access the qtable value we already have
+            #     oldQValues = self.qtable[state]   # THIS MIGHT BREAK BECAUSE OF TUPLES
+            #     if my_move == 'C':
+            #         idx = 0
+            #     elif my_move == 'D':
+            #         idx = 1
+            #
+            #     next_state = self.pp_sprime[i]
+            #     nextQValues = self.qtable[next_state]
+            #     nextQValue = nextQValues[idx]  # this is wrong, just want
+            #
+            #     oldQValue = oldQValues[idx]
+            #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
+
+            # update epsilon
+            self.moody_epsilon = sarsa_moody.decay_value(self.model.moody_epsilon, self.moody_epsilon, self.model.rounds, True, self.model.moody_epsilon_floor)
+            self.moody_alpha = sarsa_moody.decay_value(self.model.moody_alpha, self.moody_alpha, self.model.rounds, True, self.model.moody_alpha_floor)
+
+            # update s to be sprime
+            for i in self.partner_IDs:
+                self.moody_oldstates[i] = self.working_memory[i]
+
+            if self.model.moody_export_q:
+                if self.stepCount == 1:
+                    self.outputQtables(True)
+                elif self.stepCount == self.model.rounds - 1:
+                    self.outputQtables(False)
 
             self.outputData()
             self.stepCount += 1
