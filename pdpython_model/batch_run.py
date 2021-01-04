@@ -15,6 +15,7 @@ import sys
 import os
 import pickle
 from pdpython_model import statemaker
+from pdpython_model import statemaker_moody
 
 
 def get_num_coop_agents(model):
@@ -26,6 +27,7 @@ def get_num_coop_agents(model):
     # print("lol", agent_cooperations.item())
     return agent_cooperations.item()
 
+
 def get_num_defect_agents(model):
     """ return number of defections"""
 
@@ -34,6 +36,7 @@ def get_num_defect_agents(model):
     agent_defections = np.sum(agent_defections)
     # print("lol", agent_defections.item())
     return agent_defections.item()
+
 
 def get_cooperators(model):
     C_count = 0
@@ -59,6 +62,7 @@ def get_defectors(model):
 
     return D_count
 
+
 def get_tft_performance(model):
     """ For acquiring the sum total performance of a strategy"""
 
@@ -77,6 +81,7 @@ def get_tft_performance(model):
     # if sum(agent_scores) != 0:
         # print("tft scored", sum(agent_scores))
     return sum(agent_scores)
+
 
 def get_tft_cooperations(model):
     """ For acquiring the sum total cooperations of a strategy"""
@@ -97,6 +102,7 @@ def get_tft_cooperations(model):
         # print("tft cooped", sum(agent_coops))
     return sum(agent_coops)
 
+
 def get_vpp_performance(model):
     """ For acquiring the sum total performance of a strategy"""
 
@@ -115,6 +121,7 @@ def get_vpp_performance(model):
     # if sum(agent_scores) != 0:
         # print("vpp scored", sum(agent_scores))
     return sum(agent_scores)
+
 
 def get_vpp_cooperations(model):
     """ For acquiring the sum total cooperations of a strategy"""
@@ -135,6 +142,7 @@ def get_vpp_cooperations(model):
         # print("vpp cooped", sum(agent_coops))
     return sum(agent_coops)
 
+
 def get_wsls_performance(model):
     """ For acquiring the sum total performance of a strategy"""
 
@@ -153,6 +161,7 @@ def get_wsls_performance(model):
     # if sum(agent_scores) != 0:
     #     print("wsls scored", sum(agent_scores))
     return sum(agent_scores)
+
 
 def get_iwsls_performance(model):
     """ For acquiring the sum total performance of a strategy"""
@@ -173,6 +182,7 @@ def get_iwsls_performance(model):
     #     print("iwsls scored", sum(agent_scores))
     return sum(agent_scores)
 
+
 def get_wsls_cooperations(model):
     """ For acquiring the sum total cooperations of a strategy"""
 
@@ -191,6 +201,7 @@ def get_wsls_cooperations(model):
     # if sum(agent_coops) != 0:
     #     print("wsls cooped", sum(agent_coops))
     return sum(agent_coops)
+
 
 def get_iwsls_cooperations(model):
     """ For acquiring the sum total cooperations of a strategy"""
@@ -211,6 +222,7 @@ def get_iwsls_cooperations(model):
     #     print("iwsls cooped", sum(agent_coops))
     return sum(agent_coops)
 
+
 def get_learn_performance(model):
     """ For acquiring the sum total performance of a strategy"""
 
@@ -229,6 +241,7 @@ def get_learn_performance(model):
     # if sum(agent_scores) != 0:
         # print("vpp scored", sum(agent_scores))
     return sum(agent_scores)
+
 
 def get_learn_mutC(model):
     """ For acquiring the sum total performance of a strategy"""
@@ -249,6 +262,7 @@ def get_learn_mutC(model):
         # print("vpp scored", sum(agent_scores))
     return sum(agent_mutc)
 
+
 def get_learn_cooperations(model):
     """ For acquiring the sum total cooperations of a strategy"""
 
@@ -260,6 +274,66 @@ def get_learn_cooperations(model):
     agent_coops = []
     for i in strategy:
             if i == "LEARN":
+                indices = strategy.index(i)
+                agent = coops[indices]
+                agent_coops.append(agent)
+
+    # if sum(agent_coops) != 0:
+        # print("vpp cooped", sum(agent_coops))
+    return sum(agent_coops)
+
+
+def get_moodylearn_performance(model):
+    """ For acquiring the sum total performance of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    scores = [a.score for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_scores = []
+    for i in strategy:
+            if i == "MOODYLEARN":
+                indices = strategy.index(i)
+                agent = scores[indices]
+                agent_scores.append(agent)
+
+    # if sum(agent_scores) != 0:
+        # print("vpp scored", sum(agent_scores))
+    return sum(agent_scores)
+
+
+def get_moodylearn_mutC(model):
+    """ For acquiring the sum total performance of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    mutc = [a.mutual_c_outcome for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_mutc = []
+    for i in strategy:
+            if i == "MOODYLEARN":
+                indices = strategy.index(i)
+                agent = mutc[indices]
+                agent_mutc.append(agent)
+
+    # if sum(agent_scores) != 0:
+        # print("vpp scored", sum(agent_scores))
+    return sum(agent_mutc)
+
+
+def get_moodylearn_cooperations(model):
+    """ For acquiring the sum total cooperations of a strategy"""
+
+    # get the list of agent
+    strategy = [a.strategy for a in model.schedule.agents]
+    # get the list of agent performances
+    coops = [a.number_of_c for a in model.schedule.agents]
+    # for each in that list, when strategy = x y z, sum their number to a value
+    agent_coops = []
+    for i in strategy:
+            if i == "MOODYLEARN":
                 indices = strategy.index(i)
                 agent = coops[indices]
                 agent_coops.append(agent)
@@ -336,6 +410,23 @@ class PDModel(Model):
                  export_q=True,
                  alpha_floor=0.01,
                  epsilon_floor=0.05,
+
+                 moody_sarsa_spawn=True,  # should mean checkerboard
+                 moody_sarsa_training=True,
+                 moody_sarsa_testing=True,
+                 moody_sarsa_distro=0,
+                 moody_sarsa_oppo="TFT",
+                 moody_epsilon=0.99,
+                 moody_alpha=0.1,
+                 moody_gamma=0.95,
+                 moody_export_q=True,
+                 moody_alpha_floor=0.01,
+                 moody_epsilon_floor=0.05,
+                 moody_msize=1,  # the n of obj in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
+                 moody_memoryPaired=False,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
+                 moody_learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
+                 moody_chosenOne=7,
+
                  ):
 
         # ---------- Model Parameters --------
@@ -380,6 +471,22 @@ class PDModel(Model):
         self.alpha_floor = alpha_floor
         self.epsilon_floor = epsilon_floor
 
+        self.moody_msize = moody_msize
+        self.moody_memoryPaired = moody_memoryPaired
+
+        self.moody_sarsa_spawn = moody_sarsa_spawn
+        self.moody_sarsa_training = moody_sarsa_training
+        self.moody_sarsa_testing = moody_sarsa_testing
+        self.moody_sarsa_distro = moody_sarsa_distro
+        self.moody_sarsa_oppo = moody_sarsa_oppo
+        self.moody_alpha = moody_alpha
+        self.moody_gamma = moody_gamma
+        self.moody_epsilon = moody_epsilon
+        self.moody_export_q = moody_export_q
+        self.moody_learnFrom = moody_learnFrom
+        self.moody_chosenOne = moody_chosenOne
+        self.moody_alpha_floor = moody_alpha_floor
+        self.moody_epsilon_floor = moody_epsilon_floor
 
         if self.kNN_training:
             self.kNN_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
@@ -494,6 +601,9 @@ class PDModel(Model):
             "LEARN Performance": get_learn_performance,
             "MutualCooperations": get_learn_mutC,
             "LEARN Cooperations": get_learn_cooperations,
+            "moodyLEARN Performance": get_moodylearn_performance,
+            "moodyMutualCooperations": get_moodylearn_mutC,
+            "moodyLEARN Cooperations": get_moodylearn_cooperations,
             "Model Params": track_params,
         },
             agent_reporters={
@@ -502,7 +612,10 @@ class PDModel(Model):
             })
 
         self.memory_states = statemaker.get_memory_states(['C', 'D'], self.msize, self.memoryPaired)
+        self.moody_memory_states = statemaker_moody.get_memory_states(['C', 'D'], self.msize, self.memoryPaired)
         self.state_values = self.state_evaluation(self.memory_states)
+        self.moody_state_values = self.moody_state_evaluation(self.moody_memory_states)
+
         self.firstgame = self.first_game_check()
         self.agent_ppds = {}
         self.set_ppds()
@@ -687,6 +800,47 @@ class PDModel(Model):
 
         return state_value
 
+    def moody_state_evaluation(self, state_list):
+        # if self.stepCount == 1:
+
+        state_value = []
+        if not self.moody_memoryPaired:
+
+            for i in state_list:
+                current_value = 0
+                for j in range(len(i)):
+                    item = i[j]
+                    # print("Array", i, "Index", j, "Item", item)
+                    if item == 'C':
+                        current_value = current_value + (1 * j)  # Slight bias towards cooperation
+                    if item == 'D':
+                        current_value = current_value - (1 * j)
+                    if item == 0:
+                        current_value = current_value
+                state_value.append(current_value)
+
+        elif self.moody_memoryPaired:
+            for i in state_list:
+                counter = 0
+                i = list(i)
+                # print(i)
+                current_value = 0
+                for j in i:
+                    # item = i[1]  # should hopefully index the opponent's move in each of the pairs
+                    # TODO: I don't think state_evaluation currently affects anything but we will see
+                    item = j
+                    # print("Array", i, "Index", j, "Item", item)
+                    if item == 'C':
+                        current_value = current_value + (1 * counter)  # Should there be a slight bias towards C?
+                    if item == 'D':
+                        current_value = current_value - (1 * counter)
+                    if item == 0:
+                        current_value = current_value
+                    counter += 1
+                state_value.append(current_value)
+
+        return state_value
+
     def get_highest_score(self):
         scores = [a.score for a in self.schedule.agents]
         self.highest_score = max(scores)
@@ -753,7 +907,7 @@ class PDModel(Model):
                 self.grid.place_agent(pdagent, (x, y))
                 self.schedule.add(pdagent)
 
-    def export_q_tables(self, init):
+    def export_q_tables(self, init):                                    # Does this need a moody counterpart? =============================
         qs = [a.qtable for a in self.schedule.agents]
         # we need to print/save a list of the keys
         # then print/save each
@@ -842,6 +996,15 @@ class PDModel(Model):
                             # writer.writeheader()
                             writer.writerow({'state': j})
 
+            if self.moody_export_q:                                                                 # THIS MIGHT NOT WORK INITIALLY ======================================
+                for j in self.moody_memory_states:
+                    for k in range(2):
+                        with open('{} states_agent36.csv'.format(self.filename), 'a', newline='') as csvfile:
+                            fieldnames = ['state']
+                            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                            # writer.writeheader()
+                            writer.writerow({'state': j})
+
 
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
@@ -866,16 +1029,22 @@ br_params = {#"number_of_agents": [64],
              #"DD": [1],
              #"DC": [5],
              #"CD": [0],
-             "sarsa_oppo": [#"TFT",
-                            #"ANGEL", "DEVIL", "LEARN",
-                            #"VPP",
-                            #"RANDOM",
-                            #"WSLS",
-                            #"iWSLS"
-                            ],
+             "sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
+                            "MOODYLEARN"],
+
              #"learnFrom": ["them"],
              #"memoryPaired": [False],
              "msize": [1,
+                       #4,
+                       #7
+                       ],
+
+             "moody_alpha": [0.1],
+             "moody_gamma": [0.95],
+             "moody_epsilon": [0.99],
+             #"moody_learnFrom": ["them"],
+             #"moody_memoryPaired": [False],
+             "moody_msize": [1,
                        #4,
                        #7
                        ],
