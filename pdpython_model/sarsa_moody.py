@@ -32,6 +32,7 @@ def egreedy_action(e, qtable, current_state, paired):
             if paired:
                 current_state = current_state[0]
         # print('my state:', current_state)
+        # print("q", qtable)
         current = qtable[tuple(current_state)]
         # print('qvalues:', current)
         # pick the action with the highest Q value - if indx:0, C, if indx:1, D

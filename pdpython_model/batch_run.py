@@ -399,9 +399,9 @@ class PDModel(Model):
                  learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
                  chosenOne=7,
 
-                 sarsa_spawn=False,  # should mean checkerboard
-                 sarsa_training=False,          #TODO: THESE VARIABLES HAVE BEEN TURNED OFF FOR MOODY SARSA TESTING
-                 sarsa_testing=False,
+                 sarsa_spawn=True,  # should mean checkerboard
+                 sarsa_training=True,          #TODO: THESE VARIABLES HAVE BEEN TURNED OFF FOR MOODY SARSA TESTING
+                 sarsa_testing=True,
                  sarsa_distro=0,
                  sarsa_oppo="TFT",
                  epsilon=0.99,
@@ -411,9 +411,9 @@ class PDModel(Model):
                  alpha_floor=0.01,
                  epsilon_floor=0.05,
 
-                 moody_sarsa_spawn=True,  # should mean checkerboard
-                 moody_sarsa_training=True,
-                 moody_sarsa_testing=True,
+                 moody_sarsa_spawn=False,  # should mean checkerboard
+                 moody_sarsa_training=False,
+                 moody_sarsa_testing=False,
                  moody_sarsa_distro=0,
                  moody_sarsa_oppo="TFT",
                  moody_epsilon=0.99,
@@ -507,7 +507,7 @@ class PDModel(Model):
                                              44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT",
                                              26: "TFT",
                                              36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
-                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 12:"WSLS", 22: "WSLS",
+                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 22: "WSLS",
                                              25: "WSLS",
                                              35: "WSLS", 38: "WSLS", 41: "WSLS"}
 

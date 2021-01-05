@@ -325,9 +325,11 @@ class PDAgent(Agent):
                     # print("My ID is:", self.ID, "and my coordinates are", self)
                     if self.ID in check_a:
                         strat = choices[0]
+                        # print("I am in check_a and my strategy is now", strat)
                         return str(strat)
                     elif self.ID in check_b:
                         strat = choices[1]
+                        # print("I am in check_b and my strategy is now", strat)
                         return str(strat)
 
         else:
@@ -662,8 +664,10 @@ class PDAgent(Agent):
 
                     learning_state[j] = blank_list
 
-
-            egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]), self.model.memoryPaired)
+            if self.delta > 1:
+                egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]), self.model.memoryPaired)
+            else:
+                egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, learning_state[id], self.model.memoryPaired)
             if egreedy == "C":
                 self.number_of_c += 1
             elif egreedy == "D":
@@ -686,8 +690,12 @@ class PDAgent(Agent):
 
                     learning_state[j] = blank_list
 
+            # print("my learning state is", learning_state)
+            if self.moody_delta > 1:
+                egreedy = sarsa_moody.egreedy_action(self.moody_epsilon, self.moody_qtable, tuple(learning_state[id]), self.model.moody_memoryPaired)
+            else:
+                egreedy = sarsa_moody.egreedy_action(self.moody_epsilon, self.moody_qtable, learning_state[id], self.model.moody_memoryPaired)
 
-            egreedy = sarsa.egreedy_action(self.moody_epsilon, self.moody_qtable, tuple(learning_state[id]), self.model.moody_memoryPaired)
             if egreedy == "C":
                 self.number_of_c += 1
             elif egreedy == "D":
@@ -1668,7 +1676,13 @@ class PDAgent(Agent):
     def step(self):
         self.compare_score()
         self.reset_values()
+        #TODO: ARE YOU TELLING ME THIS WHOLE TIME, PICKSTRATEGY HAS DONE NOTHING?
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
+        # print("stepcount", self.stepCount)
+        if self.stepCount:
+            self.stepCount = 1
+        # print("stepcount", self.stepCount)
+        print("strat", self.strategy)
         if self.stepCount == 1:
             # self.strategy = self.pick_strategy()
             self.set_defaults(self.partner_IDs)
@@ -1691,22 +1705,25 @@ class PDAgent(Agent):
                             zeroes.append((0,0))
                         self.oldstates[i] = zeroes
 
-                if self.strategy == "MOODYLEARN":
+                elif self.strategy == "MOODYLEARN":
                     if self.model.moody_learnFrom == "me":
                         zeroes = []
                         for j in range(self.moody_delta):
                             zeroes.append(0)
                         self.moody_oldstates[i] = zeroes
+                        print("moody oldstates are:", self.moody_oldstates)
                     elif self.model.moody_learnFrom == "them":
                         zeroes = []
                         for j in range(self.moody_delta):
                             zeroes.append(0)
                         self.moody_oldstates[i] = zeroes
+                        print("moody oldstates are:", self.moody_oldstates)
                     elif self.model.moody_learnFrom == "us":
                         zeroes = []
                         for j in range(self.moody_delta):
                             zeroes.append((0,0))
                         self.moody_oldstates[i] = zeroes
+                        print("moody oldstates are:", self.moody_oldstates)
 
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
@@ -1721,8 +1738,8 @@ class PDAgent(Agent):
                     self.states = copy.deepcopy(self.model.memory_states)
                 if self.strategy == 'MOODYLEARN':
                     # Initialise the q tables and states on the first turn
-                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
-                    self.states = copy.deepcopy(self.model.moody_memory_states)
+                    self.moody_qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                    self.moody_states = copy.deepcopy(self.model.moody_memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
@@ -1743,7 +1760,8 @@ class PDAgent(Agent):
                     self.states = copy.deepcopy(self.model.memory_states)
                 if self.strategy == 'MOODYLEARN':
                     # Initialise the q tables and states on the first turn
-                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                    self.qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                    print("I made a moody qtable")
                     self.states = copy.deepcopy(self.model.moody_memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
@@ -1928,6 +1946,7 @@ class PDAgent(Agent):
             # update the Q for the CURRENT sprime
 
             for i in self.partner_IDs:
+                print("my oldstates were", self.moody_oldstates)
                 s = self.moody_oldstates[i]           # the state I used to be in
                 a = self.itermove_result[i]     # the action I took
                 sprime = self.working_memory[i] # the state I found myself in
