@@ -399,9 +399,9 @@ class PDModel(Model):
                  learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
                  chosenOne=7,
 
-                 sarsa_spawn=True,  # should mean checkerboard
-                 sarsa_training=True,          #TODO: THESE VARIABLES HAVE BEEN TURNED OFF FOR MOODY SARSA TESTING
-                 sarsa_testing=True,
+                 sarsa_spawn=False,  # should mean checkerboard
+                 sarsa_training=False,          #TODO: THESE VARIABLES HAVE BEEN TURNED OFF FOR MOODY SARSA TESTING
+                 sarsa_testing=False,
                  sarsa_distro=0,
                  sarsa_oppo="TFT",
                  epsilon=0.99,
@@ -411,9 +411,9 @@ class PDModel(Model):
                  alpha_floor=0.01,
                  epsilon_floor=0.05,
 
-                 moody_sarsa_spawn=False,  # should mean checkerboard
-                 moody_sarsa_training=False,
-                 moody_sarsa_testing=False,
+                 moody_sarsa_spawn=True,  # should mean checkerboard
+                 moody_sarsa_training=True,
+                 moody_sarsa_testing=True,
                  moody_sarsa_distro=0,
                  moody_sarsa_oppo="TFT",
                  moody_epsilon=0.99,
@@ -1043,8 +1043,8 @@ br_params = {#"number_of_agents": [64],
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
              "moody_epsilon": [0.99],
-             #"moody_learnFrom": ["them"],
-             #"moody_memoryPaired": [False],
+             "moody_learnFrom": ["them"],
+             "moody_memoryPaired": [False],
              "moody_msize": [1,
                        #4,
                        #7
@@ -1062,7 +1062,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=5,
+                 iterations=1,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

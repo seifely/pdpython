@@ -770,6 +770,7 @@ class PDAgent(Agent):
         state_value = state_values[index]
 
         # TODO: This section is probably going to break to all hell when the new statemaker is used
+        # I don't think it did?
 
         """" Now need to decide what the boundaries are for changing update value
             based on this state value that is returned... """
@@ -1012,7 +1013,10 @@ class PDAgent(Agent):
             # print("Outcome with partner %i was:" % i, outcome)
 
             self.per_partner_payoffs[i].append(outcome_payoff)
-            self.pp_payoff[i] = outcome_payoff
+            if self.strategy == "LEARN":
+                self.pp_payoff[i] = outcome_payoff
+            elif self.strategy == "MOODYLEARN":
+                self.moody_pp_payoff[i] = outcome_payoff
             self.indivAvPayoff[i] = statistics.mean(self.per_partner_payoffs[i])
             # print("My individual average payoff for partner", i, "is ", self.indivAvPayoff[i])
 
@@ -1372,7 +1376,7 @@ class PDAgent(Agent):
             class_list, classification = self.knn_analysis(game_utility, game_selfcoops, game_oppcoops, game_mutcoops,
                                                            game_ppd, training_data,
                                                            self.model.k)
-            priority = "U"  # out of options 'C', 'U', and // TODO
+            priority = "U"
 
             # print("My ID:", self.ID,
             #       "Partner ID:", i,
@@ -1553,7 +1557,6 @@ class PDAgent(Agent):
         relevant_data = self.BinaryPPDSearch(list,
                                              classification,
                                              (len(list)), 5)  # need to decide how many times to run this for
-                                             # TODO my GODS why is this not fucking working
         npRev = np.array(relevant_data)
         # if len(npRev) == 0:
             # print("I'm agent", self.ID, "and ", len(list), classification, optimisation_choice, len(relevant_data))
@@ -1641,7 +1644,7 @@ class PDAgent(Agent):
 
     def outputQtables(self, init):
         # if I am the chosen one
-        #TODO: FIX THIS SO IT OUTPUTS THE MULTIPLE Q TABLES THAT MOODY SARSA WILL HAVE
+        #TODO: FIX THIS SO IT OUTPUTS THE MULTIPLE Q TABLES THAT MOODY SARSA WILL REQUIRE
         qvalues = []
         if self.ID == self.model.moody_chosenOne:
             # get my qtable
@@ -1673,57 +1676,71 @@ class PDAgent(Agent):
         if self.model.collect_data:
             self.output_data_to_file(self.outcome_list)
 
+    def set_starting_oldstates(self, learning_from, size):
+        if learning_from == "me":
+            zeroes = []
+            for j in range(size):
+                zeroes.append(0)
+            return zeroes
+        elif learning_from == "them":
+            zeroes = []
+            for j in range(size):
+                zeroes.append(0)
+            return zeroes
+        elif learning_from == "us":
+            zeroes = []
+            for j in range(size):
+                zeroes.append((0, 0))
+            return zeroes
+
     def step(self):
         self.compare_score()
         self.reset_values()
-        #TODO: ARE YOU TELLING ME THIS WHOLE TIME, PICKSTRATEGY HAS DONE NOTHING?
         """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
-        # print("stepcount", self.stepCount)
-        if self.stepCount:
-            self.stepCount = 1
-        # print("stepcount", self.stepCount)
-        print("strat", self.strategy)
+
         if self.stepCount == 1:
-            # self.strategy = self.pick_strategy()
             self.set_defaults(self.partner_IDs)
             self.get_IDs()
             for i in self.partner_IDs:
-                if self.strategy == "LEARN":
-                    if self.model.learnFrom == "me":
-                        zeroes = []
-                        for j in range(self.delta):
-                            zeroes.append(0)
-                        self.oldstates[i] = zeroes
-                    elif self.model.learnFrom == "them":
-                        zeroes = []
-                        for j in range(self.delta):
-                            zeroes.append(0)
-                        self.oldstates[i] = zeroes
-                    elif self.model.learnFrom == "us":
-                        zeroes = []
-                        for j in range(self.delta):
-                            zeroes.append((0,0))
-                        self.oldstates[i] = zeroes
-
-                elif self.strategy == "MOODYLEARN":
-                    if self.model.moody_learnFrom == "me":
-                        zeroes = []
-                        for j in range(self.moody_delta):
-                            zeroes.append(0)
-                        self.moody_oldstates[i] = zeroes
-                        print("moody oldstates are:", self.moody_oldstates)
-                    elif self.model.moody_learnFrom == "them":
-                        zeroes = []
-                        for j in range(self.moody_delta):
-                            zeroes.append(0)
-                        self.moody_oldstates[i] = zeroes
-                        print("moody oldstates are:", self.moody_oldstates)
-                    elif self.model.moody_learnFrom == "us":
-                        zeroes = []
-                        for j in range(self.moody_delta):
-                            zeroes.append((0,0))
-                        self.moody_oldstates[i] = zeroes
-                        print("moody oldstates are:", self.moody_oldstates)
+                self.oldstates[i] = self.set_starting_oldstates(self.model.learnFrom, self.delta)
+                self.moody_oldstates[i] = self.set_starting_oldstates(self.model.moody_learnFrom, self.moody_delta)
+            # for i in self.partner_IDs:
+            #     if self.strategy == "LEARN":
+            #         if self.model.learnFrom == "me":
+            #             zeroes = []
+            #             for j in range(self.delta):
+            #                 zeroes.append(0)
+            #             self.oldstates[i] = zeroes
+            #         elif self.model.learnFrom == "them":
+            #             zeroes = []
+            #             for j in range(self.delta):
+            #                 zeroes.append(0)
+            #             self.oldstates[i] = zeroes
+            #         elif self.model.learnFrom == "us":
+            #             zeroes = []
+            #             for j in range(self.delta):
+            #                 zeroes.append((0,0))
+            #             self.oldstates[i] = zeroes
+            #
+            #     elif self.strategy == "MOODYLEARN":
+            #         if self.model.moody_learnFrom == "me":
+            #             zeroes = []
+            #             for j in range(self.moody_delta):
+            #                 zeroes.append(0)
+            #             self.moody_oldstates[i] = zeroes
+            #             print("moody oldstates are:", self.moody_oldstates)
+            #         elif self.model.moody_learnFrom == "them":
+            #             zeroes = []
+            #             for j in range(self.moody_delta):
+            #                 zeroes.append(0)
+            #             self.moody_oldstates[i] = zeroes
+            #             print("moody oldstates are:", self.moody_oldstates)
+            #         elif self.model.moody_learnFrom == "us":
+            #             zeroes = []
+            #             for j in range(self.moody_delta):
+            #                 zeroes.append((0,0))
+            #             self.moody_oldstates[i] = zeroes
+            #             print("moody oldstates are:", self.moody_oldstates)
 
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()
@@ -1761,7 +1778,6 @@ class PDAgent(Agent):
                 if self.strategy == 'MOODYLEARN':
                     # Initialise the q tables and states on the first turn
                     self.qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
-                    print("I made a moody qtable")
                     self.states = copy.deepcopy(self.model.moody_memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
@@ -1782,13 +1798,12 @@ class PDAgent(Agent):
                     #clear next_action?
                     if self.pp_aprime:
                         self.itermove_result = copy.deepcopy(self.pp_aprime)
-                        # TODO: Do I then need to wipe the aprime dict?
+                        # TO/DO: Do I then need to wipe the aprime dict?
                 elif self.strategy == 'MOODYLEARN':
                     # if self.pp_aprime exists, itermove_result = copy.deepcopy(self.pp_aprime)
                     # clear next_action?
                     if self.moody_pp_aprime:
                         self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
-                        # TODO: Do I then need to wipe the aprime dict?
                 else:
                     self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
@@ -1803,11 +1818,10 @@ class PDAgent(Agent):
                 if self.strategy == 'LEARN':
                     if self.pp_aprime:
                         self.itermove_result = copy.deepcopy(self.pp_aprime)
-                        # TODO: Do I then need to wipe the aprime dict?
+                        # TO/DO: Do I then need to wipe the aprime dict?
                 elif self.strategy == 'MOODYLEARN':
                     if self.moody_pp_aprime:
                         self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
-                        # TODO: Do I then need to wipe the aprime dict?
                 else:
                     self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
@@ -1827,6 +1841,7 @@ class PDAgent(Agent):
 
     def advance(self):
 
+        #TODO: THE BELOW NEEDS MOVING INTO A FUNCTION SOMEWHERE NOW THAT IS HAS BEEN DUPLICATED
         if self.strategy == 'LEARN':
             self.check_partner()  # We took action a, what s prime did we end up in?
             # ----- WORKING MEMORY IS NOW S-PRIME -----
@@ -1946,10 +1961,9 @@ class PDAgent(Agent):
             # update the Q for the CURRENT sprime
 
             for i in self.partner_IDs:
-                print("my oldstates were", self.moody_oldstates)
                 s = self.moody_oldstates[i]           # the state I used to be in
-                a = self.itermove_result[i]     # the action I took
-                sprime = self.working_memory[i] # the state I found myself in
+                a = self.itermove_result[i]           # the action I took
+                sprime = self.working_memory[i]       # the state I found myself in
                 reward = self.moody_pp_payoff[i]      # the reward I observed
                 aprime = self.moody_pp_aprime[i]      # the action I will take next
 
