@@ -416,13 +416,13 @@ class PDModel(Model):
                  moody_sarsa_testing=True,
                  moody_sarsa_distro=0,
                  moody_sarsa_oppo="TFT",
-                 moody_epsilon=0.99,
+                 moody_epsilon=0.1,
                  moody_alpha=0.1,
                  moody_gamma=0.95,
                  moody_export_q=True,
                  moody_alpha_floor=0.01,
-                 moody_epsilon_floor=0.05,
-                 moody_msize=1,  # the n of obj in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
+                 moody_epsilon_floor=0.01,
+                 moody_msize=20,  # the n of obj in short memory, e.g. 2 =[('C', 'C')] or [('C', 'C'), ('C', 'D')] if paired
                  moody_memoryPaired=False,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
                  moody_learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
                  moody_chosenOne=6,
@@ -1043,12 +1043,6 @@ br_params = {#"number_of_agents": [64],
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
              "moody_epsilon": [0.99],
-             "moody_learnFrom": ["them"],
-             "moody_memoryPaired": [False],
-             "moody_msize": [1,
-                       #4,
-                       #7
-                       ],
              "moody_sarsa_oppo": ["TFT",
                             # "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
                             #"MOODYLEARN"

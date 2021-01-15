@@ -136,6 +136,7 @@ class PDAgent(Agent):
         self.qtable = []
 
         # ----------------------- MOODY SARSA GLOBALS ---------------------------
+        self.mood = 50  # A value between 0 and 100
 
         self.moody_states = []
         self.moody_pp_sprime = {}
@@ -1670,7 +1671,6 @@ class PDAgent(Agent):
                     # writer.writeheader()
                     writer.writerow({'q': i})
 
-
     def outputData(self):
         self.output_data_to_model()
         if self.model.collect_data:
@@ -1704,43 +1704,6 @@ class PDAgent(Agent):
             for i in self.partner_IDs:
                 self.oldstates[i] = self.set_starting_oldstates(self.model.learnFrom, self.delta)
                 self.moody_oldstates[i] = self.set_starting_oldstates(self.model.moody_learnFrom, self.moody_delta)
-            # for i in self.partner_IDs:
-            #     if self.strategy == "LEARN":
-            #         if self.model.learnFrom == "me":
-            #             zeroes = []
-            #             for j in range(self.delta):
-            #                 zeroes.append(0)
-            #             self.oldstates[i] = zeroes
-            #         elif self.model.learnFrom == "them":
-            #             zeroes = []
-            #             for j in range(self.delta):
-            #                 zeroes.append(0)
-            #             self.oldstates[i] = zeroes
-            #         elif self.model.learnFrom == "us":
-            #             zeroes = []
-            #             for j in range(self.delta):
-            #                 zeroes.append((0,0))
-            #             self.oldstates[i] = zeroes
-            #
-            #     elif self.strategy == "MOODYLEARN":
-            #         if self.model.moody_learnFrom == "me":
-            #             zeroes = []
-            #             for j in range(self.moody_delta):
-            #                 zeroes.append(0)
-            #             self.moody_oldstates[i] = zeroes
-            #             print("moody oldstates are:", self.moody_oldstates)
-            #         elif self.model.moody_learnFrom == "them":
-            #             zeroes = []
-            #             for j in range(self.moody_delta):
-            #                 zeroes.append(0)
-            #             self.moody_oldstates[i] = zeroes
-            #             print("moody oldstates are:", self.moody_oldstates)
-            #         elif self.model.moody_learnFrom == "us":
-            #             zeroes = []
-            #             for j in range(self.moody_delta):
-            #                 zeroes.append((0,0))
-            #             self.moody_oldstates[i] = zeroes
-            #             print("moody oldstates are:", self.moody_oldstates)
 
             if self.strategy is None or 0 or []:
                 self.strategy = self.pick_strategy()

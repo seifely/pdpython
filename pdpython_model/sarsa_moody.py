@@ -1,7 +1,18 @@
 import random
+import math
 
+def observe_state(obsAction, oppID, oppMood):
+    """Keeping this as a separate method in case we want to manipulate the observation somehow,
+    like with noise (x chance we make an observational mistake, etc)."""
+    state = []
+    state.append(obsAction)
+    state.append(oppID)
+    state.append(oppMood)
+    # Returns a list, but this should be utilised as a tuple when used to key a Q value
+    return state
 
 def init_qtable(states, n_actions, zeroes):
+    """First value is for cooperate, second value is for defect."""
     iqtable = {}   # does this want to be a list or a dict?
 
     for i in states:
@@ -18,30 +29,73 @@ def init_qtable(states, n_actions, zeroes):
 
     return iqtable
 
-
-def egreedy_action(e, qtable, current_state, paired):
-    """ Qtable should be a dict keyed by the states - tuples of 7 values. """
-
-    p = random.random()
-
-    if p < e:
-        return random.choice(["C", "D"])
+# TODO: Have something in agents which is todo, if todo is blank then set it to cooperate?
+def moody_action(mood, state, moveplayed, qtable, moodAffectMode, epsilon, fixedAmount):
+    """ Fixed Amount should be in the model as a test parameter MA """
+    change = epsilon  # not sure why change is set to epsilon to start with ???
+    r = random.randint(1, 100) / 100
+    if r > 0:
+        todo = 'C'
     else:
-        # index qtable by current_state
-        if len(current_state) == 1:
-            if paired:
-                current_state = current_state[0]
-        # print('my state:', current_state)
-        # print("q", qtable)
-        current = qtable[tuple(current_state)]
-        # print('qvalues:', current)
-        # pick the action with the highest Q value - if indx:0, C, if indx:1, D
-        if current[0] > current[1]:
-            return "C"
-        elif current[1] > current[0]:  # this might need to be an elif, but with two behaviours it's fine
-            return "D"
+        todo = 'D'
+
+    # index qtable by current state
+    current = qtable[tuple(state)]
+    if current[1] > current[0]:
+        if mood > 70 and moodAffectMode == 'Fixed':
+            change = fixedAmount
+        elif mood > 70 and moodAffectMode == 'Mood':
+            change = ((mood - 50) / 100)
+
+        if r > (1-change):  # is this a bit like egreedy's epsilon decay with optimal over exploration?
+            todo = 'D'
         else:
-            return random.choice(["C", "D"])
+            todo = 'C'
+
+    elif current[0] > current[1]:
+        if mood < 30 and moodAffectMode == 'Fixed':
+            change = fixedAmount
+        elif mood < 30 and moodAffectMode == 'Mood':
+            change = ((50 - mood) / 100)
+
+        if r < (1-change):
+            todo = 'C'
+        else:
+            todo = 'D'
+
+    return todo
+
+def getMoodType(mood):
+    if mood > 70:
+        return 'HIGH'
+    elif mood < 30:
+        return 'LOW'
+    else:
+        return 'NEUTRAL'
+
+# def egreedy_action(e, qtable, current_state, paired):
+#     """ Qtable should be a dict keyed by the states - tuples of 7 values. """
+#
+#     p = random.random()
+#
+#     if p < e:
+#         return random.choice(["C", "D"])
+#     else:
+#         # index qtable by current_state
+#         if len(current_state) == 1:
+#             if paired:
+#                 current_state = current_state[0]
+#         # print('my state:', current_state)
+#         # print("q", qtable)
+#         current = qtable[tuple(current_state)]
+#         # print('qvalues:', current)
+#         # pick the action with the highest Q value - if indx:0, C, if indx:1, D
+#         if current[0] > current[1]:
+#             return "C"
+#         elif current[1] > current[0]:  # this might need to be an elif, but with two behaviours it's fine
+#             return "D"
+#         else:
+#             return random.choice(["C", "D"])
 
 
 def sarsa_decision(alpha, epsilon, gamma):
@@ -79,13 +133,62 @@ def decay_value(initial, current, max_round, linear, floor):
         else:
             return new_value
 
+def update_q(step_number, actionTaken, state, qtable, payoff, memory, currMood):
+    # TODO: Need to manage memory outside of this function, as we do with working memory /
+    # TODO: Needs to be a NEW memory of payoffs gained instead of moves observed
+    """THIS RETURNS UPDATED Q VALUES FROM OLD Q VALUES"""
+    current = qtable[tuple(state)]
+    if step_number is not None:
+        if step_number is not 0:
+            if actionTaken == 'C':
+                current[0] = learn(current[0], payoff, memory, currMood)
+                return current[0], current[1]
+            else:
+                current[1] = learn(current[1], payoff, memory, currMood)
+                return current[0], current[1]
+        else:
+            if actionTaken == 'C':
+                current[0] = payoff
+                current[1] = 0
+                return current[0], current[1]
+            else:
+                current[0] = 0
+                current[1] = payoff
+                return current[0], current[1]
+    else:
+        if actionTaken == 'C':
+            current[0] = payoff
+            current[1] = 0
+            return current[0], current[1]
+        else:
+            current[0] = 0
+            current[1] = payoff
+            return current[0], current[1]
 
-def update_q(reward, gamma, alpha, oldQ, nextQ):
-    """ Where nextQ is determined by the epsilon greedy choice that has already been made. """
 
-    newQ = oldQ + alpha * (reward + ((gamma*nextQ) - oldQ))
+# def update_q(reward, gamma, alpha, oldQ, nextQ):
+#     """ Where nextQ is determined by the epsilon greedy choice that has already been made. """
+#
+#     newQ = oldQ + alpha * (reward + ((gamma*nextQ) - oldQ))
+#     return newQ
+#
 
+def learn(oldQ, reward, memory, mood):
+    newQ = oldQ + 0.1 * (reward + (0.95*estimateFutureRewards(mood, memory)) - oldQ)
     return newQ
+
+def estimateFutureRewards(mood, memory):
+    percentToLookAt = (100 - mood) / 100
+    actualAmount = math.ceil((len(memory) * percentToLookAt))
+
+    tot = sum(memory[0:actualAmount+1])
+    return tot/actualAmount
+
+
+def update_mood(currentmood, score, averageScore, oppScore, oppAverage):
+    ab = (100 - currentmood) / 100
+    u = averageScore - ((ab * max(oppAverage - averageScore)))
+
 
 
 # to integrate SVO into sarsa, we could try two methods
