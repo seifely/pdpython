@@ -187,8 +187,12 @@ def estimateFutureRewards(mood, memory):
 
 def update_mood(currentmood, score, averageScore, oppScore, oppAverage):
     ab = (100 - currentmood) / 100
-    u = averageScore - ((ab * max(oppAverage - averageScore)))
+    u = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))
+    dif = score - u
 
+    newMood = min(99.999, (currentmood + dif))
+    newMood = max(0.0001, newMood)
+    return newMood
 
 
 # to integrate SVO into sarsa, we could try two methods
