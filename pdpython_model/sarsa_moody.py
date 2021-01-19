@@ -1,13 +1,19 @@
 import random
 import math
 
-def observe_state(obsAction, oppID, oppMood):
+def observe_state(obsAction, oppID, oppMood, stateMode):
     """Keeping this as a separate method in case we want to manipulate the observation somehow,
     like with noise (x chance we make an observational mistake, etc)."""
     state = []
-    state.append(obsAction)
-    state.append(oppID)
-    state.append(oppMood)
+    if stateMode == 'stateless':
+        state.append(obsAction)
+    elif stateMode == 'agentstate':
+        state.append(obsAction)
+        state.append(oppID)
+    elif stateMode == 'moodstate':
+        state.append(obsAction)
+        state.append(oppID)
+        state.append(oppMood)
     # Returns a list, but this should be utilised as a tuple when used to key a Q value
     return state
 
@@ -29,41 +35,50 @@ def init_qtable(states, n_actions, zeroes):
 
     return iqtable
 
-# TODO: Have something in agents which is todo, if todo is blank then set it to cooperate?
-def moody_action(mood, state, moveplayed, qtable, moodAffectMode, epsilon, fixedAmount):
+
+def moody_action(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
     """ Fixed Amount should be in the model as a test parameter MA """
-    change = epsilon  # not sure why change is set to epsilon to start with ???
-    r = random.randint(1, 100) / 100
+    change = epsilon  # not sure why change is set to epsilon to start with --> in case none of the loops take effect
+    # TODO: part of this function needs to produce an altered epsilon value
+    epsChange = 0  # this should stay at no change if mood isn't high or low
+
+    r = random.randint(1, 100) / 100  # Still not sure about this line and below, it might need to be if r > 50?
     if r > 0:
         todo = 'C'
     else:
         todo = 'D'
+    # Inititally starts with cooperation
 
     # index qtable by current state
     current = qtable[tuple(state)]
     if current[1] > current[0]:
         if mood > 70 and moodAffectMode == 'Fixed':
-            change = fixedAmount
+            change = moodAffect
+            epsChange = change
         elif mood > 70 and moodAffectMode == 'Mood':
             change = ((mood - 50) / 100)
+            epsChange = change
 
-        if r > (1-change):  # is this a bit like egreedy's epsilon decay with optimal over exploration?
+        if r > (1-change):  # because change is epsilon, this section is the e-greedy choice making
             todo = 'D'
         else:
             todo = 'C'
 
     elif current[0] > current[1]:
         if mood < 30 and moodAffectMode == 'Fixed':
-            change = fixedAmount
+            change = moodAffect
+            epsChange = change
         elif mood < 30 and moodAffectMode == 'Mood':
             change = ((50 - mood) / 100)
+            epsChange = change
 
         if r < (1-change):
             todo = 'C'
         else:
             todo = 'D'
 
-    return todo
+    newEps = epsilon + epsChange
+    return todo, newEps
 
 def getMoodType(mood):
     if mood > 70:
@@ -193,6 +208,19 @@ def update_mood(currentmood, score, averageScore, oppScore, oppAverage):
     newMood = min(99.999, (currentmood + dif))
     newMood = max(0.0001, newMood)
     return newMood
+
+
+def get_payoff(myMove, oppMove, CCpayoff, DDpayoff, CDpayoff, DCpayoff):
+    outcome = [myMove, oppMove]
+
+    if outcome == ['C', 'C']:
+        return CCpayoff
+    elif outcome == ['C', 'D']:
+        return CDpayoff
+    elif outcome == ['D', 'C']:
+        return DCpayoff
+    else:
+        return DDpayoff
 
 
 # to integrate SVO into sarsa, we could try two methods

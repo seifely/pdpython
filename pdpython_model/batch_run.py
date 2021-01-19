@@ -426,7 +426,8 @@ class PDModel(Model):
                  moody_memoryPaired=False,  # set to True for states/memory items as paired outcomes, e.g. ('C', 'D')
                  moody_learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
                  moody_chosenOne=6,
-
+                 moody_statemode='stateless',
+                 moody_MA=1,
                  ):
 
         # ---------- Model Parameters --------
@@ -487,6 +488,8 @@ class PDModel(Model):
         self.moody_chosenOne = moody_chosenOne
         self.moody_alpha_floor = moody_alpha_floor
         self.moody_epsilon_floor = moody_epsilon_floor
+        self.moody_statemode = moody_statemode
+        self.moody_MA = moody_MA
 
         if self.kNN_training:
             self.kNN_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
@@ -616,7 +619,7 @@ class PDModel(Model):
                 "Defections": lambda x: x.number_of_d
             })
 
-        self.memory_states = statemaker.get_memory_states(['C', 'D'], self.msize, self.memoryPaired)
+        self.memory_states = statemaker.get_memory_states([0, 'C', 'D'], self.msize, self.memoryPaired)
         self.moody_memory_states = statemaker_moody.get_memory_states(['C', 'D'], self.msize, self.memoryPaired)
         self.state_values = self.state_evaluation(self.memory_states)
         self.moody_state_values = self.moody_state_evaluation(self.moody_memory_states)
@@ -1029,10 +1032,10 @@ br_params = {#"number_of_agents": [64],
              #"gamma": [0.95],
              #"epsilon": [0.99],
              #"sarsa_distro": [0.25, 0.50, 0.75],
-             #"CC": [3],
-             #"DD": [1],
-             #"DC": [5],
-             #"CD": [0],
+             "CC": [3],
+             "DD": [1],
+             "DC": [5],
+             "CD": [0],
              #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
                             #"MOODYLEARN"],
 
@@ -1042,11 +1045,15 @@ br_params = {#"number_of_agents": [64],
 
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
-             "moody_epsilon": [0.99],
+             "moody_epsilon": [0.1],
              "moody_sarsa_oppo": ["TFT",
                             # "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
                             #"MOODYLEARN"
                                   ],
+             "moody_statemode": ['stateless', 'agentstate', 'moodstate'],
+             "moody_MA": [0, 'v',
+                          #0.2, 0.4, 0.6, 0.8,
+                          ],
              }
 
 

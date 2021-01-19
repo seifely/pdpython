@@ -8,6 +8,7 @@ from scipy.spatial import distance as dst
 import copy
 from pdpython_model import sarsa
 from pdpython_model import sarsa_moody
+import math
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
@@ -114,6 +115,7 @@ class PDAgent(Agent):
         self.globalAvPayoff = 0
         self.globalHighPayoff = 0  # effectively the highscore
         self.indivAvPayoff = {}
+        # self.oppAvPayoff = {}
         self.proportional_score = 0  # this is used by the visualiser
 
         # self.average_payoff = 0  # should this be across partners or between them?
@@ -148,8 +150,9 @@ class PDAgent(Agent):
         self.moody_alpha = copy.deepcopy(self.model.moody_alpha)
         self.moody_gamma = copy.deepcopy(self.model.moody_gamma)
 
-        # Per Partner Q Tables
         self.moody_qtable = []
+        self.partner_moods = {}
+        self.statemode = self.model.moody_statemode
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
@@ -692,16 +695,36 @@ class PDAgent(Agent):
                     learning_state[j] = blank_list
 
             # print("my learning state is", learning_state)
-            if self.moody_delta > 1:
-                egreedy = sarsa_moody.egreedy_action(self.moody_epsilon, self.moody_qtable, tuple(learning_state[id]), self.model.moody_memoryPaired)
+            # if self.moody_delta > 1:
+            #     egreedy = sarsa_moody.egreedy_action(self.moody_epsilon, self.moody_qtable, tuple(learning_state[id]), self.model.moody_memoryPaired)
+            # else:
+            #     egreedy = sarsa_moody.egreedy_action(self.moody_epsilon, self.moody_qtable, learning_state[id], self.model.moody_memoryPaired)
+            if self.model.moody_MA is not 'v':
+                moodAffectMode = 'Fixed'
             else:
-                egreedy = sarsa_moody.egreedy_action(self.moody_epsilon, self.moody_qtable, learning_state[id], self.model.moody_memoryPaired)
+                moodAffectMode = 'Mood'
 
-            if egreedy == "C":
+
+            if self.moody_delta > 1:
+                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action(self.mood, sarsa_moody.observe_state(self.partner_latest_move[id],
+                                                                                           id, self.partner_moods[id],
+                                                                                           self.statemode),
+                                                      self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA)
+            else:
+                # this doesn't need to be here, not sure why the original version it was copied from was like this
+                # but I will leave it for now because it works
+                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action(self.mood, sarsa_moody.observe_state(self.partner_latest_move[id],
+                                                                                           id, self.partner_moods[id],
+                                                                                           self.statemode),
+                                                      self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA)
+
+            #TODO: Should we be using epsilon, or 0.1, above??
+
+            if moodyBehav == "C":
                 self.number_of_c += 1
-            elif egreedy == "D":
+            elif moodyBehav == "D":
                 self.number_of_d += 1
-            return egreedy
+            return moodyBehav
 
     def change_update_value(self, partner_behaviour):
         """ Produce a [new update value] VALUE BY WHICH TO ALTER THE CURRENT UV given the current uv and the
@@ -823,6 +846,7 @@ class PDAgent(Agent):
                     partner_strategy = partner.strategy
                     partner_move = partner.itermove_result[self.ID]
                     partner_moves = partner.previous_moves
+                    partner_mood = sarsa_moody.getMoodType(partner.mood)
 
                     my_move = self.itermove_result[partner_ID]
 
@@ -854,11 +878,20 @@ class PDAgent(Agent):
                     if self.indivAvPayoff.get(partner_ID) is None:
                         self.indivAvPayoff[partner_ID] = 0
 
+                    if self.partner_moods.get(partner_ID) is None:
+                        self.partner_moods[partner_ID] = "NEUTRAL"
+
                     if self.per_partner_strategies.get(partner_ID) is None:
                         self.per_partner_strategies[partner_ID] = partner_strategy
 
                     if self.update_values.get(partner_ID) is None:  # add in default update value per partner
                         self.update_values[partner_ID] = self.init_uv  # this has to happen before change update value occurs!!
+
+                    # if self.oppAvPayoff.get(partner_ID) is None:
+                    #     self.indivAvPayoff[partner_ID] = 0
+                    #
+                    # if self.myAvPayoff.get(partner_ID) is None:
+                    #     self.indivAvPayoff[partner_ID] = 0
 
                     """ Below is the code for adding to and/or updating self.working_memory.
                      if WM does not have a key for current partner's ID in it, we open one
@@ -921,12 +954,13 @@ class PDAgent(Agent):
                                 # TODO: Change the above so it doesn't need to work on just 7-count opponent values
 
                     if self.strategy == "MOODYLEARN":
+                        self.partner_moods[partner_ID] = partner_mood
                         if self.model.moody_learnFrom != "us":
                             if self.working_memory.get(partner_ID) is None:
                                 zeroes = []
                                 for j in range(self.moody_delta-1):
                                     zeroes.append(0)
-                                zeroes.append(partner_move)
+                                zeroes.append(sarsa_moody.get_payoff(my_move, partner_move, self.model.CC, self.model.DD, self.model.CD, self.model.DC))
                                 self.working_memory[partner_ID] = zeroes  # initialise with first value if doesn't exist
                             else:
                                 current_state = self.working_memory.pop(partner_ID)
@@ -934,44 +968,43 @@ class PDAgent(Agent):
                                 # first, check if it has more than three values
                                 if len(current_state) < self.moody_delta:  # if list hasn't hit delta, add in new move
                                     if self.model.moody_learnFrom == "them":
-                                        current_state.append(partner_move)
-                                    elif self.model.moody_learnFrom == "me":
-                                        current_state.append(my_move)
+                                        current_state.append(sarsa_moody.get_payoff(my_move, partner_move, self.model.CC, self.model.DD, self.model.CD, self.model.DC))
+                                    # elif self.model.moody_learnFrom == "me":
+                                    #     current_state.append(my_move)
                                 elif len(current_state) == self.moody_delta:
                                     current_state.pop(0)
                                     if self.model.moody_learnFrom == "them":
-                                        current_state.append(partner_move)  # we have the updated move list for that partner here
+                                        current_state.append(sarsa_moody.get_payoff(my_move, partner_move, self.model.CC, self.model.DD, self.model.CD, self.model.DC))
                                         current_uv = self.update_values[partner_ID]
 
                                         self.update_value = self.update_value + self.change_update_value(current_state)
-                                    elif self.model.moody_learnFrom == "me":
-                                        current_state.append(my_move)
+                                    # elif self.model.moody_learnFrom == "me":
+                                    #     current_state.append(my_move)
 
                                 # print('My current partner history is now:', current_state)
                                 self.working_memory[partner_ID] = current_state  # re-instantiate the memory to the bank
 
-                        elif self.model.moody_learnFrom == "us":
-                            if self.working_memory.get(partner_ID) is None:
-                                zeroes = []
-                                if self.moody_delta > 1:
-                                    for j in range(self.moody_delta-1):
-                                        zeroes.append((0,0))
-                                # print('mm', my_move, 'pm', partner_move)
-                                zeroes.append((my_move, partner_move))
-                                self.working_memory[partner_ID] = zeroes
-                            else:
-                                current_state = self.working_memory.pop(partner_ID)
-                                # print('mmm', my_move, 'pmm', partner_move)
-                                # print('len cs:', len(current_state), 'del', self.delta)
-                                if len(current_state) < self.moody_delta:
-                                    current_state.append((my_move, partner_move))
-                                elif len(current_state) == self.moody_delta:
-                                    current_state.pop(0)
-                                    current_state.append((my_move, partner_move))
-                                self.working_memory[partner_ID] = current_state
+                        # elif self.model.moody_learnFrom == "us":
+                        #     if self.working_memory.get(partner_ID) is None:
+                        #         zeroes = []
+                        #         if self.moody_delta > 1:
+                        #             for j in range(self.moody_delta-1):
+                        #                 zeroes.append((0,0))
+                        #         # print('mm', my_move, 'pm', partner_move)
+                        #         zeroes.append((my_move, partner_move))
+                        #         self.working_memory[partner_ID] = zeroes
+                        #     else:
+                        #         current_state = self.working_memory.pop(partner_ID)
+                        #         # print('mmm', my_move, 'pmm', partner_move)
+                        #         # print('len cs:', len(current_state), 'del', self.delta)
+                        #         if len(current_state) < self.moody_delta:
+                        #             current_state.append((my_move, partner_move))
+                        #         elif len(current_state) == self.moody_delta:
+                        #             current_state.pop(0)
+                        #             current_state.append((my_move, partner_move))
+                        #         self.working_memory[partner_ID] = current_state
 
                                 # self.update_value = self.update_value + self.change_update_value(current_state)
-                                # TODO: Change the above so it doesn't need to work on just 7-count opponent values
 
                     """" ======================================================================================== """
 
@@ -1643,34 +1676,6 @@ class PDAgent(Agent):
                     # writer.writeheader()
                     writer.writerow({'q': i})
 
-    def outputQtables(self, init):
-        # if I am the chosen one
-        #TODO: FIX THIS SO IT OUTPUTS THE MULTIPLE Q TABLES THAT MOODY SARSA WILL REQUIRE
-        qvalues = []
-        if self.ID == self.model.moody_chosenOne:
-            # get my qtable
-            for i in self.qtable:
-                pair = self.qtable[i]
-                for j in pair:
-                    qvalues.append(j)
-
-            # for each numerical value in it, append it to a new list
-            # for each item in that list, open up the csv and print it to it
-        if init:
-            for i in qvalues:
-                with open('{} qinit_agent6.csv'.format(self.model.filename), 'a', newline='') as csvfile:
-                    fieldnames = ['q']
-                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                    # writer.writeheader()
-                    writer.writerow({'q': i})
-        else:
-            for i in qvalues:
-                with open('{} qend_agent6.csv'.format(self.model.filename), 'a', newline='') as csvfile:
-                    fieldnames = ['q']
-                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                    # writer.writeheader()
-                    writer.writerow({'q': i})
-
     def outputData(self):
         self.output_data_to_model()
         if self.model.collect_data:
@@ -1692,6 +1697,26 @@ class PDAgent(Agent):
             for j in range(size):
                 zeroes.append((0, 0))
             return zeroes
+
+    def averageScoreComparison(self, oppID):
+        bound_checker = self.model.grid.out_of_bounds(oppID)
+        if not bound_checker:
+            this_cell = self.model.grid.get_cell_list_contents([oppID])
+
+            if len(this_cell) > 0:
+                partner = [obj for obj in this_cell
+                           if isinstance(obj, PDAgent)][0]
+
+                partner_ID = partner.ID
+                partner_score = partner.score
+                partner_payoffs = partner.per_partner_payoffs[self.ID]
+                partner_recent_payoff = partner_payoffs[len(partner_payoffs)-1]
+                partner_average = statistics.mean(partner_payoffs)
+
+        my_average = statistics.mean(self.per_partner_payoffs[oppID])
+
+        return my_average, partner_average, partner_score
+
 
     def step(self):
         self.compare_score()
@@ -1926,7 +1951,10 @@ class PDAgent(Agent):
             for i in self.partner_IDs:
                 s = self.moody_oldstates[i]           # the state I used to be in
                 a = self.itermove_result[i]           # the action I took
-                sprime = self.working_memory[i]       # the state I found myself in
+                """ This part below is different. Our sprime is now the state we observe from our opponent, not just our 
+                    payoff memory. """
+                sprime = sarsa_moody.observe_state(self.partner_latest_move[i], i, self.partner_moods[i],
+                                                   self.statemode)       # the state I found myself in
                 reward = self.moody_pp_payoff[i]      # the reward I observed
                 aprime = self.moody_pp_aprime[i]      # the action I will take next
 
@@ -1936,34 +1964,48 @@ class PDAgent(Agent):
                 if self.moody_delta == 1:
                     if self.model.moody_memoryPaired:
                         s = s[0]
-                oldQValues = self.moody_qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES     #TODO: THIS IS THE BIT THAT'S GONNA CHANGE FOR MULTIPLE Q TABLES
+                oldQValues = self.moody_qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES
 
-                if a == 'C':  # This still works because it's keyed off the itermove_result and not part of the state
-                    idx = 0
-                elif a == 'D':
-                    idx = 1
-                #TODO: BASICALLY, WE'RE GONNA NEED TO DO THIS SECTION X TIMES, ONCE FOR EACH PARTNER    ->>>> HANG ON, WE DO THIS PART X TIMES ANYWAY, WE JUST NEED TO KEY QTABLES BY PARTNER ID_(KEY COULD BE [MYIDTHEIRID, e.g. 3432]
 
-                if self.moody_delta == 1:
-                    if self.model.moody_memoryPaired:
-                        sprime = sprime[0]  #TODO: WILL WE NEED 4 SPRIMES? - OR WAIT, ========= DO WE DO THIS WHOLE SECTION PER PARTNER?=====
-                newQValues = self.moody_qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?  #TODO: SEE ONE TODO ABOVE -> THIS IS GONNA CHANGE FROM MOODY_QTABLE TO ID_QTABLE, POSSIBLY
-                if aprime == 'C':
-                    idxprime = 0
-                elif aprime == 'D':
-                    idxprime = 1
+                # Get the Q value we want to change, based on our state and our action
+                # qToChange = self.moody_qtable[tuple(s)]
 
-                Qsa = oldQValues[idx]
-                Qsaprime = newQValues[idxprime]
+                # if a == 'C':
+                #     idx = 0
+                # elif a == 'D':
+                #     idx = 1
+                #
+                # qToChange = qToChange[idx]
 
-                # update the Q value for the old state and old action
+                # get the updated Qs according to the function provided
+                updatedQs = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward, self.working_memory, self.mood)
 
-                newQsa = sarsa_moody.update_q(reward, self.moody_gamma, self.moody_alpha, Qsa, Qsaprime)
+                # if self.moody_delta == 1:
+                #     if self.model.moody_memoryPaired:
+                #         sprime = sprime[0]  #TODO: WILL WE NEED 4 SPRIMES? - OR WAIT, ========= DO WE DO THIS WHOLE SECTION PER PARTNER?=====
+                # newQValues = self.moody_qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?  #TODO: SEE ONE TODO ABOVE -> THIS IS GONNA CHANGE FROM MOODY_QTABLE TO ID_QTABLE, POSSIBLY
+                # if aprime == 'C':
+                #     idxprime = 0
+                # elif aprime == 'D':
+                #     idxprime = 1
+                #
+                # Qsa = oldQValues[idx]
+                # Qsaprime = newQValues[idxprime]
+                #
+                # # update the Q value for the old state and old action
+                #
+                # newQsa = sarsa_moody.update_q(reward, self.moody_gamma, self.moody_alpha, Qsa, Qsaprime)
                 # print('My old Q for this partner was:', Qsa, 'and my new Q is:', newQsa)
                 # then put newQ in the Qtable[s] at index idx
-                change = self.moody_qtable[tuple(s)]
-                change[idx] = newQsa
-                self.moody_qtable[tuple(s)] = change
+                # change = self.moody_qtable[tuple(s)]
+                # change[idx] = newQsa
+                self.moody_qtable[tuple(s)] = updatedQs
+
+                """Update mood here at the end of each interaction WITHIN a ROUND. This means that initial interactions
+                    in each round will influence subsequent interactions"""
+                myAv, oppAv, oppScore = self.averageScoreComparison(i)
+                self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+
 
 
             # for i in self.working_memory:
@@ -1987,12 +2029,20 @@ class PDAgent(Agent):
             #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
 
             # update epsilon
-            self.moody_epsilon = sarsa_moody.decay_value(self.model.moody_epsilon, self.moody_epsilon, self.model.rounds, True, self.model.moody_epsilon_floor)
-            self.moody_alpha = sarsa_moody.decay_value(self.model.moody_alpha, self.moody_alpha, self.model.rounds, True, self.model.moody_alpha_floor)
+            # self.moody_epsilon = sarsa_moody.decay_value(self.model.moody_epsilon, self.moody_epsilon, self.model.rounds, True, self.model.moody_epsilon_floor)
+            # self.moody_alpha = sarsa_moody.decay_value(self.model.moody_alpha, self.moody_alpha, self.model.rounds, True, self.model.moody_alpha_floor)
+            #TODO: I don't believe they decay any values?
 
             # update s to be sprime
             for i in self.partner_IDs:
-                self.moody_oldstates[i] = self.working_memory[i]
+                # self.moody_oldstates[i] = self.working_memory[i]
+                self.moody_oldstates[i] = sarsa_moody.observe_state(self.partner_latest_move[i], i, self.partner_moods,
+                                                                    self.statemode)
+
+                # Update how we feel
+                # TODO: update mood earlier, after each Q value update??
+                # myAv, oppAv, oppScore = self.averageScoreComparison(i)
+                # self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
 
             if self.model.moody_export_q:
                 if self.stepCount == 1:

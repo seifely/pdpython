@@ -10,7 +10,6 @@ def get_memory_states(behaviours, statemode, n_agents):
     mood_values = ["LOW", "NEUTRAL", "HIGH"] #THIS MIGHT NEED A GENERATOR ALL ON ITS OWN
     agents = list(range(1, n_agents+1))
 
-
     if statemode == "stateless":
         """Where agents only know about what they observed on that previous round"""
         permutations.append([0, ])
