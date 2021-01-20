@@ -620,7 +620,7 @@ class PDModel(Model):
             })
 
         self.memory_states = statemaker.get_memory_states([0, 'C', 'D'], self.msize, self.memoryPaired)
-        self.moody_memory_states = statemaker_moody.get_memory_states(['C', 'D'], self.msize, self.memoryPaired)
+        self.moody_memory_states = statemaker_moody.get_memory_states(['C', 'D'], self.moody_statemode, self.number_of_agents)
         self.state_values = self.state_evaluation(self.memory_states)
         self.moody_state_values = self.moody_state_evaluation(self.moody_memory_states)
 

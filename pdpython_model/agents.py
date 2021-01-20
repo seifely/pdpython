@@ -683,16 +683,17 @@ class PDAgent(Agent):
             if not learning_state:
                 for j in self.partner_IDs:
                     blank_list = []
-                    if self.model.moody_memoryPaired:
-                        # need to now vary the length of this depending on msize
-
-                        for n in range(self.moody_delta):
-                            blank_list.append((0, 0))
-                    elif not self.model.moody_memoryPaired:
-                        for n in range(self.moody_delta):
-                            blank_list.append(0)
-
+                    if self.statemode == 'stateless':
+                        blank_list.append((0))
+                    if self.statemode == 'agentstate':
+                        blank_list.append(((0, 0)))
+                    if self.statemode == 'moodstate':
+                        blank_list.append(((0, 0, 0)))
                     learning_state[j] = blank_list
+
+            # elif learning_state[id]:
+            #     learning_state[id] = sarsa_moody.observe_state(self.partner_latest_move[id], id, self.partner_moods[id],
+            #                                                                                self.statemode)
 
             # print("my learning state is", learning_state)
             # if self.moody_delta > 1:
@@ -705,17 +706,27 @@ class PDAgent(Agent):
                 moodAffectMode = 'Mood'
 
 
+            # print(self.partner_moods)
+            # print('latest move:', self.partner_latest_move[id])
+            # print('id:', id)
+            # print('partner_mood', self.partner_moods[id])
+            # print('statemode', self.statemode)
+
             if self.moody_delta > 1:
-                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action(self.mood, sarsa_moody.observe_state(self.partner_latest_move[id],
-                                                                                           id, self.partner_moods[id],
-                                                                                           self.statemode),
+                # print("Mood,", self.mood)
+                # print(' State:',sarsa_moody.observe_state(self.partner_latest_move[id],
+                #                                         id, self.partner_moods[id],
+                #                                         self.statemode))
+                # print(' Len Qtable:', len(self.moody_qtable))
+                # print(' MAM:', moodAffectMode)
+                # print(' e:', self.moody_epsilon)
+                # print(' MA:', self.model.moody_MA)
+                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action(self.mood, learning_state[id],
                                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA)
             else:
                 # this doesn't need to be here, not sure why the original version it was copied from was like this
                 # but I will leave it for now because it works
-                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action(self.mood, sarsa_moody.observe_state(self.partner_latest_move[id],
-                                                                                           id, self.partner_moods[id],
-                                                                                           self.statemode),
+                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action(self.mood, learning_state[id],
                                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA)
 
             #TODO: Should we be using epsilon, or 0.1, above??
@@ -1744,6 +1755,7 @@ class PDAgent(Agent):
                 if self.strategy == 'MOODYLEARN':
                     # Initialise the q tables and states on the first turn
                     self.moody_qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                    # print('init qtable len:', len(self.moody_qtable))
                     self.moody_states = copy.deepcopy(self.model.moody_memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
@@ -1766,6 +1778,7 @@ class PDAgent(Agent):
                 if self.strategy == 'MOODYLEARN':
                     # Initialise the q tables and states on the first turn
                     self.qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                    # print('init qtable len:', len(self.moody_qtable))
                     self.states = copy.deepcopy(self.model.moody_memory_states)
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)

@@ -31,6 +31,6 @@ def get_memory_states(behaviours, statemode, n_agents):
             for i2 in agents:
                 for i3 in mood_values:
                     permutations.append([i1, i2, i3])
-
+    
     return permutations
 
