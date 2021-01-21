@@ -32,7 +32,6 @@ def init_qtable(states, n_actions, zeroes):
 
         #print('indx=', indx, 'vu=', vu)
         iqtable[indx] = vu
-
     return iqtable
 
 
