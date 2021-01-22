@@ -1343,7 +1343,7 @@ class PDAgent(Agent):
                               'uv_%d' % self.ID,
                               'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
                               'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID,'avp4_%d' % self.ID,
-                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID]
+                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID]
             #     'p1', 'p2', 'p3', 'p4'
             else:
                 fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
@@ -1355,7 +1355,7 @@ class PDAgent(Agent):
                               'm4_%d' % self.ID, 'uv_%d' % self.ID,
                               'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
                               'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
-                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID]
+                              'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID]
 
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -1388,7 +1388,7 @@ class PDAgent(Agent):
                      'avp1_%d' % self.ID: avpay_partner_1, 'avp2_%d' % self.ID: avpay_partner_2,
                      'avp3_%d' % self.ID: avpay_partner_3, 'avp4_%d' % self.ID: avpay_partner_4,
                      'globav_%d' % self.ID: self.globalAvPayoff, 'epsilon_%d' % self.ID: self.epsilon,
-                     'alpha_%d' % self.ID: self.alpha})
+                     'alpha_%d' % self.ID: self.alpha, 'mood_%d' % self.ID: self.mood})
             #
             else:
                 writer.writerow(
@@ -1408,7 +1408,7 @@ class PDAgent(Agent):
                      'avp1_%d' % self.ID: avpay_partner_1, 'avp2_%d' % self.ID: avpay_partner_2,
                      'avp3_%d' % self.ID: avpay_partner_3, 'avp4_%d' % self.ID: avpay_partner_4,
                      'globav_%d' % self.ID: self.globalAvPayoff, 'epsilon_%d' % self.ID: self.epsilon,
-                     'alpha_%d' % self.ID: self.alpha})
+                     'alpha_%d' % self.ID: self.alpha, 'mood_%d' % self.ID: self.mood})
 
     def reset_values(self):
         """ Resets relevant global variables to default values. """
@@ -1783,7 +1783,7 @@ class PDAgent(Agent):
             my_average = self.indivAvPayoff[oppID]
             #TODO: does this need to give partner's score against me, or score as a whole? Because if ============================================================================================
             #TODO: it's the latter, you could use pp_utility from the opponent
-            return my_average, averages[oppID], self.moody_pp_oppPayoff[oppID]
+        return my_average, averages[oppID], self.moody_pp_oppPayoff[oppID]
 
 
     def step(self):
@@ -2054,7 +2054,7 @@ class PDAgent(Agent):
                 # qToChange = qToChange[idx]
 
                 # get the updated Qs according to the function provided
-                updatedQs = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward, self.working_memory[i], self.mood)
+                updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward, self.working_memory[i], self.mood)
 
                 # if self.moody_delta == 1:
                 #     if self.model.moody_memoryPaired:
@@ -2075,7 +2075,8 @@ class PDAgent(Agent):
                 # then put newQ in the Qtable[s] at index idx
                 # change = self.moody_qtable[tuple(s)]
                 # change[idx] = newQsa
-                self.moody_qtable[tuple(s)] = updatedQs
+                self.moody_qtable[tuple(s)][0] = updatedQone
+                self.moody_qtable[tuple(s)][1] = updatedQtwo
 
                 """Update mood here at the end of each interaction WITHIN a ROUND. This means that initial interactions
                     in each round will influence subsequent interactions"""
@@ -2123,9 +2124,9 @@ class PDAgent(Agent):
 
             if self.model.moody_export_q:
                 if self.stepCount == 1:
-                    self.outputQtables(True)
+                    self.outputQtable(True)
                 elif self.stepCount == self.model.rounds - 1:
-                    self.outputQtables(False)
+                    self.outputQtable(False)
 
             self.outputData()
             self.stepCount += 1

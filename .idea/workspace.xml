@@ -25,8 +25,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="443">
-              <caret line="1783" column="194" selection-start-line="1783" selection-start-column="194" selection-end-line="1783" selection-end-column="194" />
+            <state relative-caret-position="-289">
+              <caret line="1411" lean-forward="true" selection-start-line="1411" selection-end-line="1411" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#2337#2595#0" />
@@ -53,7 +53,6 @@
                 <element signature="e#42508#46244#0" />
                 <element signature="e#47020#50685#0" />
                 <element signature="e#50731#51372#0" />
-                <element signature="e#51427#63551#0" />
                 <element signature="e#63589#63781#0" />
                 <element signature="e#63989#66036#0" />
                 <element signature="e#66106#66753#0" />
@@ -65,7 +64,6 @@
                 <element signature="e#75722#76840#0" />
                 <element signature="e#78133#78252#0" />
                 <element signature="e#81229#82323#0" />
-                <element signature="e#84162#88702#0" />
                 <element signature="e#91685#91716#0" />
               </folding>
             </state>
@@ -75,8 +73,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="114">
-              <caret line="153" selection-start-line="153" selection-end-line="153" />
+            <state relative-caret-position="2110">
+              <caret line="153" column="34" selection-start-line="153" selection-start-column="34" selection-end-line="153" selection-end-column="34" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -116,7 +114,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.stat</find>
       <find>memory_s</find>
       <find>self.statemo</find>
       <find>learning_</find>
@@ -142,10 +139,11 @@
       <find>compare_score()</find>
       <find>compare_score(</find>
       <find>check_partner(</find>
-      <find>update_q</find>
       <find>averageSc</find>
       <find>IndivA</find>
       <find>try</find>
+      <find>update_q</find>
+      <find>moody_pp</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -430,8 +428,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="153" selection-start-line="153" selection-end-line="153" />
+        <state relative-caret-position="2110">
+          <caret line="153" column="34" selection-start-line="153" selection-start-column="34" selection-end-line="153" selection-end-column="34" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
@@ -440,8 +438,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="1783" column="194" selection-start-line="1783" selection-start-column="194" selection-end-line="1783" selection-end-column="194" />
+        <state relative-caret-position="-289">
+          <caret line="1411" lean-forward="true" selection-start-line="1411" selection-end-line="1411" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#2337#2595#0" />
@@ -468,7 +466,6 @@
             <element signature="e#42508#46244#0" />
             <element signature="e#47020#50685#0" />
             <element signature="e#50731#51372#0" />
-            <element signature="e#51427#63551#0" />
             <element signature="e#63589#63781#0" />
             <element signature="e#63989#66036#0" />
             <element signature="e#66106#66753#0" />
@@ -480,7 +477,6 @@
             <element signature="e#75722#76840#0" />
             <element signature="e#78133#78252#0" />
             <element signature="e#81229#82323#0" />
-            <element signature="e#84162#88702#0" />
             <element signature="e#91685#91716#0" />
           </folding>
         </state>
