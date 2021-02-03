@@ -18,6 +18,10 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="306">
               <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
+              <folding>
+                <element signature="e#1611#1832#0" />
+                <element signature="e#1899#2475#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -25,46 +29,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-289">
-              <caret line="1411" lean-forward="true" selection-start-line="1411" selection-end-line="1411" />
+            <state relative-caret-position="219">
+              <caret line="420" column="83" selection-start-line="420" selection-start-column="70" selection-end-line="420" selection-end-column="83" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
-                <element signature="e#2337#2595#0" />
-                <element signature="e#2650#2944#0" />
-                <element signature="e#2812#2844#0" />
-                <element signature="e#6251#7029#0" />
-                <element signature="e#7072#7678#0" />
-                <element signature="e#7724#8874#0" />
-                <element signature="e#8913#16973#0" />
-                <element signature="e#17059#17398#0" />
-                <element signature="e#17457#18671#0" />
-                <element signature="e#20451#20550#0" />
-                <element signature="e#20598#20693#0" />
-                <element signature="e#20793#22046#0" />
-                <element signature="e#22095#22298#0" />
-                <element signature="e#22344#23095#0" />
-                <element signature="e#23141#23497#0" />
-                <element signature="e#23544#25614#0" />
-                <element signature="e#25662#27114#0" />
-                <element signature="e#27160#27927#0" />
-                <element signature="e#27976#28259#0" />
-                <element signature="e#30733#35510#0" />
-                <element signature="e#35549#46970#0" />
-                <element signature="e#42508#46244#0" />
-                <element signature="e#47020#50685#0" />
-                <element signature="e#50731#51372#0" />
-                <element signature="e#63589#63781#0" />
-                <element signature="e#63989#66036#0" />
-                <element signature="e#66106#66753#0" />
-                <element signature="e#66822#68102#0" />
-                <element signature="e#68157#68551#0" />
-                <element signature="e#68652#72527#0" />
-                <element signature="e#72606#74229#0" />
-                <element signature="e#74272#75678#0" />
-                <element signature="e#75722#76840#0" />
-                <element signature="e#78133#78252#0" />
-                <element signature="e#81229#82323#0" />
-                <element signature="e#91685#91716#0" />
               </folding>
             </state>
           </provider>
@@ -73,8 +41,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2110">
-              <caret line="153" column="34" selection-start-line="153" selection-start-column="34" selection-end-line="153" selection-end-column="34" />
+            <state relative-caret-position="306">
+              <caret line="19" column="16" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -94,10 +62,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="586">
-              <caret line="786" column="21" selection-start-line="786" selection-start-column="16" selection-end-line="786" selection-end-column="21" />
+            <state relative-caret-position="16796">
+              <caret line="1054" column="33" selection-start-line="1054" selection-start-column="33" selection-end-line="1054" selection-end-column="33" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
+                <element signature="e#26346#26435#0" />
+                <element signature="e#26765#26807#0" />
               </folding>
             </state>
           </provider>
@@ -114,19 +84,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>memory_s</find>
-      <find>self.statemo</find>
-      <find>learning_</find>
-      <find>learning_state</find>
-      <find>pick_move</find>
-      <find>.get(</find>
-      <find>state</find>
-      <find>self.pick_mo</find>
-      <find>iter_pick_ne</find>
-      <find>moody_oldstates</find>
-      <find>set_starting_oldstates</find>
-      <find>old</find>
-      <find>oldstat</find>
       <find>sarsa_moody.</find>
       <find>sarsa_moody.upda</find>
       <find>self.working</find>
@@ -144,6 +101,19 @@
       <find>try</find>
       <find>update_q</find>
       <find>moody_pp</find>
+      <find>output_data</find>
+      <find>output_data_to_fil</find>
+      <find>outputData</find>
+      <find>open('{}.csv'.format(self.filename)</find>
+      <find>open(</find>
+      <find>outputDa</find>
+      <find>output_data_to_file</find>
+      <find>self.partner</find>
+      <find>self.</find>
+      <find>self.partner_states</find>
+      <find>partner_mood</find>
+      <find>self.pick_move</find>
+      <find>observe_state</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -157,8 +127,8 @@
         <option value="$PROJECT_DIR$/pdpython_model/sarsa.py" />
         <option value="$PROJECT_DIR$/pdpython_model/statemaker.py" />
         <option value="$USER_HOME$/Downloads/RLEmotionalconvert.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/statemaker_moody.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/sarsa_moody.py" />
         <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
       </list>
@@ -314,14 +284,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49919742" visible="true" weight="0.15226555" />
       <window_info id="Structure" order="1" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info id="Favorites" order="2" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32827735" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49947312" visible="true" weight="0.30119178" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49947312" weight="0.30119178" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -395,20 +364,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="586">
-          <caret line="786" column="21" selection-start-line="786" selection-start-column="16" selection-end-line="786" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/pdproject/Lib/site-packages/mesa/batchrunner.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1158">
           <caret line="160" column="32" lean-forward="true" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
+          <folding>
+            <element signature="e#1611#1832#0" />
+            <element signature="e#1899#2475#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="19" column="16" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -419,65 +399,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa.py">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2110">
-          <caret line="153" column="34" selection-start-line="153" selection-start-column="34" selection-end-line="153" selection-end-column="34" />
+        <state relative-caret-position="16796">
+          <caret line="1054" column="33" selection-start-line="1054" selection-start-column="33" selection-end-line="1054" selection-end-column="33" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#26346#26435#0" />
+            <element signature="e#26765#26807#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-289">
-          <caret line="1411" lean-forward="true" selection-start-line="1411" selection-end-line="1411" />
+        <state relative-caret-position="219">
+          <caret line="420" column="83" selection-start-line="420" selection-start-column="70" selection-end-line="420" selection-end-column="83" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#2337#2595#0" />
-            <element signature="e#2650#2944#0" />
-            <element signature="e#2812#2844#0" />
-            <element signature="e#6251#7029#0" />
-            <element signature="e#7072#7678#0" />
-            <element signature="e#7724#8874#0" />
-            <element signature="e#8913#16973#0" />
-            <element signature="e#17059#17398#0" />
-            <element signature="e#17457#18671#0" />
-            <element signature="e#20451#20550#0" />
-            <element signature="e#20598#20693#0" />
-            <element signature="e#20793#22046#0" />
-            <element signature="e#22095#22298#0" />
-            <element signature="e#22344#23095#0" />
-            <element signature="e#23141#23497#0" />
-            <element signature="e#23544#25614#0" />
-            <element signature="e#25662#27114#0" />
-            <element signature="e#27160#27927#0" />
-            <element signature="e#27976#28259#0" />
-            <element signature="e#30733#35510#0" />
-            <element signature="e#35549#46970#0" />
-            <element signature="e#42508#46244#0" />
-            <element signature="e#47020#50685#0" />
-            <element signature="e#50731#51372#0" />
-            <element signature="e#63589#63781#0" />
-            <element signature="e#63989#66036#0" />
-            <element signature="e#66106#66753#0" />
-            <element signature="e#66822#68102#0" />
-            <element signature="e#68157#68551#0" />
-            <element signature="e#68652#72527#0" />
-            <element signature="e#72606#74229#0" />
-            <element signature="e#74272#75678#0" />
-            <element signature="e#75722#76840#0" />
-            <element signature="e#78133#78252#0" />
-            <element signature="e#81229#82323#0" />
-            <element signature="e#91685#91716#0" />
+            <element signature="e#56554#56689#0" />
+            <element signature="e#56736#56880#0" />
+            <element signature="e#56927#57080#0" />
+            <element signature="e#57127#57289#0" />
+            <element signature="e#57336#57507#0" />
+            <element signature="e#57764#57891#0" />
+            <element signature="e#57938#58071#0" />
+            <element signature="e#58118#58257#0" />
+            <element signature="e#58304#58449#0" />
+            <element signature="e#58496#58647#0" />
+            <element signature="e#58936#59079#0" />
+            <element signature="e#59126#59275#0" />
+            <element signature="e#59322#59477#0" />
+            <element signature="e#59524#59685#0" />
+            <element signature="e#59732#59899#0" />
+            <element signature="e#60382#60513#0" />
+            <element signature="e#60560#60697#0" />
+            <element signature="e#60744#60887#0" />
+            <element signature="e#60934#61083#0" />
+            <element signature="e#61130#61285#0" />
           </folding>
         </state>
       </provider>

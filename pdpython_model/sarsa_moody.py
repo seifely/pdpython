@@ -4,6 +4,7 @@ import math
 def observe_state(obsAction, oppID, oppMood, stateMode):
     """Keeping this as a separate method in case we want to manipulate the observation somehow,
     like with noise (x chance we make an observational mistake, etc)."""
+    # print('oppmood', oppMood)
     state = []
     if stateMode == 'stateless':
         state.append(obsAction)
@@ -15,6 +16,7 @@ def observe_state(obsAction, oppID, oppMood, stateMode):
         state.append(oppID)
         state.append(oppMood)
     # Returns a list, but this should be utilised as a tuple when used to key a Q value
+    # print('state:', state)
     return state
 
 def init_qtable(states, n_actions, zeroes):

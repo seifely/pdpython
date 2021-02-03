@@ -542,7 +542,7 @@ class PDModel(Model):
         if self.sarsa_spawn:
             concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         elif self.moody_sarsa_spawn:
-            concatenator = ('testing_%s_%s_%s_moodysarsa_no_%s' % (self.moody_msize, self.moody_learnFrom, self.moody_sarsa_oppo, self.iteration_n), "a")
+            concatenator = ('testing_mA_%s_%s_%s_moodysarsa_no_%s' % (self.moody_MA, self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
@@ -1047,12 +1047,19 @@ br_params = {#"number_of_agents": [64],
              "moody_gamma": [0.95],
              "moody_epsilon": [0.1],
              "moody_sarsa_oppo": ["TFT",
-                            # "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
-                            #"MOODYLEARN"
+                             #"ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
+                             #"MOODYLEARN"
                                   ],
-             "moody_statemode": ['stateless', 'agentstate', 'moodstate'],
-             "moody_MA": [0, 'v',
-                          #0.2, 0.4, 0.6, 0.8,
+             "moody_statemode": [#'stateless',
+                                 #'agentstate',
+                                 'moodstate'
+                                 ],
+             "moody_MA": [0,
+                          0.2,
+                          0.4,
+                          0.6,
+                          0.8,
+                          'v',
                           ],
              }
 
@@ -1063,7 +1070,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
+                 iterations=3,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
