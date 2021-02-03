@@ -29,8 +29,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="219">
-              <caret line="420" column="83" selection-start-line="420" selection-start-column="70" selection-end-line="420" selection-end-column="83" />
+            <state relative-caret-position="-835">
+              <caret line="1423" column="72" lean-forward="true" selection-start-line="1423" selection-start-column="72" selection-end-line="1423" selection-end-column="72" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -62,7 +62,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="16796">
+            <state relative-caret-position="1198">
               <caret line="1054" column="33" selection-start-line="1054" selection-start-column="33" selection-end-line="1054" selection-end-column="33" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
@@ -145,7 +145,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -162,6 +161,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -284,6 +284,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49919742" visible="true" weight="0.15226555" />
       <window_info id="Structure" order="1" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
@@ -401,7 +402,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="16796">
+        <state relative-caret-position="1198">
           <caret line="1054" column="33" selection-start-line="1054" selection-start-column="33" selection-end-line="1054" selection-end-column="33" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
@@ -413,30 +414,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="420" column="83" selection-start-line="420" selection-start-column="70" selection-end-line="420" selection-end-column="83" />
+        <state relative-caret-position="-835">
+          <caret line="1423" column="72" lean-forward="true" selection-start-line="1423" selection-start-column="72" selection-end-line="1423" selection-end-column="72" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#56554#56689#0" />
-            <element signature="e#56736#56880#0" />
-            <element signature="e#56927#57080#0" />
-            <element signature="e#57127#57289#0" />
-            <element signature="e#57336#57507#0" />
-            <element signature="e#57764#57891#0" />
-            <element signature="e#57938#58071#0" />
-            <element signature="e#58118#58257#0" />
-            <element signature="e#58304#58449#0" />
-            <element signature="e#58496#58647#0" />
-            <element signature="e#58936#59079#0" />
-            <element signature="e#59126#59275#0" />
-            <element signature="e#59322#59477#0" />
-            <element signature="e#59524#59685#0" />
-            <element signature="e#59732#59899#0" />
-            <element signature="e#60382#60513#0" />
-            <element signature="e#60560#60697#0" />
-            <element signature="e#60744#60887#0" />
-            <element signature="e#60934#61083#0" />
-            <element signature="e#61130#61285#0" />
           </folding>
         </state>
       </provider>

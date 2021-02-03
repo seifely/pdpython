@@ -1363,6 +1363,7 @@ class PDAgent(Agent):
                          'strategy_%d' % self.ID: self.strategy,
                          'strat code_%d' % self.ID: strategy_code,
                          'move_%d' % self.ID: self.itermove_result,
+                         'probabilities_%d' % self.ID: self.ppD_partner,
                          'utility_%d' % self.ID: self.score,
                          'common_move_%d' % self.ID: self.common_move,
                          'number_coop_%d' % self.ID: self.number_of_c,
@@ -1396,7 +1397,7 @@ class PDAgent(Agent):
             try:
                 with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
                     fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
-                                  'move_%d' % self.ID,
+                                  'move_%d' % self.ID, 'probabilities_%d' % self.ID,
                                   'utility_%d' % self.ID, 'common_move_%d' % self.ID, 'number_coop_%d' % self.ID,
                                   'number_defect_%d' % self.ID,
                                   'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
@@ -1420,6 +1421,7 @@ class PDAgent(Agent):
                          'strategy_%d' % self.ID: self.strategy,
                          'strat code_%d' % self.ID: strategy_code,
                          'move_%d' % self.ID: self.itermove_result,
+                         'probabilities_%d' % self.ID: self.ppD_partner,
                          'utility_%d' % self.ID: self.score,
                          'common_move_%d' % self.ID: self.common_move,
                          'number_coop_%d' % self.ID: self.number_of_c,
