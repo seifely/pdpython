@@ -1046,20 +1046,19 @@ br_params = {#"number_of_agents": [64],
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
              "moody_epsilon": [0.1],
-             "moody_sarsa_oppo": ["TFT",
-                             #"ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
-                             #"MOODYLEARN"
+             "moody_sarsa_oppo": ["TFT",  #"LEARN", "MOODYLEARN",
+                             #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                   ],
              "moody_statemode": [#'stateless',
                                  #'agentstate',
                                  'moodstate'
                                  ],
-             "moody_MA": [0,
-                          0.2,
-                          0.4,
-                          0.6,
+             "moody_MA": [#0,
+                          #0.2,
+                          #0.4,
+                          #0.6,
                           0.8,
-                          'v',
+                          #'v',
                           ],
              }
 
@@ -1070,7 +1069,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
+                 iterations=1,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

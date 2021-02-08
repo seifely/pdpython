@@ -1166,32 +1166,34 @@ class PDAgent(Agent):
         for i in self.indivAvPayoff:
             average_list.append(self.indivAvPayoff[i])
 
+        print(average_list)
+
         avpay_partner_1 = 'None'
         avpay_partner_2 = 'None'
         avpay_partner_3 = 'None'
         avpay_partner_4 = 'None'
 
-        if len(prob_list) == 0:
+        if len(average_list) == 0:
             avpay_partner_1 = 'None'
             avpay_partner_2 = 'None'
             avpay_partner_3 = 'None'
             avpay_partner_4 = 'None'
-        elif len(prob_list) == 1:
+        elif len(average_list) == 1:
             avpay_partner_1 = average_list[0]
             avpay_partner_2 = 'None'
             avpay_partner_3 = 'None'
             avpay_partner_4 = 'None'
-        elif len(prob_list) == 2:
+        elif len(average_list) == 2:
             avpay_partner_1 = average_list[0]
             avpay_partner_2 = average_list[1]
             avpay_partner_3 = 'None'
             avpay_partner_4 = 'None'
-        elif len(prob_list) == 3:
+        elif len(average_list) == 3:
             avpay_partner_1 = average_list[0]
             avpay_partner_2 = average_list[1]
             avpay_partner_3 = average_list[2]
             avpay_partner_4 = 'None'
-        elif len(prob_list) == 4:
+        elif len(average_list) == 4:
             avpay_partner_1 = average_list[0]
             avpay_partner_2 = average_list[1]
             avpay_partner_3 = average_list[2]
@@ -1337,8 +1339,8 @@ class PDAgent(Agent):
                                   'move_%d' % self.ID,
                                   'probabilities_%d' % self.ID, 'utility_%d' % self.ID, 'common_move_%d' % self.ID,
                                   'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
-                                  'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
-                                  'p4_%d' % self.ID,
+                                  'outcomes_%d' % self.ID,
+                                  #'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID, 'p4_%d' % self.ID,
                                   'u1_%d' % self.ID,
                                   'u2_%d' % self.ID,
                                   'u3_%d' % self.ID,
