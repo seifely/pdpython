@@ -1166,7 +1166,7 @@ class PDAgent(Agent):
         for i in self.indivAvPayoff:
             average_list.append(self.indivAvPayoff[i])
 
-        print(average_list)
+        # print(average_list)
 
         avpay_partner_1 = 'None'
         avpay_partner_2 = 'None'

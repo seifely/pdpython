@@ -1046,19 +1046,20 @@ br_params = {#"number_of_agents": [64],
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
              "moody_epsilon": [0.1],
-             "moody_sarsa_oppo": ["TFT",  #"LEARN", "MOODYLEARN",
+             "moody_sarsa_oppo": [#"TFT",
+                                  "LEARN", "MOODYLEARN",
                              #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                   ],
-             "moody_statemode": [#'stateless',
-                                 #'agentstate',
+             "moody_statemode": ['stateless',
+                                 'agentstate',
                                  'moodstate'
                                  ],
-             "moody_MA": [#0,
-                          #0.2,
-                          #0.4,
-                          #0.6,
+             "moody_MA": [0,
+                          0.2,
+                          0.4,
+                          0.6,
                           0.8,
-                          #'v',
+                          'v',
                           ],
              }
 
@@ -1069,7 +1070,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
+                 iterations=3,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
@@ -1082,5 +1083,8 @@ if __name__ == '__main__':
             i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
             br_step_data = br_step_data.append(i_run_data, ignore_index=True)
     br_step_data.to_csv("PDModel_Step_Data_%s.csv" % (str(random.randint(1,200000))))  # this might not be as useful for importing
+
+
+
 
 
