@@ -145,6 +145,7 @@ class PDAgent(Agent):
         self.moody_pp_aprime = {}
         self.moody_pp_payoff = {}
         self.moody_pp_oppPayoff = {}
+        self.pp_oppPayoff = {}  #  a version of the above (history of what my opponent scored against me) for normies to use
         self.moody_oldstates = {}
 
         self.moody_epsilon = copy.deepcopy(self.model.moody_epsilon)
@@ -155,6 +156,8 @@ class PDAgent(Agent):
         self.partner_moods = {}
         self.statemode = self.model.moody_statemode
         self.partner_states = {}
+
+        self.state_working_memory = {}  # The paired (s,a) memory used to calculate psi for estimated payoff
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
@@ -1018,6 +1021,66 @@ class PDAgent(Agent):
                                                                                                        partner_ID,
                                                                                                        partner_mood,
                                                                                                        self.statemode)
+                        # get the current state, action
+                        # check the payoff for this round, add it to the state-action list if it isn't over delta
+
+                        state = sarsa_moody.observe_state(partner_move, partner_ID, partner_mood, self.model.moody_statemode)
+                        action = my_move
+                        stateMem = self.state_working_memory[tuple(state)]
+                        # print('stateMem', stateMem)
+                        if action == 'C':
+                            stateActionMem = stateMem[0]
+                        else:
+                            stateActionMem = stateMem[1]
+
+                        # At this point (after initialisation) we have the list we want to edit
+                        if stateActionMem is None:
+                            zeroes = []
+                            for j in range(self.moody_delta - 1):
+                                zeroes.append(0)
+                            zeroes.append(sarsa_moody.get_payoff(my_move, partner_move, self.model.CC, self.model.DD,
+                                                                 self.model.CD, self.model.DC))
+
+                            stateActionMem = zeroes  # initialise with first value if doesn't exist
+                            if action == 'C':
+                                stateMem[0] = stateActionMem
+                            else:
+                                stateMem[1] = stateActionMem
+
+                            self.state_working_memory[tuple(state)] = stateMem
+
+                        else:
+                            current_state = stateActionMem
+                            # print('stateActionMem', stateActionMem)
+                            # first, check if it has more than three values
+                            if len(current_state) < self.moody_delta:  # if list hasn't hit delta, add in new move
+                                if self.model.moody_learnFrom == "them":
+                                    current_state.append(
+                                        sarsa_moody.get_payoff(my_move, partner_move, self.model.CC, self.model.DD,
+                                                               self.model.CD, self.model.DC))
+                                # elif self.model.moody_learnFrom == "me":
+                                #     current_state.append(my_move)
+                            elif len(current_state) == self.moody_delta:
+                                current_state.pop(0)
+                                if self.model.moody_learnFrom == "them":
+                                    current_state.append(
+                                        sarsa_moody.get_payoff(my_move, partner_move, self.model.CC, self.model.DD,
+                                                               self.model.CD, self.model.DC))
+                                    current_uv = self.update_values[partner_ID]
+
+                                    self.update_value = self.update_value + self.change_update_value(current_state)
+                                # elif self.model.moody_learnFrom == "me":
+                                #     current_state.append(my_move)
+
+                            # print('My current partner history is now:', current_state)
+                            stateActionMem = current_state
+                            if action == 'C':
+                                stateMem[0] = stateActionMem
+                            else:
+                                stateMem[1] = stateActionMem
+
+                            self.state_working_memory[tuple(state)] = stateMem
+                            # print('mem for that (s,a) is:', self.state_working_memory[tuple(state)])
 
                         # elif self.model.moody_learnFrom == "us":
                         #     if self.working_memory.get(partner_ID) is None:
@@ -1087,6 +1150,8 @@ class PDAgent(Agent):
             elif self.strategy == "MOODYLEARN":
                 self.moody_pp_payoff[i] = outcome_payoff
                 self.moody_pp_oppPayoff[i] = payoffs[this_partner_move, my_move]
+
+            self.pp_oppPayoff[i] = payoffs[this_partner_move, my_move]
             self.indivAvPayoff[i] = statistics.mean(self.per_partner_payoffs[i])
             # print("My individual average payoff for partner", i, "is ", self.indivAvPayoff[i])
 
@@ -1953,7 +2018,7 @@ class PDAgent(Agent):
                     zeroes.append((0, 0))
                 return zeroes
 
-    def averageScoreComparison(self, oppID):
+    def averageScoreComparison(self, oppID, moodyStrat):
         scores = {}
         payoffs = {}
         recent_payoffs = {}
@@ -1976,15 +2041,21 @@ class PDAgent(Agent):
                                if isinstance(obj, PDAgent)][0]
 
                     partner_ID = partner.ID
-                    if partner.indivAvPayoff.get(self.ID) is None:
-                        averages[partner_ID] = self.moody_pp_oppPayoff[partner_ID]
+                    if partner.indivAvPayoff.get(self.ID) is None:  # if you try and get their average payoff against me and it isn't there
+                        if moodyStrat:
+                            averages[partner_ID] = self.moody_pp_oppPayoff[partner_ID]  # instead use the payoff for that turn
+                        else:
+                            averages[partner_ID] = self.pp_oppPayoff[partner_ID]
                     else:
                         averages[partner_ID] = partner.indivAvPayoff[self.ID]
 
-            my_average = self.indivAvPayoff[oppID]
+            my_average = self.indivAvPayoff[oppID]  # BEWARE, THIS IS A ===FULL AVERAGE==== NOT AN AVERAGE OVER X PERIODS, averaged over per_partner_payoffs (full history)
             #TODO: does this need to give partner's score against me, or score as a whole? Because if ============================================================================================
             #TODO: it's the latter, you could use pp_utility from the opponent
-        return my_average, averages[oppID], self.moody_pp_oppPayoff[oppID]
+        if moodyStrat:
+            return my_average, averages[oppID], self.moody_pp_oppPayoff[oppID]
+        else:
+            return my_average, averages[oppID], self.pp_oppPayoff[partner_ID]
 
 
     def step(self):
@@ -2019,6 +2090,7 @@ class PDAgent(Agent):
                 if self.strategy == 'MOODYLEARN':
                     # Initialise the q tables and states on the first turn
                     self.moody_qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                    self.state_working_memory = sarsa_moody.init_statememory(copy.deepcopy(self.model.moody_memory_states), 2, self.moody_delta)
                     # print('init qtable len:', len(self.moody_qtable))
                     self.moody_states = copy.deepcopy(self.model.moody_memory_states)
 
@@ -2163,6 +2235,11 @@ class PDAgent(Agent):
                 change[idx] = newQsa
                 self.qtable[tuple(s)] = change
 
+                if self.model.moody_opponents:
+                    myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
+                    # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
+                    self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+
 
             # for i in self.working_memory:
             #     state = self.working_memory[i]
@@ -2255,7 +2332,21 @@ class PDAgent(Agent):
                 # qToChange = qToChange[idx]
 
                 # get the updated Qs according to the function provided
-                updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward, self.working_memory[i], self.mood)
+
+                stateMem = self.state_working_memory[tuple(sprime)]
+                if aprime == 'C':
+                    stateActionMem = stateMem[0]
+                else:
+                    stateActionMem = stateMem[1]
+                # So now we have the list (memory) of the payoffs for the (sprime, aprime) that we want to do next
+                # We want to send that to be used to estimate future rewards
+                # TODO: Important warning! The memories are initialised at 0, so averaging over them will produce 0
+                # as an estimated future reward (of course, unless we have explored there before
+
+
+                # updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward, self.working_memory[i], self.mood)
+                updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward,
+                                                                stateActionMem, self.mood)
 
                 # if self.moody_delta == 1:
                 #     if self.model.moody_memoryPaired:
@@ -2281,9 +2372,10 @@ class PDAgent(Agent):
 
                 """Update mood here at the end of each interaction WITHIN a ROUND. This means that initial interactions
                     in each round will influence subsequent interactions"""
-                myAv, oppAv, oppScore = self.averageScoreComparison(i)
+                myAv, oppAv, oppScore = self.averageScoreComparison(i, True)
                 #TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+                # self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+                self.mood = sarsa_moody.update_mood(self.mood, reward, myAv, oppScore, oppAv)
 
 
 
@@ -2344,6 +2436,12 @@ class PDAgent(Agent):
             # self.move = self.next_move
             self.check_partner()  # Update Knowledge
             round_payoffs = self.increment_score(self.payoffs)
+            if self.model.moody_opponents:
+                for i in self.partner_IDs:
+                    myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
+                    # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
+                    self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+
             if self.last_round:
                 if self.strategy == 'VPP':
                     if self.model.kNN_training:

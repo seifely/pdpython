@@ -16,7 +16,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
+            <state relative-caret-position="102">
               <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
               <folding>
                 <element signature="e#1611#1832#0" />
@@ -29,10 +29,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1667">
-              <caret line="1169" selection-start-line="1169" selection-end-line="1169" />
+            <state relative-caret-position="341">
+              <caret line="1083" selection-start-line="1083" selection-end-line="1083" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
+                <element signature="e#101684#106224#0" />
               </folding>
             </state>
           </provider>
@@ -41,8 +42,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2599">
-              <caret line="46" column="13" selection-start-line="46" selection-start-column="13" selection-end-line="46" selection-end-column="13" />
+            <state relative-caret-position="238">
+              <caret line="41" column="29" selection-start-line="41" selection-start-column="29" selection-end-line="41" selection-end-column="29" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -62,8 +63,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="818">
-              <caret line="1090" selection-start-line="1090" selection-end-line="1090" />
+            <state relative-caret-position="501">
+              <caret line="1078" column="29" selection-start-line="1078" selection-start-column="29" selection-end-line="1078" selection-end-column="29" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#26346#26435#0" />
@@ -84,36 +85,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.set_defaults</find>
-      <find>set_defaults(</find>
-      <find>self.working_memory</find>
-      <find>self.compare_score()</find>
-      <find>compare_score()</find>
-      <find>compare_score(</find>
-      <find>check_partner(</find>
-      <find>IndivA</find>
-      <find>try</find>
-      <find>update_q</find>
-      <find>moody_pp</find>
-      <find>output_data</find>
-      <find>output_data_to_fil</find>
-      <find>outputData</find>
-      <find>open('{}.csv'.format(self.filename)</find>
-      <find>open(</find>
-      <find>outputDa</find>
-      <find>output_data_to_file</find>
-      <find>self.partner</find>
-      <find>self.</find>
-      <find>self.partner_states</find>
-      <find>partner_mood</find>
-      <find>self.pick_move</find>
-      <find>observe_state</find>
-      <find>avpay</find>
-      <find>(self.per_partner_payoffs[i])</find>
-      <find>self.per_partner_payoffs</find>
-      <find>self.indivAvPayoff</find>
       <find>averageSc</find>
+      <find>update</find>
+      <find>average</find>
+      <find>self.moody_pp_oppPayoff</find>
+      <find>averageScore</find>
+      <find>self.per_partner_payoffs</find>
+      <find>per_partn</find>
+      <find>moody_pp</find>
+      <find>indi</find>
+      <find>indivAv</find>
+      <find>learn(</find>
       <find>indiv</find>
+      <find>moody_pp_oppPayoff[partner_ID]</find>
+      <find>moody_pp_oppPayoff</find>
+      <find>update_mood</find>
+      <find>per_partner</find>
+      <find>per_partner_pay</find>
+      <find>self.working</find>
+      <find>init_q</find>
+      <find>self.moody_states</find>
+      <find>working_memory</find>
+      <find>tuple(</find>
+      <find>update_q</find>
+      <find>init_stat</find>
+      <find>moody_delta</find>
+      <find>state_w</find>
+      <find>mean</find>
+      <find>stateMem</find>
+      <find>aver</find>
+      <find>self.moody_delta</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -124,13 +125,13 @@
       <list>
         <option value="$PROJECT_DIR$/pdpython_model/model.py" />
         <option value="$PROJECT_DIR$/pdpython_model/server.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/sarsa.py" />
         <option value="$PROJECT_DIR$/pdpython_model/statemaker.py" />
         <option value="$USER_HOME$/Downloads/RLEmotionalconvert.py" />
         <option value="$PROJECT_DIR$/pdpython_model/statemaker_moody.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/sarsa.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/sarsa_moody.py" />
         <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
         <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/sarsa_moody.py" />
       </list>
     </option>
   </component>
@@ -284,13 +285,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49919742" weight="0.09220232" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49919742" visible="true" weight="0.09220232" />
       <window_info id="Structure" order="1" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info id="Favorites" order="2" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32827735" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49947312" weight="0.30119178" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49947312" visible="true" weight="0.30119178" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -390,9 +392,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/statemaker_moody.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
+        <state relative-caret-position="102">
           <caret line="18" column="18" selection-start-line="18" selection-start-column="18" selection-end-line="18" selection-end-column="18" />
           <folding>
             <element signature="e#1611#1832#0" />
@@ -401,37 +410,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/statemaker_moody.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1667">
-          <caret line="1169" selection-start-line="1169" selection-end-line="1169" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2599">
-          <caret line="46" column="13" selection-start-line="46" selection-start-column="13" selection-end-line="46" selection-end-column="13" />
+        <state relative-caret-position="238">
+          <caret line="41" column="29" selection-start-line="41" selection-start-column="29" selection-end-line="41" selection-end-column="29" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="341">
+          <caret line="1083" selection-start-line="1083" selection-end-line="1083" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#101684#106224#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="818">
-          <caret line="1090" selection-start-line="1090" selection-end-line="1090" />
+        <state relative-caret-position="501">
+          <caret line="1078" column="29" selection-start-line="1078" selection-start-column="29" selection-end-line="1078" selection-end-column="29" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#26346#26435#0" />

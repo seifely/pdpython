@@ -36,6 +36,23 @@ def init_qtable(states, n_actions, zeroes):
         iqtable[indx] = vu
     return iqtable
 
+def init_statememory(states, n_actions, delta):
+    iqtable = {}   # does this want to be a list or a dict?
+    vv = []
+    for j in range(0, delta):
+        vv.append(0)
+
+    for i in states:
+        indx = tuple(i)
+        vu = []
+        for j in range(n_actions):
+            vu.append(vv)
+
+        #print('indx=', indx, 'vu=', vu)
+        iqtable[indx] = vu
+
+    return iqtable
+
 
 def moody_action(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
     """ Fixed Amount should be in the model as a test parameter MA """
@@ -201,13 +218,24 @@ def estimateFutureRewards(mood, memory):
     return tot/actualAmount
 
 
+# def update_mood(currentmood, score, averageScore, oppScore, oppAverage):
+#     ab = (100 - currentmood) / 100
+#     u = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))
+#     dif = score - u
+#
+#     newMood = min(99.999, (currentmood + dif))
+#     newMood = max(0.0001, newMood)
+#     print('Mood:', newMood)
+#     return newMood
+
 def update_mood(currentmood, score, averageScore, oppScore, oppAverage):
     ab = (100 - currentmood) / 100
-    u = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))
-    dif = score - u
-
-    newMood = min(99.999, (currentmood + dif))
+    omega = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))  # perceived payoff
+    dif = score - omega  # difference between the score and the perceived payoff
+    newMood = currentmood + (score - averageScore) + omega
+    newMood = min(99.999, newMood)
     newMood = max(0.0001, newMood)
+    # print('Mood:', newMood)
     return newMood
 
 
