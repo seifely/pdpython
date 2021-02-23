@@ -70,6 +70,7 @@ def moody_action(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
     # index qtable by current state
     current = qtable[tuple(state)]
     if current[1] > current[0]:
+
         if mood > 70 and moodAffectMode == 'Fixed':
             change = moodAffect
             epsChange = change
@@ -96,6 +97,7 @@ def moody_action(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
             todo = 'D'
 
     newEps = epsilon + epsChange
+    # print(newEps)
     return todo, newEps
 
 def getMoodType(mood):

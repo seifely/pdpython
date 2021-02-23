@@ -1058,10 +1058,10 @@ br_params = {#"number_of_agents": [64],
                                  'moodstate'
                                  ],
              "moody_MA": [0,
-                          0.2,
-                          0.4,
-                          0.6,
-                          0.8,
+                          #0.2,
+                          #0.4,
+                          #0.6,
+                          #0.8,
                           #'v',
                           ],
              "moody_opponents": [True,
@@ -1076,7 +1076,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=5,
+                 iterations=1,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
