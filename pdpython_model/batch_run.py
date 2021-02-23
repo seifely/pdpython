@@ -371,8 +371,8 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=6, width=6,    # even numbers are checkerboard fair
-                 number_of_agents=36,
+    def __init__(self, height=5, width=5,    # even numbers are checkerboard fair
+                 number_of_agents=25,
                  schedule_type="Simultaneous",
                  rounds=2500,
                  collect_data=True,
@@ -544,7 +544,7 @@ class PDModel(Model):
         if self.sarsa_spawn:
             concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         elif self.moody_sarsa_spawn:
-            concatenator = ('FIXTEST_mA_%s_%s_%s_moodysarsa_no_%s' % (self.moody_MA, self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
+            concatenator = ('desptest_mA_%s_%s_%s_moodysarsa_no_%s' % (self.moody_MA, self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
