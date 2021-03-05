@@ -138,7 +138,7 @@ class PDAgent(Agent):
         self.qtable = []
 
         # ----------------------- MOODY SARSA GLOBALS ---------------------------
-        self.mood = 50  # A value between 0 and 100
+        self.mood = self.model.moody_startmood  # A value between 0 and 100
 
         self.moody_states = []
         self.moody_pp_sprime = {}

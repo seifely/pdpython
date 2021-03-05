@@ -429,6 +429,7 @@ class PDModel(Model):
                  moody_statemode='stateless',
                  moody_MA=1,
                  moody_opponents=True,
+                 moody_startmood=50,
                  ):
 
         # ---------- Model Parameters --------
@@ -492,6 +493,7 @@ class PDModel(Model):
         self.moody_statemode = moody_statemode
         self.moody_MA = moody_MA
         self.moody_opponents = moody_opponents
+        self.moody_startmood = moody_startmood
 
         if self.kNN_training:
             self.kNN_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
@@ -544,7 +546,7 @@ class PDModel(Model):
         if self.sarsa_spawn:
             concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         elif self.moody_sarsa_spawn:
-            concatenator = ('desptest_mA_%s_%s_%s_moodysarsa_no_%s' % (self.moody_MA, self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
+            concatenator = ('desptest_HIGHMOODsh_%sx%s_mA_%s_%s_%s_moodysarsa_no_%s' % (self.width, self.width, self.moody_MA, self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
@@ -1036,7 +1038,7 @@ br_params = {#"number_of_agents": [64],
              #"sarsa_distro": [0.25, 0.50, 0.75],
              "CC": [3],
              "DD": [1],
-             "DC": [5],
+             "DC": [2],
              "CD": [0],
              #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
                             #"MOODYLEARN"],
@@ -1053,9 +1055,12 @@ br_params = {#"number_of_agents": [64],
                                   "MOODYLEARN",
                              #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                   ],
-             "moody_statemode": ['stateless',
+             "moody_statemode": [#'stateless',
                                  'agentstate',
-                                 'moodstate'
+                                 #'moodstate'
+                                 ],
+             "moody_startmood": [#1,
+                                 99
                                  ],
              "moody_MA": [0,
                           #0.2,
@@ -1076,7 +1081,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
+                 iterations=5,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
