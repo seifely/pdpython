@@ -371,8 +371,8 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=5, width=5,    # even numbers are checkerboard fair
-                 number_of_agents=25,
+    def __init__(self, height=4, width=4,    # even numbers are checkerboard fair
+                 number_of_agents=16,
                  schedule_type="Simultaneous",
                  rounds=2500,
                  collect_data=True,
@@ -403,7 +403,7 @@ class PDModel(Model):
                  sarsa_training=False,          #TODO: THESE VARIABLES HAVE BEEN TURNED OFF FOR MOODY SARSA TESTING
                  sarsa_testing=False,
                  sarsa_distro=0,
-                 sarsa_oppo="TFT",
+                 sarsa_oppo="LEARN",
                  epsilon=0.99,
                  alpha=0.1,
                  gamma=0.95,
@@ -546,7 +546,7 @@ class PDModel(Model):
         if self.sarsa_spawn:
             concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         elif self.moody_sarsa_spawn:
-            concatenator = ('desptest_HIGHMOODsh_%sx%s_mA_%s_%s_%s_moodysarsa_no_%s' % (self.width, self.width, self.moody_MA, self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
+            concatenator = ('desptest_MEDMOOD_DC_%s_%sx%s_mA_%s_%s_%s_moodysarsa_no_%s' % (self.DC, self.width, self.width, self.moody_MA, self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
@@ -1038,7 +1038,9 @@ br_params = {#"number_of_agents": [64],
              #"sarsa_distro": [0.25, 0.50, 0.75],
              "CC": [3],
              "DD": [1],
-             "DC": [2],
+             "DC": [#5,
+                    2
+                    ],
              "CD": [0],
              #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
                             #"MOODYLEARN"],
@@ -1055,18 +1057,19 @@ br_params = {#"number_of_agents": [64],
                                   "MOODYLEARN",
                              #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                   ],
-             "moody_statemode": [#'stateless',
+             "moody_statemode": ['stateless',
                                  'agentstate',
-                                 #'moodstate'
+                                 'moodstate'
                                  ],
              "moody_startmood": [#1,
-                                 99
+                                 #99,
+                                 50,
                                  ],
              "moody_MA": [0,
                           #0.2,
-                          #0.4,
+                          0.4,
                           #0.6,
-                          #0.8,
+                          0.8,
                           #'v',
                           ],
              "moody_opponents": [True,
