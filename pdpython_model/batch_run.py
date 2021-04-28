@@ -371,8 +371,8 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=4, width=4,    # even numbers are checkerboard fair
-                 number_of_agents=16,
+    def __init__(self, height=5, width=5,    # even numbers are checkerboard fair
+                 number_of_agents=25,
                  schedule_type="Simultaneous",
                  rounds=2500,
                  collect_data=True,
@@ -416,7 +416,7 @@ class PDModel(Model):
                  moody_sarsa_testing=True,
                  moody_sarsa_distro=0,
                  moody_sarsa_oppo="TFT",
-                 moody_epsilon=0.1,
+                 moody_epsilon=0.9,
                  moody_alpha=0.1,
                  moody_gamma=0.95,
                  moody_export_q=True,
@@ -495,6 +495,19 @@ class PDModel(Model):
         self.moody_opponents = moody_opponents
         self.moody_startmood = moody_startmood
 
+        # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
+        self.oppoList = [
+                         "TFT",
+                         "LEARN",
+                         "MOODYLEARN",
+                          "ANGEL",
+                         "DEVIL",
+                         "VPP",
+                         "RANDOM",
+                         "WSLS",
+                         # "iWSLS",
+                         ]
+
         if self.kNN_training:
             self.kNN_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
                                             20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
@@ -546,7 +559,13 @@ class PDModel(Model):
         if self.sarsa_spawn:
             concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         elif self.moody_sarsa_spawn:
-            concatenator = ('desptest_MEDMOOD_DC_%s_%sx%s_mA_%s_%s_%s_moodysarsa_no_%s' % (self.DC, self.width, self.width, self.moody_MA, self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
+            if type(self.moody_sarsa_oppo) == list:
+                concatenator = ('csvfix_mood%s_DC_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (
+                self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
+                self.moody_statemode, "mixedOppo", self.iteration_n), "a")
+            else:
+                concatenator = ('edecay_mood%s_DC_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
+                                                                                          self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
@@ -919,7 +938,7 @@ class PDModel(Model):
                 self.grid.place_agent(pdagent, (x, y))
                 self.schedule.add(pdagent)
 
-    def export_q_tables(self, init):                                    #TODO: Does this need a moody counterpart? =============================
+    def export_q_tables(self, init):      # TODO: Does this need a moody counterpart? =============================
         qs = [a.qtable for a in self.schedule.agents]
         # we need to print/save a list of the keys
         # then print/save each
@@ -952,7 +971,6 @@ class PDModel(Model):
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writeheader()
                 writer.writerow({'q': qvals})
-
 
     def update_agent_ppds(self, ppds):
         with open("agent_ppds.p", "wb") as f:
@@ -1008,7 +1026,7 @@ class PDModel(Model):
                             # writer.writeheader()
                             writer.writerow({'state': j})
 
-            if self.moody_export_q:                                                                 # THIS MIGHT NOT WORK INITIALLY ======================================
+            if self.moody_export_q:
                 for j in self.moody_memory_states:
                     for k in range(2):
                         with open('{} states_agent36.csv'.format(self.filename), 'a', newline='') as csvfile:
@@ -1038,8 +1056,8 @@ br_params = {#"number_of_agents": [64],
              #"sarsa_distro": [0.25, 0.50, 0.75],
              "CC": [3],
              "DD": [1],
-             "DC": [#5,
-                    2
+             "DC": [5,
+             #        2
                     ],
              "CD": [0],
              #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
@@ -1051,21 +1069,26 @@ br_params = {#"number_of_agents": [64],
 
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
-             "moody_epsilon": [0.1],
+             "moody_epsilon": [0.1,
+                               0.5,
+                               0.9],
              "moody_sarsa_oppo": [#"TFT",
                                   #"LEARN",
                                   "MOODYLEARN",
-                             #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
+                                #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
+                                #'MIXED',
                                   ],
-             "moody_statemode": ['stateless',
-                                 'agentstate',
+             "moody_statemode": [#'stateless',
+                                 #'agentstate',
                                  'moodstate'
                                  ],
              "moody_startmood": [#1,
                                  #99,
                                  50,
                                  ],
-             "moody_MA": [0,
+             "moody_MA": [#0,
+                          #0.001,
+                          0.1,
                           #0.2,
                           0.4,
                           #0.6,
@@ -1084,7 +1107,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=5,
+                 iterations=3,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

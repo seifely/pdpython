@@ -165,6 +165,9 @@ class PDAgent(Agent):
         self.mutual_c_outcome = 0
         self.n_partners = 0
 
+        self.default_attempt = 0
+        self.attempts_taken = 0
+
         # ----------------------- INTERACTIVE VARIABLES ----------------------
         # these values are increased if partner defects. ppC for each is 1 - ppD
         self.ppD_partner = {}
@@ -295,6 +298,14 @@ class PDAgent(Agent):
                         return str(strat)
                     elif self.ID in check_b:
                         strat = choices[1]
+                        if strat == 'MIXED':
+                            # Then we should randomly pick from this list without weighting
+                            strat = random.choice(self.model.oppoList)
+                            return str(strat)
+                        # if type(strat) == list:
+                        #     # Then we should randomly pick from this list without weighting
+                        #     strat = random.choice(strat)
+                        #     return str(strat)
                         return str(strat)
 
         elif self.model.moody_sarsa_spawn:
@@ -338,7 +349,14 @@ class PDAgent(Agent):
                         return str(strat)
                     elif self.ID in check_b:
                         strat = choices[1]
-                        # print("I am in check_b and my strategy is now", strat)
+                        if strat == 'MIXED':
+                            # Then we should randomly pick from this list without weighting
+                            strat = random.choice(self.model.oppoList)
+                            return str(strat)
+                        # if type(strat) == list:
+                        #     # Then we should randomly pick from this list without weighting
+                        #     strat = random.choice(strat)
+                        #     return str(strat)
                         return str(strat)
 
         else:
@@ -741,12 +759,12 @@ class PDAgent(Agent):
                 # print(' MAM:', moodAffectMode)
                 # print(' e:', self.moody_epsilon)
                 # print(' MA:', self.model.moody_MA)
-                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action(self.mood, learning_state[id],
+                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_alt(self.mood, learning_state[id],
                                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA)
             else:
                 # this doesn't need to be here, not sure why the original version it was copied from was like this
                 # but I will leave it for now because it works
-                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action(self.mood, learning_state[id],
+                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_alt(self.mood, learning_state[id],
                                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA)
 
             #TODO: Should we be using epsilon, or 0.1, above??
@@ -1399,6 +1417,7 @@ class PDAgent(Agent):
         #TODO: FIX DATA OUTPUTTING PLEASE?
         if self.strategy == "MOODYLEARN":
             try:
+                self.attempts_taken += 1
                 with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
                     fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
                                   'move_%d' % self.ID,
@@ -1517,163 +1536,6 @@ class PDAgent(Agent):
                          'mood_%d' % self.ID: self.mood})
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
-
-        # with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-        #     if self.strategy == "MOODYLEARN":
-        #         fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
-        #                       'move_%d' % self.ID,
-        #                       'probabilities_%d' % self.ID, 'utility_%d' % self.ID, 'common_move_%d' % self.ID,
-        #                       'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
-        #                       'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
-        #                       'p4_%d' % self.ID,
-        #                       'u1_%d' % self.ID,
-        #                       'u2_%d' % self.ID,
-        #                       'u3_%d' % self.ID,
-        #                       'u4_%d' % self.ID,
-        #                       'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID,
-        #                       'uv_%d' % self.ID,
-        #                       'ps_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
-        #                       'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID,'avp4_%d' % self.ID,
-        #                       'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID]
-        #
-        #     # elif self.strategy == "RANDOM":
-        #     #     fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
-        #     #                   'move_%d' % self.ID,
-        #     #                   'probabilities_%d' % self.ID, 'utility_%d' % self.ID, 'common_move_%d' % self.ID,
-        #     #                   'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
-        #     #                   'outcomes_%d' % self.ID, 'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID,
-        #     #                   'p4_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
-        #     #                   'u4_%d' % self.ID,
-        #     #                   'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID,
-        #     #                   'uv_%d' % self.ID,
-        #     #                   'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
-        #     #                   'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID,'avp4_%d' % self.ID,
-        #     #                   'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID]
-        #     # #     'p1', 'p2', 'p3', 'p4'
-        #     else:
-        #         fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
-        #                       'move_%d' % self.ID,
-        #                       'utility_%d' % self.ID, 'common_move_%d' % self.ID, 'number_coop_%d' % self.ID,
-        #                       'number_defect_%d' % self.ID,
-        #                       'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
-        #                       'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID,
-        #                       'm4_%d' % self.ID, 'uv_%d' % self.ID,
-        #                       'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
-        #                       'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
-        #                       'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID]
-        #
-        #     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        #
-        #     # moves = []
-        #     # for i in self.move:
-        #     #     moves.append(self.move[i])
-        #
-        #     if self.stepCount == 1:
-        #         writer.writeheader()
-        #
-        #     if self.strategy == "MOODYLEARN":
-        #         writer.writerow(
-        #             {'stepcount_%d' % self.ID: self.stepCount,
-        #              'strategy_%d' % self.ID: self.strategy,
-        #              'strat code_%d' % self.ID: strategy_code,
-        #              'move_%d' % self.ID: self.itermove_result,
-        #              'utility_%d' % self.ID: self.score,
-        #              'common_move_%d' % self.ID: self.common_move,
-        #              'number_coop_%d' % self.ID: self.number_of_c,
-        #              'number_defect_%d' % self.ID: self.number_of_d,
-        #              'outcomes_%d' % self.ID: outcomes,
-        #              'u1_%d' % self.ID: utility_partner_1,
-        #              'u2_%d' % self.ID: utility_partner_2,
-        #              'u3_%d' % self.ID: utility_partner_3,
-        #              'u4_%d' % self.ID: utility_partner_4,
-        #              'm1_%d' % self.ID: move_partner_1,
-        #              'm2_%d' % self.ID: move_partner_2,
-        #              'm3_%d' % self.ID: move_partner_3,
-        #              'm4_%d' % self.ID: move_partner_4,
-        #              'uv_%d' % self.ID: self.update_value,
-        #              'ps_%d' % self.ID: self.partner_states,
-        #              'nc_%d' % self.ID: self.number_of_c,
-        #              'mutC_%d' % self.ID: self.mutual_c_outcome,
-        #              'simP_%d' % self.ID: self.similar_partners,
-        #              'avp1_%d' % self.ID: avpay_partner_1,
-        #              'avp2_%d' % self.ID: avpay_partner_2,
-        #              'avp3_%d' % self.ID: avpay_partner_3,
-        #              'avp4_%d' % self.ID: avpay_partner_4,
-        #              'globav_%d' % self.ID: self.globalAvPayoff,
-        #              'epsilon_%d' % self.ID: self.moody_epsilon,
-        #              'alpha_%d' % self.ID: self.moody_alpha,
-        #              'mood_%d' % self.ID: self.mood})
-        #
-        #     # elif self.strategy == "RANDOM":
-        #     #     writer.writerow(
-        #     #         {'stepcount_%d' % self.ID: self.stepCount,
-        #     #          'strategy_%d' % self.ID: self.strategy,
-        #     #          'strat code_%d' % self.ID: strategy_code,
-        #     #          'move_%d' % self.ID: self.itermove_result,
-        #     #          'probabilities_%d' % self.ID: self.ppD_partner,
-        #     #          'utility_%d' % self.ID: self.score,
-        #     #          'common_move_%d' % self.ID: self.common_move,
-        #     #          'number_coop_%d' % self.ID: self.number_of_c,
-        #     #          'number_defect_%d' % self.ID: self.number_of_d,
-        #     #          'outcomes_%d' % self.ID: outcomes,
-        #     #          'p1_%d' % self.ID: ppd_partner_1,
-        #     #          'p2_%d' % self.ID: ppd_partner_2,
-        #     #          'p3_%d' % self.ID: ppd_partner_3,
-        #     #          'p4_%d' % self.ID: ppd_partner_4,
-        #     #          'u1_%d' % self.ID: utility_partner_1,
-        #     #          'u2_%d' % self.ID: utility_partner_2,
-        #     #          'u3_%d' % self.ID: utility_partner_3,
-        #     #          'u4_%d' % self.ID: utility_partner_4,
-        #     #          'm1_%d' % self.ID: move_partner_1,
-        #     #          'm2_%d' % self.ID: move_partner_2,
-        #     #          'm3_%d' % self.ID: move_partner_3,
-        #     #          'm4_%d' % self.ID: move_partner_4,
-        #     #          'uv_%d' % self.ID: self.update_value,
-        #     #          'wm_%d' % self.ID: self.working_memory,
-        #     #          'nc_%d' % self.ID: self.number_of_c,
-        #     #          'mutC_%d' % self.ID: self.mutual_c_outcome,
-        #     #          'simP_%d' % self.ID: self.similar_partners,
-        #     #          'avp1_%d' % self.ID: avpay_partner_1,
-        #     #          'avp2_%d' % self.ID: avpay_partner_2,
-        #     #          'avp3_%d' % self.ID: avpay_partner_3,
-        #     #          'avp4_%d' % self.ID: avpay_partner_4,
-        #     #          'globav_%d' % self.ID: self.globalAvPayoff,
-        #     #          'epsilon_%d' % self.ID: self.epsilon,
-        #     #          'alpha_%d' % self.ID: self.alpha,
-        #     #          'mood_%d' % self.ID: self.mood})
-        #     # #
-        #     else:
-        #         writer.writerow(
-        #             {'stepcount_%d' % self.ID: self.stepCount,
-        #              'strategy_%d' % self.ID: self.strategy,
-        #              'strat code_%d' % self.ID: strategy_code,
-        #              'move_%d' % self.ID: self.itermove_result,
-        #              'utility_%d' % self.ID: self.score,
-        #              'common_move_%d' % self.ID: self.common_move,
-        #              'number_coop_%d' % self.ID: self.number_of_c,
-        #              'number_defect_%d' % self.ID: self.number_of_d,
-        #              'outcomes_%d' % self.ID: outcomes,
-        #              'u1_%d' % self.ID: utility_partner_1,
-        #              'u2_%d' % self.ID: utility_partner_2,
-        #              'u3_%d' % self.ID: utility_partner_3,
-        #              'u4_%d' % self.ID: utility_partner_4,
-        #              'm1_%d' % self.ID: move_partner_1,
-        #              'm2_%d' % self.ID: move_partner_2,
-        #              'm3_%d' % self.ID: move_partner_3,
-        #              'm4_%d' % self.ID: move_partner_4,
-        #              'uv_%d' % self.ID: self.update_value,
-        #              'wm_%d' % self.ID: self.working_memory,
-        #              'nc_%d' % self.ID: self.number_of_c,
-        #              'mutC_%d' % self.ID: self.mutual_c_outcome,
-        #              'simP_%d' % self.ID: self.similar_partners,
-        #              'avp1_%d' % self.ID: avpay_partner_1,
-        #              'avp2_%d' % self.ID: avpay_partner_2,
-        #              'avp3_%d' % self.ID: avpay_partner_3,
-        #              'avp4_%d' % self.ID: avpay_partner_4,
-        #              'globav_%d' % self.ID: self.globalAvPayoff,
-        #              'epsilon_%d' % self.ID: self.epsilon,
-        #              'alpha_%d' % self.ID: self.alpha,
-        #              'mood_%d' % self.ID: self.mood})
 
 
     def reset_values(self):
@@ -1983,6 +1845,9 @@ class PDAgent(Agent):
         self.output_data_to_model()
         if self.model.collect_data:
             self.output_data_to_file(self.outcome_list)
+            if self.attempts_taken > 1:
+                print("Agent", self.ID, "on step", self.stepCount, "took", self.attempts_taken, "attempt/s to export.")
+            self.attempts_taken = 0
 
     def set_starting_oldstates(self, strategy, learning_from, size):
         if strategy is not 'MOODYLEARN':

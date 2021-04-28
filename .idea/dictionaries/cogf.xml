@@ -1,9 +1,16 @@
 <component name="ProjectDictionaryState">
   <dictionary name="cogf">
     <words>
+      <w>agentstate</w>
+      <w>moodstate</w>
+      <w>moodylearn</w>
       <w>nagents</w>
+      <w>oppo</w>
       <w>pmoves</w>
+      <w>sarsa</w>
       <w>spatiality</w>
+      <w>startmood</w>
+      <w>statemode</w>
     </words>
   </dictionary>
 </component>

@@ -53,6 +53,66 @@ def init_statememory(states, n_actions, delta):
 
     return iqtable
 
+def decay_value(initial, current, max_round, linear, floor):
+    # Version WITHOUT simulated annealing, though that could be in V2
+    if linear:
+        increment = initial / max_round
+        new_value = current - increment
+        if new_value < floor:
+            if floor > 0:
+                return floor
+            else:
+                return new_value
+        else:
+            return new_value
+    else:
+        increment = current / 50        # any better value to use rather than arbitrary?
+        new_value = current - increment
+        if new_value > floor:
+            return floor
+        else:
+            return new_value
+
+def moody_action_alt(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
+    """ The essence of this should be that we pick an action through epsilon greedy, then
+        depending on which one we picked and our mood, we change epsilon. """
+    r = random.randint(1, 100) / 100
+    current = qtable[tuple(state)]
+    todo = 'C'  # just in case the next steps mess up, let's cooperate as default
+    change = 0
+    # print("My initial action is:", todo)
+
+    # In the original paper, we don't explore a lot to start and then explore more as we go on (I think this is wrong
+    # and should be the other way around but ah well)
+    if r > epsilon:
+        # Do the optimal action
+        if current[1] > current[0]:
+            todo = 'D'
+        else:
+            todo = 'C'
+        # print("One was higher, so my action is now:", todo)
+    elif r <= epsilon:
+        todo = random.choice(['C', 'D'])
+        # print("I picked randomly and my action is now:", todo)
+
+    if mood >= 70:
+        # print("My mood is high")
+        if todo == 'D':
+            # print("And I chose D, so I will change my epsilon")
+            change = moodAffect
+    if mood <= 30:
+        # print("My mood is low")
+        if todo == 'C':
+            # print("And I chose C, so I will change my epsilon")
+            change = moodAffect
+
+    # print("Amount to change epsilon by:", change)
+    newEps = epsilon - change
+    # print("So my new epsilon is:", newEps)
+    newEps = min(99.999, newEps)
+    newEps = max(0.0001, newEps)
+
+    return todo, newEps
 
 def moody_action(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
     """ Fixed Amount should be in the model as a test parameter MA """
