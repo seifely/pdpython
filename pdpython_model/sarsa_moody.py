@@ -73,7 +73,7 @@ def decay_value(initial, current, max_round, linear, floor):
         else:
             return new_value
 
-def moody_action_alt(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
+def moody_action_alt(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
     """ The essence of this should be that we pick an action through epsilon greedy, then
         depending on which one we picked and our mood, we change epsilon. """
     r = random.randint(1, 100) / 100
@@ -82,29 +82,32 @@ def moody_action_alt(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
     change = 0
     # print("My initial action is:", todo)
 
-    # In the original paper, we don't explore a lot to start and then explore more as we go on (I think this is wrong
-    # and should be the other way around but ah well)
-    if r > epsilon:
-        # Do the optimal action
-        if current[1] > current[0]:
-            todo = 'D'
-        else:
-            todo = 'C'
-        # print("One was higher, so my action is now:", todo)
-    elif r <= epsilon:
-        todo = random.choice(['C', 'D'])
-        # print("I picked randomly and my action is now:", todo)
+    if turn == 1:
+        todo = startingBehav
+    else:
+        # In the original paper, we don't explore a lot to start and then explore more as we go on (I think this is wrong
+        # and should be the other way around but ah well)
+        if r > epsilon:
+            # Do the optimal action
+            if current[1] > current[0]:
+                todo = 'D'
+            else:
+                todo = 'C'
+            # print("One was higher, so my action is now:", todo)
+        elif r <= epsilon:
+            todo = random.choice(['C', 'D'])
+            # print("I picked randomly and my action is now:", todo)
 
-    if mood >= 70:
-        # print("My mood is high")
-        if todo == 'D':
-            # print("And I chose D, so I will change my epsilon")
-            change = moodAffect
-    if mood <= 30:
-        # print("My mood is low")
-        if todo == 'C':
-            # print("And I chose C, so I will change my epsilon")
-            change = moodAffect
+        if mood >= 70:
+            # print("My mood is high")
+            if todo == 'D':
+                # print("And I chose D, so I will change my epsilon")
+                change = moodAffect
+        if mood <= 30:
+            # print("My mood is low")
+            if todo == 'C':
+                # print("And I chose C, so I will change my epsilon")
+                change = moodAffect
 
     # print("Amount to change epsilon by:", change)
     newEps = epsilon - change

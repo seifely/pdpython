@@ -430,6 +430,7 @@ class PDModel(Model):
                  moody_MA=1,
                  moody_opponents=True,
                  moody_startmood=50,
+                 startingBehav='C',
                  ):
 
         # ---------- Model Parameters --------
@@ -494,6 +495,8 @@ class PDModel(Model):
         self.moody_MA = moody_MA
         self.moody_opponents = moody_opponents
         self.moody_startmood = moody_startmood
+
+        self.startingBehav = startingBehav
 
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
@@ -564,7 +567,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('edecay_mood%s_DC_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
+                concatenator = ('startwith%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1069,9 +1072,10 @@ br_params = {#"number_of_agents": [64],
 
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
-             "moody_epsilon": [0.1,
+             "moody_epsilon": [#0.1,
                                0.5,
-                               0.9],
+                               0.9
+                               ],
              "moody_sarsa_oppo": [#"TFT",
                                   #"LEARN",
                                   "MOODYLEARN",
@@ -1088,7 +1092,7 @@ br_params = {#"number_of_agents": [64],
                                  ],
              "moody_MA": [#0,
                           #0.001,
-                          0.1,
+                          #0.1,
                           #0.2,
                           0.4,
                           #0.6,
@@ -1097,7 +1101,10 @@ br_params = {#"number_of_agents": [64],
                           ],
              "moody_opponents": [True,
                                  #False
-                                 ]
+                                 ],
+             "startingBehav":[#'C',
+                              'D'
+                              ]
              }
 
 
