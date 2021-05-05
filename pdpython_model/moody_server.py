@@ -3,7 +3,7 @@ from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 
 from pdpython_model.agents import PDAgent
-from pdpython_model.model import PDModel
+from pdpython_model.moody_model import PDModel
 
 # Green
 C_COLOR = "#007f7f"
@@ -215,15 +215,27 @@ step_element = StepCountDisplay()
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
-model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 64, 2, 64, 1),
+model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 25, 2, 64, 1),
+                "number_of_agents": UserSettableParameter('choice', 'Number of Agents', value=16,
+                                          choices=[2, 4, 9, 16, 25, 36, 49, 64]),
+                "moody_sarsa_oppo": UserSettableParameter('choice', 'Opponent Type', value='TFT',
+                                          choices=['MOODYLEARN', 'LEARN', 'TFT', 'VPP', 'ANGEL', 'DEVIL', 'RANDOM', 'WSLS', 'MIXED']),
+                "startingBehav": UserSettableParameter('choice', 'First Round Move', value='C',
+                                          choices=['C', 'D']),
+                "moody_statemode": UserSettableParameter('choice', 'State Information', value='stateless',
+                                          choices=['stateless', 'agentstate', 'moodstate']),
                 "rounds": UserSettableParameter('slider', 'Number of Rounds', 5000,1,100000,10),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', False),
-                "init_ppD": UserSettableParameter('slider', 'Initial Probability VPP Agents Defect', 0.50,0.01,1,0.01),
+                #"init_ppD": UserSettableParameter('slider', 'Initial Probability VPP Agents Defect', 0.50,0.01,1,0.01),
                 # "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),
-                "CC": UserSettableParameter('number', 'Payoff for C-C (Default: 3)', value=1.5),
-                "CD": UserSettableParameter('number', 'Payoff for C-D (Default: 0)', value=-2),
-                "DC": UserSettableParameter('number', 'Payoff for D-C (Default: 5)', value=2),
-                "DD": UserSettableParameter('number', 'Payoff for D-D (Default: 2)', value=1),
+                "CC": UserSettableParameter('number', 'Payoff for CC (Default: 3)', value=3),
+                "CD": UserSettableParameter('number', 'Payoff for CD (Default: 0)', value=0),
+                "DC": UserSettableParameter('number', 'Payoff for DC (Default: 5)', value=5),
+                "DD": UserSettableParameter('number', 'Payoff for DD (Default: 2)', value=2),
+                "moody_epsilon": UserSettableParameter('number', 'Starting Epsilon (Default: 0.9)', value=0.9),
+                "moody_startmood": UserSettableParameter('slider', 'Starting Mood (Default: 50)', 50,1,100,1),
+                "moody_MA": UserSettableParameter('slider', 'Value of mA', 0.5,0,1,0.01),
+
 
                 # "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),
                 # "b": UserSettableParameter('number', 'Simplified Payoffs: Benefit of Co-op', value=4),
