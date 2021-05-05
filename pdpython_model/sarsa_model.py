@@ -537,6 +537,11 @@ class PDModel(Model):
             self.height = 8
             self.width = 8
 
+        if self.memoryPaired:
+            self.learnFrom = 'us'
+            if self.msize > 4:
+                self.msize = 4
+
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
                          "TFT",

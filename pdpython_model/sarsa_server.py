@@ -234,8 +234,8 @@ model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of 
                 "DD": UserSettableParameter('number', 'Payoff for DD (Default: 2)', value=2),
                 "epsilon": UserSettableParameter('number', 'Starting Epsilon (Default: 0.9)', value=0.9),
                 "sarsa_distro": UserSettableParameter('slider', '% of SARSA Agents (0 = Checkerboard)', 0,0,1,0.1),
-                #"moody_startmood": UserSettableParameter('slider', 'Starting Mood (Default: 50)', 50,1,100,1),
-                #"moody_MA": UserSettableParameter('slider', 'Value of mA', 0.5,0,1,0.01),
+
+                "memoryPaired": UserSettableParameter('checkbox', 'Use memory pairs? (Sets Below Option to "Them" and Memory Limit to 4)', False),
                 "msize": UserSettableParameter('choice', 'Memory Size', value=1,
                                           choices=[1, 2, 3, 4, 5, 6, 7]),
                 "learnFrom": UserSettableParameter('choice', 'Who do we learn from?', value='me',
