@@ -1073,7 +1073,7 @@ br_params = {#"number_of_agents": [64],
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
              "moody_epsilon": [#0.1,
-                               0.5,
+                               #0.5,
                                0.9
                                ],
              "moody_sarsa_oppo": [#"TFT",
@@ -1094,7 +1094,7 @@ br_params = {#"number_of_agents": [64],
                           #0.001,
                           #0.1,
                           #0.2,
-                          0.4,
+                          #0.4,
                           #0.6,
                           0.8,
                           #'v',
@@ -1102,8 +1102,8 @@ br_params = {#"number_of_agents": [64],
              "moody_opponents": [True,
                                  #False
                                  ],
-             "startingBehav":[#'C',
-                              'D'
+             "startingBehav":['C',
+                              #'D'
                               ]
              }
 
