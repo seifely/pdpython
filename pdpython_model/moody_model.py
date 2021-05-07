@@ -4,19 +4,32 @@ from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
 from pdpython_model.agents import PDAgent
 
 from mesa.datacollection import DataCollector
-from mesa.batchrunner import BatchRunner
 import random
 import time
 import csv
 import numpy as np
 import pandas as pd
-import statistics
 import sys
-import os
+import os.path
 import pickle
+import statistics
+
 from pdpython_model import statemaker
 from pdpython_model import statemaker_moody
 
+""" Variables we want to be able to control from the UI include:
+    Payoffs Rewards for Each Value  /
+    Starting Epsilon  /
+    Starting Mood  /
+    Moody Statemode
+    Value of mA
+    Starting Behaviour
+    Opponent Type?
+    """
+
+# TODO: Make sure all the variables needed by the agents/moody_sarsa files are in here
+# TODO:
+# TODO: Due to the nature of implementing a sarsa test grid or a moody test grid, I think there would have to be two separate files - one for normal and one for moody?
 
 def get_num_coop_agents(model):
     """ return number of cooperations"""
@@ -498,6 +511,32 @@ class PDModel(Model):
 
         self.startingBehav = startingBehav
 
+        """ This section here changes the spawn locations if the number of agents is changed"""
+        if self.number_of_agents == 2:
+            self.height = 2
+            self.width = 2
+        if self.number_of_agents == 4:
+            self.height = 2
+            self.width = 2
+        if self.number_of_agents == 9:
+            self.height = 3
+            self.width = 3
+        if self.number_of_agents == 16:
+            self.height = 4
+            self.width = 4
+        if self.number_of_agents == 25:
+            self.height = 5
+            self.height = 5
+        if self.number_of_agents == 36:
+            self.height = 6
+            self.width = 6
+        if self.number_of_agents == 49:
+            self.height = 7
+            self.width = 7
+        if self.number_of_agents == 64:
+            self.height = 8
+            self.width = 8
+
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
                          "TFT",
@@ -511,34 +550,25 @@ class PDModel(Model):
                          # "iWSLS",
                          ]
 
+        # kNN Spawning
         if self.kNN_training:
             self.kNN_strategies = {1: "DEVIL", 3: "DEVIL", 5: "DEVIL", 6: "DEVIL", 16: "DEVIL", 18: "DEVIL",
-                                            20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
-                                            46: "DEVIL", 2: "ANGEL", 4: "ANGEL", 14: "ANGEL", 15: "ANGEL", 17: "ANGEL",
-                                            19: "ANGEL", 28: "ANGEL", 30: "ANGEL", 32: "ANGEL", 42: "ANGEL", 43: "ANGEL",
-                                            45: "ANGEL", 47: "ANGEL", 8: "VPP", 11: "VPP", 23: "VPP", 26: "VPP", 35: "VPP",
-                                            38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
-                                            37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
-                                            36: "TFT", 39: "TFT"}
+                                   20: "DEVIL", 29: "DEVIL", 31: "DEVIL", 33: "DEVIL", 34: "DEVIL", 44: "DEVIL",
+                                   46: "DEVIL", 2: "ANGEL", 4: "ANGEL", 14: "ANGEL", 15: "ANGEL", 17: "ANGEL",
+                                   19: "ANGEL", 28: "ANGEL", 30: "ANGEL", 32: "ANGEL", 42: "ANGEL", 43: "ANGEL",
+                                   45: "ANGEL", 47: "ANGEL", 8: "VPP", 11: "VPP", 23: "VPP", 26: "VPP", 35: "VPP",
+                                   38: "VPP", 41: "VPP", 7: "WSLS", 10: "WSLS", 13: "WSLS", 22: "WSLS", 25: "WSLS",
+                                   37: "WSLS", 40: "WSLS", 9: "TFT", 12: "TFT", 21: "TFT", 24: "TFT", 27: "TFT",
+                                   36: "TFT", 39: "TFT"}
         elif self.kNN_testing:
             self.kNN_strategies = {2: "DEVIL", 4: "DEVIL", 14: "DEVIL", 15: "DEVIL", 17: "DEVIL", 19: "DEVIL",
-                                             28: "DEVIL", 30: "DEVIL", 32: "DEVIL", 42: "DEVIL", 43: "DEVIL",
-                                             45: "DEVIL",
-                                             47: "DEVIL", 1: "ANGEL", 3: "ANGEL", 5: "ANGEL", 6: "ANGEL", 16: "ANGEL",
-                                             18: "ANGEL", 20: "ANGEL", 29: "ANGEL", 31: "ANGEL", 33: "ANGEL",
-                                             34: "ANGEL",
-                                             44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT",
-                                             26: "TFT",
-                                             36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
-                                             37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 22: "WSLS",
-                                             25: "WSLS",
-                                             35: "WSLS", 38: "WSLS", 41: "WSLS"}
-
-        # self.experimental_defectors = [42, 64, 86, 19, 51, 73, 17, 38, 60, 82, 15, 47, 69]
-        # self.experimental_coordinators = [53, 75, 107, 40, 62, 84, 49, 71, 105, 103, 36, 58, 80]
-        # self.experimental_vpp = [41, 74, 50, 83, 26, 59, 92]
-        # self.experimental_wsls = [30, 63, 96, 39, 72, 48, 81]
-        # self.experimental_tft = [52, 85, 28, 61, 94, 37, 70]
+                                   28: "DEVIL", 30: "DEVIL", 32: "DEVIL", 42: "DEVIL", 43: "DEVIL", 45: "DEVIL",
+                                   47: "DEVIL", 1: "ANGEL", 3: "ANGEL", 5: "ANGEL", 6: "ANGEL", 16: "ANGEL",
+                                   18: "ANGEL", 20: "ANGEL", 29: "ANGEL", 31: "ANGEL", 33: "ANGEL", 34: "ANGEL",
+                                   44: "ANGEL", 46: "ANGEL", 7: "TFT", 10: "TFT", 13: "TFT", 23: "TFT", 26: "TFT",
+                                   36: "TFT", 39: "TFT", 8: "VPP", 11: "VPP", 21: "VPP", 24: "VPP", 27: "VPP",
+                                   37: "VPP", 40: "VPP", 9: "WSLS", 12: "WSLS", 22: "WSLS", 25: "WSLS",
+                                   35: "WSLS", 38: "WSLS", 41: "WSLS"}
 
         with open('filename_number.csv', 'r') as f:
             reader = csv.reader(f)  # pass the file to our csv reader
@@ -597,6 +627,7 @@ class PDModel(Model):
 
         # Find list of empty cells
         self.coordinates = [(x, y) for x in range(self.width) for y in range(self.height)]
+        # print(self.coordinates)
         self.experimental_coordinates = [(3, 8), (4, 8), (5, 8), (6, 8), (7, 8), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7),
                                          (6, 7),
                                          (7, 7), (8, 7), (9, 7), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6), (1, 5), (2, 5),
@@ -610,7 +641,6 @@ class PDModel(Model):
         self.agentIDs = list(range(1, (number_of_agents + 1)))
 
         # ----- Storage -----
-
         self.agents_cooperating = 0
         self.agents_defecting = 0
         self.number_of_defects = 0
@@ -647,6 +677,8 @@ class PDModel(Model):
 
         self.memory_states = statemaker.get_memory_states([0, 'C', 'D'], self.msize, self.memoryPaired)
         self.moody_memory_states = statemaker_moody.get_memory_states([0, 'C', 'D'], self.moody_statemode, self.number_of_agents)
+        # self.training_data = []
+        self.training_data = pickle.load(open("training_data_5.p", "rb"))
         self.state_values = self.state_evaluation(self.memory_states)
         self.moody_state_values = self.moody_state_evaluation(self.moody_memory_states)
 
@@ -655,7 +687,8 @@ class PDModel(Model):
         self.set_ppds()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
-        self.training_data = pickle.load(open("training_data_50.p", "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        self.training_data = pickle.load(open("training_data_50.p",
+                                              "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if not kNN_spawn:
             self.make_agents()
@@ -688,7 +721,7 @@ class PDModel(Model):
                              })
         if self.kNN_testing:
             with open('{}_kNN.csv'.format(self.filename), 'a', newline='') as csvfile:
-                fieldnames = ['k', 'accuracy', 'accuracy_p',]
+                fieldnames = ['k', 'accuracy',]
 
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -696,7 +729,7 @@ class PDModel(Model):
 
                 if self.step_count == 1:
                     writer.writeheader()
-                writer.writerow({'k': self.k, 'accuracy': self.kNN_accuracy, 'accuracy_p': kNN_accuracy_percent,
+                writer.writerow({'k': self.k, 'accuracy': kNN_accuracy_percent,
                                  })
 
                 self.kNN_accuracy = 0  # Hopefully resetting this value here is fine
@@ -712,11 +745,9 @@ class PDModel(Model):
 
     # def get_memory_states(self, behaviours):
     #     """ Get a list of all possible states given n behaviour options and
-    #         r spaces in the agent's memory - Size: msize  """
+    #         r spaces in the agent's memory - CURRENTLY: 7  """
     #     options = behaviours
     #     permutations = []
-    #
-    #     if self.msize == 7:
     #     for i1 in options:
     #         for i2 in options:
     #             for i3 in options:
@@ -728,7 +759,6 @@ class PDModel(Model):
     #
     #     # to generate the < step 7 states
     #     permutations.append([0, 0, 0, 0, 0, 0, 0])
-    #
     #     initial_state1 = [0, 0, 0, 0, 0, 0]
     #     initial_state2 = [0, 0, 0, 0, 0]
     #     initial_state3 = [0, 0, 0, 0]
@@ -917,14 +947,44 @@ class PDModel(Model):
         else:
             return
 
+    # def make_agents(self):
+    #
+    #     # generate current experiment ppD pickle if one does not exist?
+    #     # if not os.path.isfile('agent_ppds.p'):
+    #     #     initialised = {}
+    #     #     for i in range(self.number_of_agents):
+    #     #         initialised[i+1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+    #     #         pickle.dump(initialised, open("agent_ppds.p", "wb"))
+    #
+    #     if not self.randspawn:
+    #         for i in range(self.number_of_agents):
+    #             """This is for adding agents in sequentially."""
+    #             x, y = self.coordinates.pop(0)
+    #             print("x, y:", x, y)
+    #             # x, y = self.grid.find_empty()
+    #             pdagent = PDAgent((x, y), self, True)
+    #             self.grid.place_agent(pdagent, (x, y))
+    #             self.schedule.add(pdagent)
+    #
+    #     elif self.randspawn:
+    #         """ This is for adding in agents randomly """
+    #         for i in range(self.number_of_agents):
+    #             x, y = self.coordinates.pop(random.randrange(len(self.coordinates)))
+    #             # print("x, y:", x, y)
+    #             # x, y = self.grid.find_empty()
+    #             pdagent = PDAgent((x, y), self, True)
+    #             self.grid.place_agent(pdagent, (x, y))
+    #             self.schedule.add(pdagent)
+
     def make_agents(self):
         with open("agent_ppds.p", "rb") as f:
             self.agent_ppds = pickle.load(f)
 
         if not self.randspawn:
             for i in range(self.number_of_agents):
+                # print(self.number_of_agents)
+                # print(self.coordinates)
                 """This is for adding agents in sequentially."""
-                print(self.coordinates)
                 x, y = self.coordinates.pop(0)
                 # print("x, y:", x, y)
                 # x, y = self.grid.find_empty()
@@ -1000,7 +1060,6 @@ class PDModel(Model):
             self.schedule.add(pdagent)
 
     def step(self):
-
         start = time.time()
         self.schedule.step()
         if self.step_count == self.rounds - 1:
@@ -1020,7 +1079,7 @@ class PDModel(Model):
         #     if self.step_count == 1:
         #         self.export_q_tables(True)
         #     export intitial q tables
-        if self.step_count == self.rounds-1:
+        if self.step_count == self.rounds - 1:
             if self.export_q:
                 for j in self.memory_states:
                     for k in range(2):
@@ -1039,97 +1098,6 @@ class PDModel(Model):
                             # writer.writeheader()
                             writer.writerow({'state': j})
 
-
-        # if self.step_count >= self.rounds:
-            # sys.exit()  # Do we need it to kill itself?
-
-    def run_model(self, rounds=5000):
+    def run_model(self, rounds=1000):
         for i in range(self.rounds):
             self.step()
-
-
-# parameter lists for each parameter to be tested in batch run
-br_params = {#"number_of_agents": [64],
-             #"theta": [0.015, #0.01, 0.015, 0.02],
-             #model.learning_rate
-             #"init_ppD": [0.5],
-             #"k": [35],
-             #"alpha": [0.1],
-             #"gamma": [0.95],
-             #"epsilon": [0.99],
-             #"sarsa_distro": [0.25, 0.50, 0.75],
-             "CC": [3],
-             "DD": [1],
-             "DC": [5,
-             #        2
-                    ],
-             "CD": [0],
-             #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
-                            #"MOODYLEARN"],
-
-             #"learnFrom": ["them"],
-             #"memoryPaired": [False],
-             #"msize": [1,4,7],
-
-             "moody_alpha": [0.1],
-             "moody_gamma": [0.95],
-             "moody_epsilon": [#0.1,
-                               #0.5,
-                               0.9
-                               ],
-             "moody_sarsa_oppo": [#"TFT",
-                                  #"LEARN",
-                                  "MOODYLEARN",
-                                #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
-                                #'MIXED',
-                                  ],
-             "moody_statemode": [#'stateless',
-                                 #'agentstate',
-                                 'moodstate'
-                                 ],
-             "moody_startmood": [#1,
-                                 #99,
-                                 50,
-                                 ],
-             "moody_MA": [#0,
-                          #0.001,
-                          #0.1,
-                          #0.2,
-                          #0.4,
-                          #0.6,
-                          0.8,
-                          #'v',
-                          ],
-             "moody_opponents": [True,
-                                 #False
-                                 ],
-             "startingBehav":['C',
-                              #'D'
-                              ]
-             }
-
-
-""" For collecting training data for kNN, please run one init_ppD at a time.
-    Otherwise, it doesn't export the ppD variable correctly to the pickle! """
-
-
-br = BatchRunner(PDModel,
-                 br_params,
-                 iterations=1,
-                 max_steps=5000,
-                 model_reporters={"Data Collector": lambda m: m.datacollector})
-
-if __name__ == '__main__':
-    br.run_all()
-    br_df = br.get_model_vars_dataframe()
-    br_step_data = pd.DataFrame()
-    for i in range(len(br_df["Data Collector"])):
-        if isinstance(br_df["Data Collector"][i], DataCollector):
-            i_run_data = br_df["Data Collector"][i].get_model_vars_dataframe()
-            br_step_data = br_step_data.append(i_run_data, ignore_index=True)
-    br_step_data.to_csv("PDModel_Step_Data_%s.csv" % (str(random.randint(1,200000))))  # this might not be as useful for importing
-
-
-
-
-
