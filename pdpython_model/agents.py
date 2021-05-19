@@ -677,16 +677,16 @@ class PDAgent(Agent):
                 # print("number_of_d increased by 1, is now", self.number_of_d)
             return choice[0]
 
-        elif strategy == "SWITCH":
-            if self.stepCount <= 100:
-                self.number_of_c += 1
-                return "C"
-            elif self.stepCount > 100 < 200:
-                self.number_of_d += 1
-                return "D"
-            else:
-                self.number_of_c += 1
-                return "C"
+        # elif strategy == "SWITCH":
+            # if self.stepCount <= 100:
+            #     self.number_of_c += 1
+            #     return "C"
+            # elif self.stepCount > 100 < 200:
+            #     self.number_of_d += 1
+            #     return "D"
+            # else:
+            #     self.number_of_c += 1
+            #     return "C"
 
         elif strategy == "LEARN":
             """ Use the epsilon-greedy algorithm to select a move to play. """
@@ -772,9 +772,15 @@ class PDAgent(Agent):
             #TODO: Should we be using epsilon, or 0.1, above??
 
             if moodyBehav == "C":
-                self.number_of_c += 1
+                if self.stepCount == 1:
+                    self.number_of_c += 0.5
+                else:
+                    self.number_of_c += 1
             elif moodyBehav == "D":
-                self.number_of_d += 1
+                if self.stepCount == 1:
+                    self.number_of_d += 0.5
+                else:
+                    self.number_of_d += 1
 
             return moodyBehav
 
@@ -1984,6 +1990,7 @@ class PDAgent(Agent):
                     # print('init qtable len:', len(self.moody_qtable))
                     self.states = copy.deepcopy(self.model.moody_memory_states)
 
+
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
                 self.find_average_move()
@@ -2027,6 +2034,7 @@ class PDAgent(Agent):
                     if self.moody_pp_aprime:
                         self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
                 else:
+
                     self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?

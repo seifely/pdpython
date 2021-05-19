@@ -216,7 +216,7 @@ step_element = StepCountDisplay()
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
 model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 25, 2, 64, 1),
-                "number_of_agents": UserSettableParameter('choice', 'Number of Agents', value=16,
+                "number_of_agents": UserSettableParameter('choice', 'Number of Agents', value=25,
                                           choices=[2, 4, 9, 16, 25, 36, 49, 64]),
                 "moody_sarsa_oppo": UserSettableParameter('choice', 'Opponent Type', value='TFT',
                                           choices=['MOODYLEARN', 'LEARN', 'TFT', 'VPP', 'ANGEL', 'DEVIL', 'RANDOM', 'WSLS', 'MIXED']),
@@ -243,9 +243,16 @@ model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of 
 
                 }
 
-chart_element = ChartModule([{"Label": "Cooperations", "Color": C_COLOR},
-                             {"Label": "Defections", "Color": D_COLOR}])
+#chart_element = ChartModule([{"Label": "Cooperations", "Color": C_COLOR},
+ #                            {"Label": "Defections", "Color": D_COLOR}], canvas_height=200, canvas_width=200)
+
+chart_element = ChartModule([{"Label": "Percentage Cooperations", "Color": C_COLOR},
+                             {"Label": "Percentage Defections", "Color": D_COLOR},
+                             {"Label": "Average Mood", "Color": "#ffc0cb"}])
+
+#chart_element_2 = ChartModule([{"Label": "Average Mood", "Color": "#ffc0cb"}], canvas_height=200, canvas_width=300)
 # TODO: Kind of want to add in mutual cooperations tracking, but that's extraneous right now
 
-server = ModularServer(PDModel, [canvas_element, step_element, chart_element], "Prisoner's Dilemma Simulation", model_params)
+server = ModularServer(PDModel, [canvas_element, step_element, chart_element, #chart_element_2
+                                 ], "Prisoner's Dilemma Simulation", model_params)
 server.port = 8521
