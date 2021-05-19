@@ -55,13 +55,13 @@ def get_num_defect_agents(model):
 def get_per_coop_agents(model):
     """ return number of cooperations"""
     agent_cooperations = [a.number_of_c for a in model.schedule.agents]
-    for i in agent_cooperations:
-        print(i)
+    # for i in agent_cooperations:
+    #     print(i)
     # print("hey", agent_cooperations)
     height = math.sqrt(len(agent_cooperations))
     interactions = calcInteractions(height)
     agent_cooperations = np.sum(agent_cooperations)
-    print("cop total", agent_cooperations.item(), "int", interactions)
+    # print("cop total", agent_cooperations.item(), "int", interactions)
     percentage_cooperations = (agent_cooperations.item() / interactions) * 100
     # print("lol", agent_cooperations.item())
     return percentage_cooperations
@@ -75,7 +75,7 @@ def get_per_defect_agents(model):
     interactions = calcInteractions(height)
     # print("hey", agent_defections)
     agent_defections = np.sum(agent_defections)
-    print("def total", agent_defections.item(), "int", interactions)
+    # print("def total", agent_defections.item(), "int", interactions)
     percentage_defections = (agent_defections.item() / interactions) * 100
     # print("lol", agent_defections.item())
     return percentage_defections
