@@ -1955,7 +1955,7 @@ class PDAgent(Agent):
                 self.previous_moves.append(self.move)
                 self.set_defaults(self.partner_IDs)
                 # print("My ppDs are:", self.ppD_partner)
-
+                # print("my name is agent ", self.ID, "my strategy is ", self.strategy)
                 if self.strategy == 'LEARN':
                     # Initialise the q tables and states on the first turn
                     self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
@@ -1966,7 +1966,6 @@ class PDAgent(Agent):
                     self.state_working_memory = sarsa_moody.init_statememory(copy.deepcopy(self.model.moody_memory_states), 2, self.moody_delta)
                     # print('init qtable len:', len(self.moody_qtable))
                     self.moody_states = copy.deepcopy(self.model.moody_memory_states)
-
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 self.find_average_move()
@@ -2113,7 +2112,7 @@ class PDAgent(Agent):
                 if self.model.moody_opponents:
                     myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                    self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+                    self.mood = sarsa_moody.update_mood(self.mood, reward, myAv, oppScore, oppAv)
 
 
             # for i in self.working_memory:

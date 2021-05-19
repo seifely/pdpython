@@ -77,7 +77,11 @@ def moody_action_alt(mood, state, qtable, moodAffectMode, epsilon, moodAffect, t
     """ The essence of this should be that we pick an action through epsilon greedy, then
         depending on which one we picked and our mood, we change epsilon. """
     r = random.randint(1, 100) / 100
-    current = qtable[tuple(state)]
+    if type(state[0]) == tuple:
+        state = state[0]
+    else:
+        state = tuple(state)
+    current = qtable[state]
     todo = 'C'  # just in case the next steps mess up, let's cooperate as default
     change = 0
     # print("My initial action is:", todo)
