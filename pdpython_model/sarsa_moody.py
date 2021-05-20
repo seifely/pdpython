@@ -72,12 +72,76 @@ def decay_value(initial, current, max_round, linear, floor):
             return floor
         else:
             return new_value
+        
+def moody_action_three(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
+    """ Fixed Amount should be in the model as a test parameter MA """
+    change = epsilon
+    epsChange = 0  # this should stay at no change if mood isn't high or low
+    current = qtable[tuple(state)]
+
+    r = random.randint(1, 100) / 100  # Still not sure about this line and below, it might need to be if r > 50?
+    if turn == 1:
+        todo = startingBehav
+    # Inititally starts with cooperation
+
+    else:
+        # we pick a move. if that move fits the behavioural condition, then we instead perhaps explore
+        if r < (1 - change):
+            # pick the optimal move
+            if current[0] > current[1]:
+                todo = 'C'
+            else:
+                todo = 'D'
+
+        else:
+            # explore
+            todo = random.choice(['C', 'D'])
+
+        # then we see if either of the behavioural conditions are met - i.e., were we high or low mood and D/C-ing
+        if mood > 70:
+            if todo == 'D':
+                change = moodAffect
+
+                if r < (1 - change):
+                    # pick the optimal move
+                    if current[0] > current[1]:
+                        todo = 'C'
+                    else:
+                        todo = 'D'
+
+                else:
+                    # explore
+                    todo = random.choice(['C', 'D'])
+
+                return todo, epsilon
+        elif mood < 30:
+            if todo == 'C':
+                change = moodAffect
+
+                if r < (1 - change):
+                    # pick the optimal move
+                    if current[0] > current[1]:
+                        todo = 'C'
+                    else:
+                        todo = 'D'
+
+                else:
+                    # explore
+                    todo = random.choice(['C', 'D'])
+                return todo, epsilon
+        # if we weren't in either of those behavioural conditions, then we can just return the original selection
+        else:
+            return todo, epsilon
 
 def moody_action_alt(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
     """ The essence of this should be that we pick an action through epsilon greedy, then
         depending on which one we picked and our mood, we change epsilon. """
     r = random.randint(1, 100) / 100
-    current = qtable[tuple(state)]
+    if type(state[0]) == tuple:
+        state = state[0]
+    else:
+        state = tuple(state)
+    current = qtable[state]
     todo = 'C'  # just in case the next steps mess up, let's cooperate as default
     change = 0
     # print("My initial action is:", todo)

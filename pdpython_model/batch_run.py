@@ -364,6 +364,12 @@ def get_average_payoffs(model):
     # return these thingies
     return statistics.mean(average_payoffs)
 
+def calcInteractions(height):
+    innSquare = ((height - 2) * (height - 2)) * 4
+    outWalls = ((height - 2) * 3) * 4
+    corners = 4 * 2
+    return innSquare + outWalls + corners
+
 
 class PDModel(Model):
 

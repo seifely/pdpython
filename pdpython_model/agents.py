@@ -677,16 +677,16 @@ class PDAgent(Agent):
                 # print("number_of_d increased by 1, is now", self.number_of_d)
             return choice[0]
 
-        elif strategy == "SWITCH":
-            if self.stepCount <= 100:
-                self.number_of_c += 1
-                return "C"
-            elif self.stepCount > 100 < 200:
-                self.number_of_d += 1
-                return "D"
-            else:
-                self.number_of_c += 1
-                return "C"
+        # elif strategy == "SWITCH":
+            # if self.stepCount <= 100:
+            #     self.number_of_c += 1
+            #     return "C"
+            # elif self.stepCount > 100 < 200:
+            #     self.number_of_d += 1
+            #     return "D"
+            # else:
+            #     self.number_of_c += 1
+            #     return "C"
 
         elif strategy == "LEARN":
             """ Use the epsilon-greedy algorithm to select a move to play. """
@@ -772,9 +772,15 @@ class PDAgent(Agent):
             #TODO: Should we be using epsilon, or 0.1, above??
 
             if moodyBehav == "C":
-                self.number_of_c += 1
+                if self.stepCount == 1:
+                    self.number_of_c += 0.5
+                else:
+                    self.number_of_c += 1
             elif moodyBehav == "D":
-                self.number_of_d += 1
+                if self.stepCount == 1:
+                    self.number_of_d += 0.5
+                else:
+                    self.number_of_d += 1
 
             return moodyBehav
 
@@ -1949,7 +1955,7 @@ class PDAgent(Agent):
                 self.previous_moves.append(self.move)
                 self.set_defaults(self.partner_IDs)
                 # print("My ppDs are:", self.ppD_partner)
-
+                # print("my name is agent ", self.ID, "my strategy is ", self.strategy)
                 if self.strategy == 'LEARN':
                     # Initialise the q tables and states on the first turn
                     self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
@@ -1960,7 +1966,6 @@ class PDAgent(Agent):
                     self.state_working_memory = sarsa_moody.init_statememory(copy.deepcopy(self.model.moody_memory_states), 2, self.moody_delta)
                     # print('init qtable len:', len(self.moody_qtable))
                     self.moody_states = copy.deepcopy(self.model.moody_memory_states)
-
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 self.find_average_move()
@@ -1983,6 +1988,7 @@ class PDAgent(Agent):
                     self.qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
                     # print('init qtable len:', len(self.moody_qtable))
                     self.states = copy.deepcopy(self.model.moody_memory_states)
+
 
                 self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
                 self.previous_moves.append(self.move)
@@ -2027,6 +2033,7 @@ class PDAgent(Agent):
                     if self.moody_pp_aprime:
                         self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
                 else:
+
                     self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
 
                 self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?
@@ -2105,7 +2112,7 @@ class PDAgent(Agent):
                 if self.model.moody_opponents:
                     myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                    self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+                    self.mood = sarsa_moody.update_mood(self.mood, reward, myAv, oppScore, oppAv)
 
 
             # for i in self.working_memory:

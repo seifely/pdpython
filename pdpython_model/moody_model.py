@@ -13,6 +13,7 @@ import sys
 import os.path
 import pickle
 import statistics
+import math
 
 from pdpython_model import statemaker
 from pdpython_model import statemaker_moody
@@ -50,6 +51,32 @@ def get_num_defect_agents(model):
     # print("lol", agent_defections.item())
     return agent_defections.item()
 
+def get_per_coop_agents(model):
+    """ return number of cooperations"""
+    agent_cooperations = [a.number_of_c for a in model.schedule.agents]
+    # print("hey", agent_cooperations)
+    height = math.sqrt(len(agent_cooperations))
+    interactions = calcInteractions(height)
+    agent_cooperations = np.sum(agent_cooperations)
+    # print("cop total", agent_cooperations.item(), "int", interactions)
+    percentage_cooperations = (agent_cooperations.item() / interactions) * 100
+    # print("lol", agent_cooperations.item())
+    return percentage_cooperations
+
+
+def get_per_defect_agents(model):
+    """ return number of defections"""
+
+    agent_defections = [a.number_of_d for a in model.schedule.agents]
+    height = math.sqrt(len(agent_defections))
+    interactions = calcInteractions(height)
+    # print("hey", agent_defections)
+    agent_defections = np.sum(agent_defections)
+    # print("def total", agent_defections.item(), "int", interactions)
+    percentage_defections = (agent_defections.item() / interactions) * 100
+    # print("lol", agent_defections.item())
+    return percentage_defections
+
 
 def get_cooperators(model):
     C_count = 0
@@ -74,6 +101,19 @@ def get_defectors(model):
             D_count += 1
 
     return D_count
+
+def get_av_mood(model):
+    total_mood = 0
+
+    agent_moods = [a.mood for a in model.schedule.agents]
+
+    for i in agent_moods:
+        current_agent = i
+        total_mood += current_agent
+
+    average_mood = total_mood / len(agent_moods)
+
+    return average_mood
 
 
 def get_tft_performance(model):
@@ -377,6 +417,11 @@ def get_average_payoffs(model):
     # return these thingies
     return statistics.mean(average_payoffs)
 
+def calcInteractions(height):
+    innSquare = ((height - 2) * (height - 2)) * 4
+    outWalls = ((height - 2) * 3) * 4
+    corners = 4 * 2
+    return innSquare + outWalls + corners
 
 class PDModel(Model):
 
@@ -510,6 +555,8 @@ class PDModel(Model):
         self.moody_startmood = moody_startmood
 
         self.startingBehav = startingBehav
+
+        self.n_interactions = calcInteractions(self.height)
 
         """ This section here changes the spawn locations if the number of agents is changed"""
         if self.number_of_agents == 2:
@@ -652,6 +699,9 @@ class PDModel(Model):
         self.datacollector = DataCollector(model_reporters={
             "Cooperations": get_num_coop_agents,
             "Defections": get_num_defect_agents,
+            "Percentage Cooperations": get_per_coop_agents,
+            "Percentage Defections": get_per_defect_agents,
+            "Average Mood": get_av_mood,
             "Cooperators": get_cooperators,
             "Defectors": get_defectors,
             "TFT Performance": get_tft_performance,
@@ -696,6 +746,8 @@ class PDModel(Model):
             self.make_set_agents()
         self.running = True
         self.datacollector.collect(self)
+
+
 
     def first_game_check(self):
         try:

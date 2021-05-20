@@ -248,9 +248,13 @@ model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of 
 
                 }
 
-chart_element = ChartModule([{"Label": "Cooperations", "Color": C_COLOR},
-                             {"Label": "Defections", "Color": D_COLOR}])
+# chart_element = ChartModule([{"Label": "Cooperations", "Color": C_COLOR},
+#                              {"Label": "Defections", "Color": D_COLOR}])
 # TODO: Kind of want to add in mutual cooperations tracking, but that's extraneous right now
+
+chart_element = ChartModule([{"Label": "Percentage Cooperations", "Color": C_COLOR},
+                             {"Label": "Percentage Defections", "Color": D_COLOR},
+                             {"Label": "Average Mood", "Color": "#ffc0cb"}])
 
 server = ModularServer(PDModel, [canvas_element, step_element, chart_element], "Prisoner's Dilemma Simulation", model_params)
 server.port = 8521
