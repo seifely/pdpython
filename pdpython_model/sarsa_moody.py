@@ -74,7 +74,7 @@ def decay_value(initial, current, max_round, linear, floor):
             return new_value
         
 def moody_action_three(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
-    """ Fixed Amount should be in the model as a test parameter MA """
+    """ IF USING THIS FUNCTION, USE A SMALL STARTING EPSILON AS IT USES A LARGER EPSILON VALUE SELECTIVELY """
     change = epsilon
     epsChange = 0  # this should stay at no change if mood isn't high or low
     current = qtable[tuple(state)]
@@ -136,6 +136,7 @@ def moody_action_three(mood, state, qtable, moodAffectMode, epsilon, moodAffect,
 def moody_action_alt(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
     """ The essence of this should be that we pick an action through epsilon greedy, then
         depending on which one we picked and our mood, we change epsilon. """
+    """ IF USING THIS FUNCTION, USE A LARGE EPSILON AND THEN IT DECAYS """
     r = random.randint(1, 100) / 100
     if type(state[0]) == tuple:
         state = state[0]
