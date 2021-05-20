@@ -759,13 +759,13 @@ class PDAgent(Agent):
                 # print(' MAM:', moodAffectMode)
                 # print(' e:', self.moody_epsilon)
                 # print(' MA:', self.model.moody_MA)
-                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_alt(self.mood, learning_state[id],
+                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_three(self.mood, learning_state[id],
                                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA,
                                                                               self.stepCount, self.model.startingBehav)
             else:
                 # this doesn't need to be here, not sure why the original version it was copied from was like this
                 # but I will leave it for now because it works
-                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_alt(self.mood, learning_state[id],
+                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_three(self.mood, learning_state[id],
                                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA,
                                                                               self.stepCount, self.model.startingBehav)
 

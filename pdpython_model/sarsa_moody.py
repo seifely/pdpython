@@ -72,6 +72,88 @@ def decay_value(initial, current, max_round, linear, floor):
             return floor
         else:
             return new_value
+
+# def moody_action_three(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
+#     """ IF USING THIS FUNCTION, USE A SMALL STARTING EPSILON AS IT USES A LARGER EPSILON VALUE SELECTIVELY """
+#     change = epsilon
+#     epsChange = 0  # this should stay at no change if mood isn't high or low
+#     current = qtable[tuple(state)]
+#
+#     r = random.randint(1, 100) / 100  # Still not sure about this line and below, it might need to be if r > 50?
+#     if turn == 1:
+#         print("I did my starting behaviour")
+#         todo = startingBehav
+#     # Inititally starts with cooperation
+#
+#     else:
+#         print("It isn't turn one, so I will pick a move")
+#         # we pick a move. if that move fits the behavioural condition, then we instead perhaps explore
+#         if r < (1 - change):
+#             print("r (", r, ") is less than", (1-change), "so I will pick optimally")
+#             # pick the optimal move
+#             if current[0] > current[1]:
+#                 todo = 'C'
+#             else:
+#                 todo = 'D'
+#
+#         else:
+#             print("r (", r, ") is greater than", (1 - change), "so I will explore")
+#             # explore
+#             todo = random.choice(['C', 'D'])
+#
+#         print("I am originally gonna do ", todo)
+#         # then we see if either of the behavioural conditions are met - i.e., were we high or low mood and D/C-ing
+#         if mood > 70:
+#             print("my mood is high")
+#             if todo == 'D':
+#                 print("and I am currently gonna defect, so let us decide again")
+#                 change = moodAffect
+#                 print("my epsilon is now", change)
+#                 if r < (1 - change):
+#                     print("r (", r, ") is smaller than the new", (1 - change), "so I will pick optimally")
+#                     # pick the optimal move
+#                     if current[0] > current[1]:
+#                         todo = 'C'
+#                     else:
+#                         todo = 'D'
+#
+#                 else:
+#                     # explore
+#                     print("r (", r, ") is greater than the new", (1 - change), "so I will explore")
+#                     todo = random.choice(['C', 'D'])
+#                 print("I am now gonna do ", todo)
+#                 return todo, epsilon
+#             else:
+#                 print("I didn't do the move condition even though my mood was low, so I will continue to do ", todo)
+#                 return todo, epsilon
+#         elif mood < 30:
+#             print("my mood is low")
+#             if todo == 'C':
+#                 print("and I chose to cooperate so let us decide again")
+#                 change = moodAffect
+#                 print("my epsilon is now ", change)
+#                 if r < (1 - change):
+#                     print("r (", r, ") is smaller than the new", (1 - change), "so I will pick optimally")
+#                     # pick the optimal move
+#                     if current[0] > current[1]:
+#                         todo = 'C'
+#                     else:
+#                         todo = 'D'
+#
+#                 else:
+#                     # explore
+#                     print("r (", r, ") is greater than the new", (1 - change), "so I will explore")
+#                     todo = random.choice(['C', 'D'])
+#                 print("I am now gonna do ", todo)
+#                 return todo, epsilon
+#             else:
+#                 print("I didn't do the move condition even though my mood was low, so I will continue to do ", todo)
+#                 return todo, epsilon
+#         # if we weren't in either of those behavioural conditions, then we can just return the original selection
+#         else:
+#             print("none of these conditions applied to me, so I will continue to do ", todo)
+#             return todo, epsilon
+
         
 def moody_action_three(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
     """ IF USING THIS FUNCTION, USE A SMALL STARTING EPSILON AS IT USES A LARGER EPSILON VALUE SELECTIVELY """
