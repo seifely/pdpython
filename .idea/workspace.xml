@@ -25,25 +25,34 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="281">
-              <caret line="761" column="73" selection-start-line="761" selection-start-column="73" selection-end-line="761" selection-end-column="73" />
+            <state relative-caret-position="176">
+              <caret line="1882" column="13" selection-start-line="1882" selection-start-column="13" selection-end-line="1882" selection-end-column="13" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
+                <element signature="e#23025#24278#0" />
+                <element signature="e#24576#25327#0" />
+                <element signature="e#25373#25729#0" />
+                <element signature="e#25776#27846#0" />
+                <element signature="e#27894#29346#0" />
+                <element signature="e#29392#30159#0" />
+                <element signature="e#30169#30197#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-547">
-              <caret line="156" column="8" selection-start-line="156" selection-start-column="8" selection-end-line="156" selection-end-column="8" />
+            <state relative-caret-position="927">
+              <caret line="213" column="4" selection-start-line="213" selection-start-column="4" selection-end-line="213" selection-end-column="4" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
+                <element signature="e#4454#6221#0" />
+                <element signature="e#4018#5519#0" />
               </folding>
             </state>
           </provider>
@@ -52,11 +61,22 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="623">
-              <caret line="1115" lean-forward="true" selection-start-line="1115" selection-end-line="1115" />
+            <state relative-caret-position="-1948">
+              <caret line="575" column="44" selection-start-line="575" selection-start-column="44" selection-end-line="575" selection-end-column="44" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
+                <element signature="e#27741#27830#0" />
+                <element signature="e#28160#28202#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pdpython_model/statemaker_moody.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="204">
+              <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -72,12 +92,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.working</find>
-      <find>init_q</find>
-      <find>self.moody_states</find>
-      <find>working_memory</find>
-      <find>tuple(</find>
-      <find>update_q</find>
       <find>init_stat</find>
       <find>moody_delta</find>
       <find>state_w</find>
@@ -102,6 +116,12 @@
       <find>moody_action_alt</find>
       <find>self.model</find>
       <find>moody_action(</find>
+      <find>print</find>
+      <find>pick_move</find>
+      <find>self.partner_moods</find>
+      <find>check_partner</find>
+      <find>'latest</find>
+      <find>self.model.startin</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -116,9 +136,9 @@
         <option value="$USER_HOME$/Downloads/RLEmotionalconvert.py" />
         <option value="$PROJECT_DIR$/pdpython_model/statemaker_moody.py" />
         <option value="$PROJECT_DIR$/pdpython_model/sarsa.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
         <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/sarsa_moody.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
       </list>
     </option>
   </component>
@@ -274,7 +294,7 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49919742" visible="true" weight="0.20864068" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49919742" visible="true" weight="0.113804005" />
       <window_info id="Structure" order="1" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info id="Favorites" order="2" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -287,7 +307,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32936078" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32827735" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50052685" side_tool="true" weight="0.2990249" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" visible="true" weight="0.32502708" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32502708" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -324,13 +344,6 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/pdpython_model/generic_model/batch_run.py" />
     <entry file="file://$USER_HOME$/.PyCharmCE2018.3/system/python_stubs/55578246/builtins.py" />
-    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/pdproject/Lib/site-packages/mesa/time.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="131" selection-start-line="131" selection-end-line="131" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Downloads/RLEmotionalconvert.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="312">
@@ -352,34 +365,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/statemaker_moody.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/('altepsilon_mood50_DC_5_5x5_mA_0.01_agentstate_MOODYLEARN_msarsa_no_4 agent 25.csv', 'a').csv" />
     <entry file="file://$PROJECT_DIR$/pdpython_model/model.py" />
     <entry file="file://$PROJECT_DIR$/pdpython_model/server.py" />
     <entry file="file://$PROJECT_DIR$/pdpython_model/run.py" />
-    <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/statemaker_moody.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="761" column="73" selection-start-line="761" selection-start-column="73" selection-end-line="761" selection-end-column="73" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="623">
-          <caret line="1115" lean-forward="true" selection-start-line="1115" selection-end-line="1115" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="204">
+          <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
         </state>
       </provider>
     </entry>
@@ -393,12 +386,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/pdproject/Lib/site-packages/mesa/time.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="131" selection-start-line="131" selection-end-line="131" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/batch_run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1948">
+          <caret line="575" column="44" selection-start-line="575" selection-start-column="44" selection-end-line="575" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#27741#27830#0" />
+            <element signature="e#28160#28202#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-547">
-          <caret line="156" column="8" selection-start-line="156" selection-start-column="8" selection-end-line="156" selection-end-column="8" />
+        <state relative-caret-position="927">
+          <caret line="213" column="4" selection-start-line="213" selection-start-column="4" selection-end-line="213" selection-end-column="4" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#4454#6221#0" />
+            <element signature="e#4018#5519#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="1882" column="13" selection-start-line="1882" selection-start-column="13" selection-end-line="1882" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#23025#24278#0" />
+            <element signature="e#24576#25327#0" />
+            <element signature="e#25373#25729#0" />
+            <element signature="e#25776#27846#0" />
+            <element signature="e#27894#29346#0" />
+            <element signature="e#29392#30159#0" />
+            <element signature="e#30169#30197#0" />
           </folding>
         </state>
       </provider>

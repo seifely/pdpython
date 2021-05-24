@@ -573,7 +573,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('startwith%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('MOODYTHREE_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -930,7 +930,7 @@ class PDModel(Model):
         if not self.randspawn:
             for i in range(self.number_of_agents):
                 """This is for adding agents in sequentially."""
-                print(self.coordinates)
+                # print(self.coordinates)
                 x, y = self.coordinates.pop(0)
                 # print("x, y:", x, y)
                 # x, y = self.grid.find_empty()
@@ -952,7 +952,7 @@ class PDModel(Model):
         qs = [a.qtable for a in self.schedule.agents]
         # we need to print/save a list of the keys
         # then print/save each
-        print('qs', qs)
+        # print('qs', qs)
         qvals = []
         for i in qs:
             if i is not []:
@@ -968,7 +968,7 @@ class PDModel(Model):
                         # append all the qvalues into one big list
                     qvals.append(temp_qs)
 
-        print('qvals', qvals)
+        # print('qvals', qvals)
         if init:
             with open('{} qinit.csv'.format(self.filename), 'a', newline='') as csvfile:
                 fieldnames = ['q']
@@ -1109,8 +1109,8 @@ br_params = {#"number_of_agents": [64],
              "moody_opponents": [True,
                                  #False
                                  ],
-             "startingBehav":['C',
-                              'D'
+             "startingBehav": ['C',
+                              #'D',
                               ]
              }
 

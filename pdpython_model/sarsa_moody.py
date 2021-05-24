@@ -154,66 +154,64 @@ def decay_value(initial, current, max_round, linear, floor):
 #             print("none of these conditions applied to me, so I will continue to do ", todo)
 #             return todo, epsilon
 
-        
-def moody_action_three(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
+
+def moody_action_three(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
     """ IF USING THIS FUNCTION, USE A SMALL STARTING EPSILON AS IT USES A LARGER EPSILON VALUE SELECTIVELY """
+    # print(mood, state, qtable, epsilon, moodAffect, turn, startingBehav)
     change = epsilon
     epsChange = 0  # this should stay at no change if mood isn't high or low
     current = qtable[tuple(state)]
 
     r = random.randint(1, 100) / 100  # Still not sure about this line and below, it might need to be if r > 50?
-    if turn == 1:
-        todo = startingBehav
-    # Inititally starts with cooperation
 
+    # Inititally starts with StartingBehav outside of this function
+
+
+    # we pick a move. if that move fits the behavioural condition, then we instead perhaps explore
+    if r < (1 - change):
+        # pick the optimal move
+        if current[0] > current[1]:
+            todo = 'C'
+        else:
+            todo = 'D'
     else:
-        # we pick a move. if that move fits the behavioural condition, then we instead perhaps explore
-        if r < (1 - change):
-            # pick the optimal move
-            if current[0] > current[1]:
-                todo = 'C'
+        # explore
+        todo = random.choice(['C', 'D'])
+
+    # then we see if either of the behavioural conditions are met - i.e., were we high or low mood and D/C-ing
+    if mood > 70:
+        if todo == 'D':
+            change = moodAffect
+
+            if r < (1 - change):
+                # pick the optimal move
+                if current[0] > current[1]:
+                    todo = 'C'
+                else:
+                    todo = 'D'
+
             else:
-                todo = 'D'
+                # explore
+                todo = random.choice(['C', 'D'])
+            return todo
+    elif mood < 30:
+        if todo == 'C':
+            change = moodAffect
 
-        else:
-            # explore
-            todo = random.choice(['C', 'D'])
-
-        # then we see if either of the behavioural conditions are met - i.e., were we high or low mood and D/C-ing
-        if mood > 70:
-            if todo == 'D':
-                change = moodAffect
-
-                if r < (1 - change):
-                    # pick the optimal move
-                    if current[0] > current[1]:
-                        todo = 'C'
-                    else:
-                        todo = 'D'
-
+            if r < (1 - change):
+                # pick the optimal move
+                if current[0] > current[1]:
+                    todo = 'C'
                 else:
-                    # explore
-                    todo = random.choice(['C', 'D'])
+                    todo = 'D'
 
-                return todo, epsilon
-        elif mood < 30:
-            if todo == 'C':
-                change = moodAffect
-
-                if r < (1 - change):
-                    # pick the optimal move
-                    if current[0] > current[1]:
-                        todo = 'C'
-                    else:
-                        todo = 'D'
-
-                else:
-                    # explore
-                    todo = random.choice(['C', 'D'])
-                return todo, epsilon
+            else:
+                # explore
+                todo = random.choice(['C', 'D'])
+            return todo
         # if we weren't in either of those behavioural conditions, then we can just return the original selection
-        else:
-            return todo, epsilon
+
+    return todo
 
 def moody_action_alt(mood, state, qtable, moodAffectMode, epsilon, moodAffect, turn, startingBehav):
     """ The essence of this should be that we pick an action through epsilon greedy, then

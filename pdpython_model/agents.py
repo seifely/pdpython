@@ -737,40 +737,66 @@ class PDAgent(Agent):
             #     egreedy = sarsa_moody.egreedy_action(self.moody_epsilon, self.moody_qtable, tuple(learning_state[id]), self.model.moody_memoryPaired)
             # else:
             #     egreedy = sarsa_moody.egreedy_action(self.moody_epsilon, self.moody_qtable, learning_state[id], self.model.moody_memoryPaired)
+
             if self.model.moody_MA is not 'v':
                 moodAffectMode = 'Fixed'
             else:
                 moodAffectMode = 'Mood'
 
-
-            # print(self.partner_moods)
-            # print('latest move:', self.partner_latest_move[id])
-            # print('id:', id)
-            # print('partner_mood', self.partner_moods[id])
-            # print('statemode', self.statemode)
-
-            if self.moody_delta > 1:
-                # print("Mood,", self.mood)
-                # print(' State:',sarsa_moody.observe_state(self.partner_latest_move[id],
-                #                                         id, self.partner_moods[id],
-                #                                         self.statemode))
-                # print(' Len Qtable:', len(self.moody_qtable))
-                # print(self.moody_qtable)
-                # print(' MAM:', moodAffectMode)
-                # print(' e:', self.moody_epsilon)
-                # print(' MA:', self.model.moody_MA)
-                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_three(self.mood, learning_state[id],
-                                                      self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA,
-                                                                              self.stepCount, self.model.startingBehav)
+            if self.stepCount == 1:
+                moodyBehav = self.model.startingBehav
+                self.moody_epsilon = self.moody_epsilon
             else:
-                # this doesn't need to be here, not sure why the original version it was copied from was like this
-                # but I will leave it for now because it works
-                moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_three(self.mood, learning_state[id],
-                                                      self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA,
-                                                                              self.stepCount, self.model.startingBehav)
 
-            #TODO: Should we be using epsilon, or 0.1, above??
+                # print(self.partner_moods, type(self.partner_moods))
+                # print(self.partner_latest_move, type(self.partner_latest_move))
+                # print('latest move:', self.partner_latest_move[id], type(self.partner_latest_move[id]))
+                # print('id:', id, type(id))
+                # print('partner_mood', self.partner_moods[id], type(self.partner_moods[id]))
+                # print('statemode', self.statemode, type(self.statemode))
 
+                if self.moody_delta > 1:
+                    # print("Mood,", self.mood, type(self.mood))
+                    # print(' State:', sarsa_moody.observe_state(self.partner_latest_move[id],
+                    #                                         id, self.partner_moods[id],
+                    #                                         self.statemode))
+                    # print(' Len Qtable:', len(self.moody_qtable))
+                    # print(self.moody_qtable, type(self.moody_qtable))
+                    # print(' MAM:', moodAffectMode, type(moodAffectMode))
+                    # print(' e:', self.moody_epsilon, type(self.moody_epsilon))
+                    # print(' MA:', self.model.moody_MA, type(self.model.moody_MA))
+                    # print(' Starting Behav', self.model.startingBehav, type(self.model.startingBehav))
+                    # print(' Stepcount', self.stepCount, type(self.stepCount))
+                    #
+                    # print('Learning state ', learning_state[id], type(learning_state[id]))
+
+                    # moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_alt(self.mood, learning_state[id],
+                    #                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA,
+                    #                                                               self.stepCount, self.model.startingBehav)
+
+                    moodyBehav = sarsa_moody.moody_action_three(self.mood, learning_state[id],
+                                                                                  self.moody_qtable, moodAffectMode,
+                                                                                  self.moody_epsilon,
+                                                                                  self.model.moody_MA,
+                                                                                  )
+
+                    # print('mbehav A', moodyBehav)
+                else:
+                    # this doesn't need to be here, not sure why the original version it was copied from was like this
+                    # but I will leave it for now because it works
+                    # moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_alt(self.mood, learning_state[id],
+                    #                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA,
+                    #                                                               self.stepCount, self.model.startingBehav)
+
+                    moodyBehav = sarsa_moody.moody_action_three(self.mood, learning_state[id],
+                                                                                  self.moody_qtable, moodAffectMode,
+                                                                                  self.moody_epsilon,
+                                                                                  self.model.moody_MA,)
+                    # print('mbehav B', moodyBehav)
+
+            self.moody_epsilon = self.model.moody_epsilon
+
+            #TODO: below, this should be conditional on NOT using the batchrunner (possibly)
             if moodyBehav == "C":
                 if self.stepCount == 1:
                     self.number_of_c += 0.5
@@ -782,6 +808,7 @@ class PDAgent(Agent):
                 else:
                     self.number_of_d += 1
 
+            # print('mbehav C', moodyBehav)
             return moodyBehav
 
     def change_update_value(self, partner_behaviour):
@@ -1853,8 +1880,8 @@ class PDAgent(Agent):
         self.output_data_to_model()
         if self.model.collect_data:
             self.output_data_to_file(self.outcome_list)
-            if self.attempts_taken > 1:
-                print("Agent", self.ID, "on step", self.stepCount, "took", self.attempts_taken, "attempt/s to export.")
+            #if self.attempts_taken > 1:
+                # print("Agent", self.ID, "on step", self.stepCount, "took", self.attempts_taken, "attempt/s to export.")
             self.attempts_taken = 0
 
     def set_starting_oldstates(self, strategy, learning_from, size):
