@@ -442,7 +442,7 @@ def update_mood(currentmood, score, averageScore, oppScore, oppAverage):
     ab = (100 - currentmood) / 100
     omega = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))  # perceived payoff
     dif = score - omega  # difference between the score and the perceived payoff
-    newMood = currentmood + (score - averageScore) + omega
+    newMood = currentmood + ((score - averageScore) + omega)
     newMood = min(99.999, newMood)
     newMood = max(0.0001, newMood)
     # print('Mood:', newMood)

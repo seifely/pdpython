@@ -2139,7 +2139,13 @@ class PDAgent(Agent):
                 if self.model.moody_opponents:
                     myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
+                    if self.ID == 9:
+                        print("It's turn ", self.stepCount)
+                        print("My mood going into this was ", self.mood)
+                        print("My values were ", reward, myAv, oppScore, oppAv)
                     self.mood = sarsa_moody.update_mood(self.mood, reward, myAv, oppScore, oppAv)
+                    if self.ID == 9:
+                        print("My mood coming out of it was ", self.mood)
 
 
             # for i in self.working_memory:

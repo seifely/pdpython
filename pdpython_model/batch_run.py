@@ -573,7 +573,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('MOODYTHREE_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('M3_vastmood_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1089,19 +1089,19 @@ br_params = {#"number_of_agents": [64],
                                 #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                 #'MIXED',
                                   ],
-             "moody_statemode": ['stateless',
-                                 'agentstate',
+             "moody_statemode": [#'stateless',
+                                 #'agentstate',
                                  'moodstate'
                                  ],
              "moody_startmood": [#1,
                                  #99,
                                  50,
                                  ],
-             "moody_MA": [0,
+             "moody_MA": [#0,
                           #0.001,
                           #0.1,
                           #0.2,
-                          0.4,
+                          #0.4,
                           #0.6,
                           0.8,
                           #'v',
@@ -1121,7 +1121,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=5,
+                 iterations=3,
                  max_steps=5000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
