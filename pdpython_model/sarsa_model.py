@@ -493,6 +493,7 @@ class PDModel(Model):
                  moody_opponents=True,
                  moody_startmood=50,
                  startingBehav='C',
+                 sensitivity=0,
                  ):
 
         # ---------- Model Parameters --------
@@ -559,6 +560,7 @@ class PDModel(Model):
         self.moody_startmood = moody_startmood
 
         self.startingBehav = startingBehav
+        self.sensitivity = sensitivity
 
         """ This section here changes the spawn locations if the number of agents is changed"""
         if self.number_of_agents == 2:

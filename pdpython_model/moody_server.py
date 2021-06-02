@@ -235,6 +235,7 @@ model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of 
                 "moody_epsilon": UserSettableParameter('number', 'Starting Epsilon (Default: 0.9)', value=0.9),
                 "moody_startmood": UserSettableParameter('slider', 'Starting Mood (Default: 50)', 50,1,100,1),
                 "moody_MA": UserSettableParameter('slider', 'Value of mA', 0.5,0,1,0.001),
+                "sensitivity": UserSettableParameter('slider', 'Emotional Sensitivity', 0, 0, 100, 5)
 
 
                 # "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),

@@ -2139,13 +2139,13 @@ class PDAgent(Agent):
                 if self.model.moody_opponents:
                     myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                    if self.ID == 9:
-                        print("It's turn ", self.stepCount)
-                        print("My mood going into this was ", self.mood)
-                        print("My values were ", reward, myAv, oppScore, oppAv)
-                    self.mood = sarsa_moody.update_mood(self.mood, reward, myAv, oppScore, oppAv)
-                    if self.ID == 9:
-                        print("My mood coming out of it was ", self.mood)
+                    # if self.ID == 9:
+                    #     print("It's turn ", self.stepCount)
+                    #     print("My mood going into this was ", self.mood)
+                    #     print("My values were ", reward, myAv, oppScore, oppAv)
+                    self.mood = sarsa_moody.update_mood_new(self.mood, reward, myAv, oppScore, oppAv, False, 0)
+                    # if self.ID == 9:
+                    #     print("My mood coming out of it was ", self.mood)
 
 
             # for i in self.working_memory:
@@ -2282,8 +2282,14 @@ class PDAgent(Agent):
                 myAv, oppAv, oppScore = self.averageScoreComparison(i, True)
                 #TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
                 # self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
-                self.mood = sarsa_moody.update_mood(self.mood, reward, myAv, oppScore, oppAv)
 
+                # if self.ID == 9:
+                #     print("It's turn ", self.stepCount)
+                #     print("My mood going into this was ", self.mood)
+                #     print("My values were ", reward, myAv, oppScore, oppAv)
+                self.mood = sarsa_moody.update_mood_new(self.mood, reward, myAv, oppScore, oppAv, False, 0)
+                # if self.ID == 9:
+                    # print("My mood coming out of it was ", self.mood)
 
 
             # for i in self.working_memory:
@@ -2320,7 +2326,7 @@ class PDAgent(Agent):
                 # Update how we feel
                 # TODO: update mood earlier, after each Q value update??
                 # myAv, oppAv, oppScore = self.averageScoreComparison(i)
-                # self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+                # self.mood = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
 
             if self.model.moody_export_q:
                 if self.stepCount == 1:
@@ -2347,7 +2353,7 @@ class PDAgent(Agent):
                 for i in self.partner_IDs:
                     myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                    self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+                    self.mood = sarsa_moody.update_mood_new(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
 
             if self.last_round:
                 if self.strategy == 'VPP':

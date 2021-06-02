@@ -438,11 +438,29 @@ def estimateFutureRewards(mood, memory):
 #     print('Mood:', newMood)
 #     return newMood
 
-def update_mood(currentmood, score, averageScore, oppScore, oppAverage):
+def update_mood_old(currentmood, score, averageScore, oppScore, oppAverage, sensitive, sensitivity):
     ab = (100 - currentmood) / 100
     omega = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))  # perceived payoff
     dif = score - omega  # difference between the score and the perceived payoff
-    newMood = currentmood + ((score - averageScore) + omega)
+    adjustment = (score - averageScore) + omega
+    if sensitive:
+        if adjustment < 0:
+            adjustment = adjustment * sensitivity
+    newMood = currentmood + adjustment
+    newMood = min(99.999, newMood)
+    newMood = max(0.0001, newMood)
+    # print('Mood:', newMood)
+    return newMood
+
+def update_mood_new(currentmood, score, averageScore, oppScore, oppAverage, sensitive, sensitivity):
+    ab = (100 - currentmood) / 100
+    omega = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))  # perceived payoff
+    dif = score - omega  # difference between the score and the perceived payoff
+    adjustment = (score - omega)
+    if sensitive:
+        if adjustment < 0:
+            adjustment = adjustment * sensitivity
+    newMood = currentmood + adjustment
     newMood = min(99.999, newMood)
     newMood = max(0.0001, newMood)
     # print('Mood:', newMood)
