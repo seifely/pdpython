@@ -2143,7 +2143,7 @@ class PDAgent(Agent):
                     #     print("It's turn ", self.stepCount)
                     #     print("My mood going into this was ", self.mood)
                     #     print("My values were ", reward, myAv, oppScore, oppAv)
-                    self.mood = sarsa_moody.update_mood_new(self.mood, reward, myAv, oppScore, oppAv, False, 0)
+                    self.mood = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, False, 0)
                     # if self.ID == 9:
                     #     print("My mood coming out of it was ", self.mood)
 
@@ -2287,7 +2287,7 @@ class PDAgent(Agent):
                 #     print("It's turn ", self.stepCount)
                 #     print("My mood going into this was ", self.mood)
                 #     print("My values were ", reward, myAv, oppScore, oppAv)
-                self.mood = sarsa_moody.update_mood_new(self.mood, reward, myAv, oppScore, oppAv, False, 0)
+                self.mood = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, False, 0)
                 # if self.ID == 9:
                     # print("My mood coming out of it was ", self.mood)
 
@@ -2353,7 +2353,7 @@ class PDAgent(Agent):
                 for i in self.partner_IDs:
                     myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                    self.mood = sarsa_moody.update_mood_new(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
+                    self.mood = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
 
             if self.last_round:
                 if self.strategy == 'VPP':

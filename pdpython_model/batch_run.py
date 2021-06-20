@@ -418,6 +418,8 @@ class PDModel(Model):
                  epsilon_floor=0.05,
 
                  moody_sarsa_spawn=True,  # should mean checkerboard
+                 
+
                  moody_sarsa_training=True,
                  moody_sarsa_testing=True,
                  moody_sarsa_distro=0,
@@ -437,6 +439,8 @@ class PDModel(Model):
                  moody_opponents=True,
                  moody_startmood=50,
                  startingBehav='C',
+
+
                  sensitivity=0,
                  ):
 
@@ -576,7 +580,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('M3_newmood_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('M3_redomood_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1093,18 +1097,18 @@ br_params = {#"number_of_agents": [64],
                                 #'MIXED',
                                   ],
              "moody_statemode": [#'stateless',
-                                 #'agentstate',
-                                 'moodstate'
+                                 'agentstate',
+                                 #'moodstate'
                                  ],
              "moody_startmood": [#1,
                                  #99,
                                  50,
                                  ],
-             "moody_MA": [0,
+             "moody_MA": [#0,
                           #0.001,
                           #0.1,
                           #0.2,
-                          0.4,
+                          #0.4,
                           #0.6,
                           0.8,
                           #'v',
@@ -1125,8 +1129,8 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
-                 max_steps=7500,
+                 iterations=1,
+                 max_steps=10000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
