@@ -159,6 +159,15 @@ class PDAgent(Agent):
 
         self.state_working_memory = {}  # The paired (s,a) memory used to calculate psi for estimated payoff
 
+
+        # ------------------------ SENSITIVITY ----------------------------
+
+        self.sensitivity_mod = 20  # Initialise this at full, naive and not expecting betrayal
+        if self.ID in self.model.sensitive_agents:
+            self.sensitive = True
+
+        # ----------------------- SVO GLOBALS ------------------------
+
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
         self.number_of_d = 0
@@ -1468,7 +1477,8 @@ class PDAgent(Agent):
                                   'uv_%d' % self.ID,
                                   'ps_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
                                   'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
-                                  'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID]
+                                  'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID,
+                                  'sensitivity_%d' % self.ID]
 
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -1510,7 +1520,8 @@ class PDAgent(Agent):
                          'globav_%d' % self.ID: self.globalAvPayoff,
                          'epsilon_%d' % self.ID: self.moody_epsilon,
                          'alpha_%d' % self.ID: self.moody_alpha,
-                         'mood_%d' % self.ID: self.mood})
+                         'mood_%d' % self.ID: self.mood,
+                         'sensitivity_%d' % self.ID: self.sensitivity_mod})
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
 
@@ -1526,7 +1537,8 @@ class PDAgent(Agent):
                                   'm4_%d' % self.ID, 'uv_%d' % self.ID,
                                   'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
                                   'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
-                                  'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID]
+                                  'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID,
+                                  'sensitivity_%d' % self.ID]
 
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -1568,7 +1580,8 @@ class PDAgent(Agent):
                          'globav_%d' % self.ID: self.globalAvPayoff,
                          'epsilon_%d' % self.ID: self.epsilon,
                          'alpha_%d' % self.ID: self.alpha,
-                         'mood_%d' % self.ID: self.mood})
+                         'mood_%d' % self.ID: self.mood,
+                         'sensitivity_%d' % self.ID: self.sensitivity_mod})
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
 
@@ -2143,7 +2156,7 @@ class PDAgent(Agent):
                     #     print("It's turn ", self.stepCount)
                     #     print("My mood going into this was ", self.mood)
                     #     print("My values were ", reward, myAv, oppScore, oppAv)
-                    self.mood = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, False, 0)
+                    self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                     # if self.ID == 9:
                     #     print("My mood coming out of it was ", self.mood)
 
@@ -2287,7 +2300,7 @@ class PDAgent(Agent):
                 #     print("It's turn ", self.stepCount)
                 #     print("My mood going into this was ", self.mood)
                 #     print("My values were ", reward, myAv, oppScore, oppAv)
-                self.mood = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, False, 0)
+                self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                 # if self.ID == 9:
                     # print("My mood coming out of it was ", self.mood)
 
@@ -2353,7 +2366,7 @@ class PDAgent(Agent):
                 for i in self.partner_IDs:
                     myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                    self.mood = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
+                    self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
 
             if self.last_round:
                 if self.strategy == 'VPP':

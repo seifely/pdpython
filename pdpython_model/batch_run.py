@@ -418,7 +418,7 @@ class PDModel(Model):
                  epsilon_floor=0.05,
 
                  moody_sarsa_spawn=True,  # should mean checkerboard
-                 
+                 sensitive_agents=[],
 
                  moody_sarsa_training=True,
                  moody_sarsa_testing=True,
@@ -448,6 +448,7 @@ class PDModel(Model):
         self.height = height
         self.width = width
         self.number_of_agents = number_of_agents
+        self.agentIDs = list(range(1, (number_of_agents + 1)))
         self.step_count = 0
         self.DD = DD
         self.CC = CC
@@ -508,6 +509,7 @@ class PDModel(Model):
         self.moody_startmood = moody_startmood
 
         self.sensitivity = sensitivity
+        self.sensitive_agents = sensitive_agents
 
         self.startingBehav = startingBehav
 
@@ -620,7 +622,7 @@ class PDModel(Model):
                                          (4, 2),
                                          (5, 2), (6, 2), (7, 2)]
 
-        self.agentIDs = list(range(1, (number_of_agents + 1)))
+
 
         # ----- Storage -----
 
@@ -1119,7 +1121,8 @@ br_params = {#"number_of_agents": [64],
              "startingBehav": ['C',
                               #'D',
                               ],
-             "sensitivity": [0],
+             #"sensitivity": [0],
+             "sensitive_agents": [[1], [13],]  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
              }
 
 
@@ -1129,8 +1132,8 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
-                 max_steps=10000,
+                 iterations=3,
+                 max_steps=3000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
