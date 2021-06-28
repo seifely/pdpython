@@ -162,9 +162,11 @@ class PDAgent(Agent):
 
         # ------------------------ SENSITIVITY ----------------------------
 
-        self.sensitivity_mod = 20  # Initialise this at full, naive and not expecting betrayal
-        if self.ID in self.model.sensitive_agents:
+        self.sensitivity_mod = 50  # Initialise this at full, naive and not expecting betrayal
+        if self.ID in list(self.model.sensitive_agents):
             self.sensitive = True
+        else:
+            self.sensitive = False
 
         # ----------------------- SVO GLOBALS ------------------------
 

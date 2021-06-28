@@ -438,22 +438,56 @@ def estimateFutureRewards(mood, memory):
 #     print('Mood:', newMood)
 #     return newMood
 
+def update_mood_svo(currentmood, score, averageScore, oppScore, oppAverage, orientation):
+    ab = (100 - currentmood) / 100
+    # omega = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))  # perceived payoff
+    omega = 0
+    # dif = score - omega  # difference between the score and the perceived payoff
+    adjustment = (score - averageScore) + omega
+    # if sensitive:
+    #     # print("My original adjustment was:", adjustment)
+    #     if adjustment < 0:
+    #         """Sensitivity should be used, which has been building up on every turn since a negative outcome.
+    #                         Once used, it then resets the clock. """
+    #         # print("My sensitivitiy is", sensitivity)
+    #         sensitivity = min(100.00, sensitivity)
+    #         # print("My sensitivitiy is now", sensitivity)
+    #         adjustment = adjustment * sensitivity
+    #         sensitivity = 0
+    #         # print("The mood adjustment is", adjustment)
+    #     else:
+    #         """This linearly increases the sensitivity for each turn it isn't activated."""
+    #         sensitivity += 10   # How much this increases could be indicative of forgetfulness, forgivingness, naivete
+    # # print("The mood adjustment is ", adjustment)
+    newMood = currentmood + adjustment
+    # print("The new mood is ", newMood)
+    newMood = min(99.999, newMood)
+    newMood = max(0.0001, newMood)
+    # print('Mood:', newMood)
+    return newMood, 0
+
 def update_mood_old(currentmood, score, averageScore, oppScore, oppAverage, sensitive, sensitivity):
     ab = (100 - currentmood) / 100
     omega = averageScore - ((ab * max((oppAverage - averageScore), 0)) - (ab * max((averageScore - oppAverage), 0)))  # perceived payoff
-    dif = score - omega  # difference between the score and the perceived payoff
+    # dif = score - omega  # difference between the score and the perceived payoff
     adjustment = (score - averageScore) + omega
     if sensitive:
+        # print("My original adjustment was:", adjustment)
         if adjustment < 0:
             """Sensitivity should be used, which has been building up on every turn since a negative outcome.
                             Once used, it then resets the clock. """
-            sensitivity = min(20.00, sensitivity)
+            # print("My sensitivitiy is", sensitivity)
+            sensitivity = min(100.00, sensitivity)
+            # print("My sensitivitiy is now", sensitivity)
             adjustment = adjustment * sensitivity
             sensitivity = 0
+            # print("The mood adjustment is", adjustment)
         else:
             """This linearly increases the sensitivity for each turn it isn't activated."""
-            sensitivity += 1
+            sensitivity += 10   # How much this increases could be indicative of forgetfulness, forgivingness, naivete
+    # print("The mood adjustment is ", adjustment)
     newMood = currentmood + adjustment
+    # print("The new mood is ", newMood)
     newMood = min(99.999, newMood)
     newMood = max(0.0001, newMood)
     # print('Mood:', newMood)
@@ -465,15 +499,19 @@ def update_mood_new(currentmood, score, averageScore, oppScore, oppAverage, sens
     dif = score - omega  # difference between the score and the perceived payoff
     adjustment = (score - omega)
     if sensitive:
+        print("My original adjustment was:", adjustment)
         if adjustment < 0:
             """Sensitivity should be used, which has been building up on every turn since a negative outcome.
                 Once used, it then resets the clock. """
-            sensitivity = min(20.00, sensitivity)
+            print("My sensitivitiy is", sensitivity)
+            sensitivity = min(100, sensitivity)
+            print("My sensitivitiy is now", sensitivity)
             adjustment = adjustment * sensitivity
+            print("The mood adjustment is", adjustment)
             sensitivity = 0
         else:
             """This linearly increases the sensitivity for each turn it isn't activated."""
-            sensitivity += 1
+            sensitivity += 10
     newMood = currentmood + adjustment
     newMood = min(99.999, newMood)
     newMood = max(0.0001, newMood)
