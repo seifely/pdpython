@@ -407,7 +407,7 @@ class PDModel(Model):
 
                  sarsa_spawn=False,  # should mean checkerboard
                  sarsa_training=False,          #TODO: THESE VARIABLES HAVE BEEN TURNED OFF FOR MOODY SARSA TESTING
-                 sarsa_testing=False,
+                 sarsa_testing=True,
                  sarsa_distro=0,
                  sarsa_oppo="LEARN",
                  epsilon=0.99,
@@ -582,7 +582,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('M3_redomood_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('sarsa_innerouter_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1082,8 +1082,8 @@ br_params = {#"number_of_agents": [64],
              #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
                             #"MOODYLEARN"],
 
-             #"learnFrom": ["them"],
-             #"memoryPaired": [False],
+             # "learnFrom": ["them"],
+             # "memoryPaired": [False],
              #"msize": [1,4,7],
 
              "moody_alpha": [0.1],
@@ -1093,14 +1093,14 @@ br_params = {#"number_of_agents": [64],
                                #0.9
                                ],
              "moody_sarsa_oppo": [#"TFT",
-                                  #"LEARN",
-                                  "MOODYLEARN",
+                                  "LEARN",
+                                  #"MOODYLEARN",
                                 #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                 #'MIXED',
                                   ],
              "moody_statemode": [#'stateless',
-                                 'agentstate',
-                                 #'moodstate'
+                                 #'agentstate',
+                                 'moodstate'
                                  ],
              "moody_startmood": [#1,
                                  #99,
@@ -1122,7 +1122,8 @@ br_params = {#"number_of_agents": [64],
                               #'D',
                               ],
              #"sensitivity": [0],
-             "sensitive_agents": [[1], [13],]  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
+             "sensitive_agents": [(0,), #(0, 13]),
+                                  ],  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
              }
 
 
@@ -1133,7 +1134,7 @@ br_params = {#"number_of_agents": [64],
 br = BatchRunner(PDModel,
                  br_params,
                  iterations=3,
-                 max_steps=3000,
+                 max_steps=10000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
