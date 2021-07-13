@@ -478,7 +478,7 @@ class PDModel(Model):
                  moody_sarsa_testing=False,
                  moody_sarsa_distro=0,
                  moody_sarsa_oppo="TFT",
-                 moody_epsilon=0.9,
+                 moody_epsilon=0.1,
                  moody_alpha=0.1,
                  moody_gamma=0.95,
                  moody_export_q=True,

@@ -162,9 +162,11 @@ class PDAgent(Agent):
 
         # ------------------------ SENSITIVITY ----------------------------
 
-        self.sensitivity_mod = 20  # Initialise this at full, naive and not expecting betrayal
-        if self.ID in self.model.sensitive_agents:
+        self.sensitivity_mod = 50  # Initialise this at full, naive and not expecting betrayal
+        if self.ID in list(self.model.sensitive_agents):
             self.sensitive = True
+        else:
+            self.sensitive = False
 
         # ----------------------- SVO GLOBALS ------------------------
 
@@ -2154,11 +2156,11 @@ class PDAgent(Agent):
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
                     # if self.ID == 9:
                     #     print("It's turn ", self.stepCount)
-                    #     print("My mood going into this was ", self.mood)
-                    #     print("My values were ", reward, myAv, oppScore, oppAv)
+                    # print("My mood going into this was ", self.mood)
+                    # print("My values were ", reward, myAv, oppScore, oppAv)
                     self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                     # if self.ID == 9:
-                    #     print("My mood coming out of it was ", self.mood)
+                    # print("My mood coming out of it was ", self.mood, "and my sensitiviy_mod is ", self.sensitive)
 
 
             # for i in self.working_memory:
@@ -2297,12 +2299,12 @@ class PDAgent(Agent):
                 # self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
 
                 # if self.ID == 9:
-                #     print("It's turn ", self.stepCount)
-                #     print("My mood going into this was ", self.mood)
+                # print("I'm agent", self.ID)
+                # print("My mood going into this was ", self.mood)
                 #     print("My values were ", reward, myAv, oppScore, oppAv)
                 self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                 # if self.ID == 9:
-                    # print("My mood coming out of it was ", self.mood)
+                # print("My mood coming out of it was ", self.mood, "and my mod is", self.sensitivity_mod)
 
 
             # for i in self.working_memory:

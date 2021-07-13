@@ -582,7 +582,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('M3_redomood_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('allsens_smallmood_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1099,8 +1099,8 @@ br_params = {#"number_of_agents": [64],
                                 #'MIXED',
                                   ],
              "moody_statemode": [#'stateless',
-                                 'agentstate',
-                                 #'moodstate'
+                                 #'agentstate',
+                                 'moodstate'
                                  ],
              "moody_startmood": [#1,
                                  #99,
@@ -1122,7 +1122,7 @@ br_params = {#"number_of_agents": [64],
                               #'D',
                               ],
              #"sensitivity": [0],
-             "sensitive_agents": [[1], [13],]  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
+             "sensitive_agents": [(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25),]  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
              }
 
 
@@ -1132,8 +1132,8 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
-                 max_steps=3000,
+                 iterations=5,
+                 max_steps=10000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

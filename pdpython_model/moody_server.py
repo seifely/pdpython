@@ -232,10 +232,10 @@ model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of 
                 "CD": UserSettableParameter('number', 'Payoff for CD (Default: 0)', value=0),
                 "DC": UserSettableParameter('number', 'Payoff for DC (Default: 5)', value=5),
                 "DD": UserSettableParameter('number', 'Payoff for DD (Default: 2)', value=2),
-                "moody_epsilon": UserSettableParameter('number', 'Starting Epsilon (Default: 0.9)', value=0.9),
+                "moody_epsilon": UserSettableParameter('number', 'Starting Epsilon (Default: 0.1)', value=0.1),
                 "moody_startmood": UserSettableParameter('slider', 'Starting Mood (Default: 50)', 50,1,100,1),
-                "moody_MA": UserSettableParameter('slider', 'Value of mA', 0.5,0,1,0.001),
-                "sensitivity": UserSettableParameter('slider', 'Emotional Sensitivity', 0, 0, 100, 5)
+                "moody_MA": UserSettableParameter('slider', 'Value of mA', 0.8,0,1,0.001),
+                #"sensitivity": UserSettableParameter('slider', 'Emotional Sensitivity', 0, 0, 100, 5)
 
 
                 # "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),

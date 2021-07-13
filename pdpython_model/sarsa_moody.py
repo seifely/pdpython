@@ -444,15 +444,17 @@ def update_mood_old(currentmood, score, averageScore, oppScore, oppAverage, sens
     dif = score - omega  # difference between the score and the perceived payoff
     adjustment = (score - averageScore) + omega
     if sensitive:
-        if adjustment < 0:
-            """Sensitivity should be used, which has been building up on every turn since a negative outcome.
-                            Once used, it then resets the clock. """
-            sensitivity = min(20.00, sensitivity)
-            adjustment = adjustment * sensitivity
-            sensitivity = 0
-        else:
-            """This linearly increases the sensitivity for each turn it isn't activated."""
-            sensitivity += 1
+        # if adjustment < 0:
+        #     """Sensitivity should be used, which has been building up on every turn since a negative outcome.
+        #                     Once used, it then resets the clock. """
+        #     sensitivity = min(200.00, sensitivity)
+        #     adjustment = adjustment * sensitivity
+        #     sensitivity = 0
+        # else:
+        #     """This linearly increases the sensitivity for each turn it isn't activated."""
+        #     sensitivity += 20
+        if adjustment > 0:
+            adjustment = adjustment * 0.25
     newMood = currentmood + adjustment
     newMood = min(99.999, newMood)
     newMood = max(0.0001, newMood)

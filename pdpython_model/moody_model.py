@@ -474,7 +474,7 @@ class PDModel(Model):
                  moody_sarsa_testing=True,
                  moody_sarsa_distro=0,
                  moody_sarsa_oppo="TFT",
-                 moody_epsilon=0.9,
+                 moody_epsilon=0.1,
                  moody_alpha=0.1,
                  moody_gamma=0.95,
                  moody_export_q=True,
@@ -485,7 +485,7 @@ class PDModel(Model):
                  moody_learnFrom="them",  # options being 'me', 'them', 'us', for my own history, opponent history and paired
                  moody_chosenOne=6,
                  moody_statemode='stateless',
-                 moody_MA=1,
+                 moody_MA=0.8,
                  moody_opponents=True,
                  moody_startmood=50,
                  startingBehav='C',
@@ -545,8 +545,8 @@ class PDModel(Model):
         self.moody_alpha = moody_alpha
         self.moody_gamma = moody_gamma
         self.moody_epsilon = moody_epsilon
-        self.moody_export_q = moody_export_q
         self.moody_learnFrom = moody_learnFrom
+        self.moody_export_q = moody_export_q
         self.moody_chosenOne = moody_chosenOne
         self.moody_alpha_floor = moody_alpha_floor
         self.moody_epsilon_floor = moody_epsilon_floor
@@ -557,6 +557,7 @@ class PDModel(Model):
 
         self.startingBehav = startingBehav
         self.sensitivity = sensitivity
+        self.sensitive_agents = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25)
 
         self.n_interactions = calcInteractions(self.height)
 
@@ -646,7 +647,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('startwith%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('sensitive_startwith%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
