@@ -494,5 +494,33 @@ def get_payoff(myMove, oppMove, CCpayoff, DDpayoff, CDpayoff, DCpayoff):
         return DDpayoff
 
 
+def payoff_matrix_generator(value_range, direction, critical_ci):
+    for i in value_range:
+        for j in value_range:
+            for k in value_range:
+                for n in value_range:
+                    T = i
+                    R = j
+                    P = k
+                    S = n
+
+                    if T > R:
+                        if R > P:
+                            if P > S:
+                                # then we can begin
+
+                                if 2*R > (T+S):
+                                    cooperation_index = (R-P)/(T-S)
+                                    if direction == "above":
+                                        if cooperation_index >= critical_ci:
+                                            print("T:", T, "R:", R, "P:", P, "S:", S, "and the CI = ",
+                                                  cooperation_index)
+                                    elif direction == "below":
+                                        if cooperation_index <= critical_ci:
+                                            print("T:", T, "R:", R, "P:", P, "S:", S, "and the CI = ", cooperation_index)
+                                    elif direction == "equals":
+                                        if cooperation_index == critical_ci:
+                                            print("T:", T, "R:", R, "P:", P, "S:", S, "and the CI = ", cooperation_index)
+
 # to integrate SVO into sarsa, we could try two methods
 # a: weight the value of rewards received in each state my your orientation

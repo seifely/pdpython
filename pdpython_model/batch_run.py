@@ -582,7 +582,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('sarsa_innerouter_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('sarsacomp_12agents_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1073,9 +1073,9 @@ br_params = {#"number_of_agents": [64],
              #"gamma": [0.95],
              #"epsilon": [0.99],
              #"sarsa_distro": [0.25, 0.50, 0.75],
-             "CC": [3],
-             "DD": [1],
-             "DC": [5,
+             "CC": [0.045],
+             "DD": [0.01],
+             "DC": [0.1,
              #        2
                     ],
              "CD": [0],
@@ -1133,7 +1133,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
+                 iterations=5,
                  max_steps=10000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
