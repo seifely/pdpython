@@ -582,7 +582,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('sarsacomp_12agents_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('payoffredo_%s-%s-%s-%s_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1073,11 +1073,9 @@ br_params = {#"number_of_agents": [64],
              #"gamma": [0.95],
              #"epsilon": [0.99],
              #"sarsa_distro": [0.25, 0.50, 0.75],
-             "CC": [0.045],
-             "DD": [0.01],
-             "DC": [0.1,
-             #        2
-                    ],
+             "CC": [0.6],
+             "DD": [0.5],
+             "DC": [0.8],
              "CD": [0],
              #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
                             #"MOODYLEARN"],
