@@ -342,8 +342,8 @@ class PDAgent(Agent):
                     #     check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
                     #     check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
                     elif self.model.width == 5:
-                        check_a = [1, 5, 21, 25, 9, 7, 17, 19,]
-                        check_b = [3, 11, 13, 15, 23, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+                        check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
+                        check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
                     elif self.model.width == 6:
                         check_a = [1, 3, 5, 8, 10, 12, 13, 15, 17, 20, 22, 24, 25, 27, 29, 32, 34, 36]
                         check_b = [2, 4, 6, 7, 9, 11, 14, 16, 18, 19, 21, 23, 26, 28, 30, 31, 33, 35]
@@ -2161,7 +2161,7 @@ class PDAgent(Agent):
                     #     print("It's turn ", self.stepCount)
                     #     print("My mood going into this was ", self.mood)
                     #     print("My values were ", reward, myAv, oppScore, oppAv)
-                    self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+                    self.mood, self.sensitivity_mod = sarsa_moody.update_mood_new(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                     # if self.ID == 9:
                     #     print("My mood coming out of it was ", self.mood)
 
@@ -2305,7 +2305,7 @@ class PDAgent(Agent):
                 #     print("It's turn ", self.stepCount)
                 #     print("My mood going into this was ", self.mood)
                 #     print("My values were ", reward, myAv, oppScore, oppAv)
-                self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+                self.mood, self.sensitivity_mod = sarsa_moody.update_mood_new(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                 # if self.ID == 9:
                     # print("My mood coming out of it was ", self.mood)
 
@@ -2371,7 +2371,7 @@ class PDAgent(Agent):
                 for i in self.partner_IDs:
                     myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                    self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+                    self.mood, self.sensitivity_mod = sarsa_moody.update_mood_new(self.mood, self.score, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
 
             if self.last_round:
                 if self.strategy == 'VPP':
