@@ -338,12 +338,12 @@ class PDAgent(Agent):
                     elif self.model.width == 4:
                         check_a = [1, 3, 6, 8, 9, 11, 14, 16]
                         check_b = [2, 4, 5, 7, 10, 12, 13, 15]
-                    # elif self.model.width == 5:
-                    #     check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
-                    #     check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
                     elif self.model.width == 5:
-                        check_a = [1, 5, 21, 25, 9, 7, 17, 19, 6, 16, 20, 10, ]
-                        check_b = [13, 8, 12, 14, 18, 22, 24, 2, 4, 15, 23, 3, 11,]
+                        check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
+                        check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+                    # elif self.model.width == 5:
+                    #     check_a = [1, 5, 21, 25, 9, 7, 17, 19, 6, 16, 20, 10, ]  # These are test-related coordinates used to spawn agents for the Sarsa Vs. Moody Paper Experiments
+                    #     check_b = [13, 8, 12, 14, 18, 22, 24, 2, 4, 15, 23, 3, 11,]
                     elif self.model.width == 6:
                         check_a = [1, 3, 5, 8, 10, 12, 13, 15, 17, 20, 22, 24, 25, 27, 29, 32, 34, 36]
                         check_b = [2, 4, 6, 7, 9, 11, 14, 16, 18, 19, 21, 23, 26, 28, 30, 31, 33, 35]

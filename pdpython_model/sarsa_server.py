@@ -207,7 +207,7 @@ def gen_Model_Portrayal(agent):
 class StepCountDisplay(TextElement):
 
     def render(self, model):
-        return "Step Count: " + str(model.step_count)
+        return "Step Count: " + str(model.step_count), "  ---- K: " + str(model.coop_index)
 
 
 canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)

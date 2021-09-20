@@ -510,6 +510,7 @@ class PDModel(Model):
 
         self.sensitivity = sensitivity
         self.sensitive_agents = sensitive_agents
+        self.coop_index = (self.CC - self.DD) / (self.DC - self.CD)
 
         self.startingBehav = startingBehav
 
@@ -1073,10 +1074,10 @@ br_params = {#"number_of_agents": [64],
              #"gamma": [0.95],
              #"epsilon": [0.99],
              #"sarsa_distro": [0.25, 0.50, 0.75],
-             "DC": [52],
-             "CC": [51],
-             "DD": [44],
-             "CD": [42],
+             "DC": [5],
+             "CC": [3],
+             "DD": [1],
+             "CD": [0],
              #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
                             #"MOODYLEARN"],
 

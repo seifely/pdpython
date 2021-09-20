@@ -207,11 +207,18 @@ def gen_Model_Portrayal(agent):
 class StepCountDisplay(TextElement):
 
     def render(self, model):
-        return "Step Count: " + str(model.step_count)
+        return "Step Count: " + str(model.step_count), "  ---- K: " + str(model.coop_index)
+
+
+# class CoopIndexDisplay(TextElement):
+#
+#     def render(self, model):
+#         return "K: " + str(model.coop_index)
 
 
 canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
 step_element = StepCountDisplay()
+
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
@@ -251,9 +258,10 @@ chart_element = ChartModule([{"Label": "Percentage Cooperations", "Color": C_COL
                              {"Label": "Percentage Defections", "Color": D_COLOR},
                              {"Label": "Average Mood", "Color": "#ffc0cb"}])
 
+# k_element = CoopIndexDisplay()
 #chart_element_2 = ChartModule([{"Label": "Average Mood", "Color": "#ffc0cb"}], canvas_height=200, canvas_width=300)
 # TODO: Kind of want to add in mutual cooperations tracking, but that's extraneous right now
 
-server = ModularServer(PDModel, [canvas_element, step_element, chart_element, #chart_element_2
+server = ModularServer(PDModel, [canvas_element, step_element, chart_element, #k_element
                                  ], "Prisoner's Dilemma Simulation", model_params)
 server.port = 8521

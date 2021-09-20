@@ -493,7 +493,9 @@ class PDModel(Model):
                  moody_opponents=True,
                  moody_startmood=50,
                  startingBehav='C',
+
                  sensitivity=0,
+                 sensitive_agents=[],
                  ):
 
         # ---------- Model Parameters --------
@@ -561,6 +563,10 @@ class PDModel(Model):
 
         self.startingBehav = startingBehav
         self.sensitivity = sensitivity
+        self.sensitive_agents = sensitive_agents
+
+        self.sensitive_agents = [(0,)]
+        self.coop_index = (self.CC - self.DD) / (self.DC - self.CD)
 
         """ This section here changes the spawn locations if the number of agents is changed"""
         if self.number_of_agents == 2:
