@@ -207,7 +207,7 @@ def gen_Model_Portrayal(agent):
 class StepCountDisplay(TextElement):
 
     def render(self, model):
-        return "Step Count: " + str(model.step_count), "  ---- K: " + str(model.coop_index)
+        return "Step Count: " + str(model.step_count), "  --- K: " + str(model.coop_index)
 
 
 # class CoopIndexDisplay(TextElement):
