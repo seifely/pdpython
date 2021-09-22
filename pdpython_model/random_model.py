@@ -484,7 +484,7 @@ class PDModel(Model):
                  moody_MA=1,
                  moody_opponents=True,
                  moody_startmood=50,
-                 startingBehav='C',
+                 startingBehav=None,
 
                  sensitivity=0,
                  sensitive_agents=[],

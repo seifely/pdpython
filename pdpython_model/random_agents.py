@@ -168,7 +168,16 @@ class PDAgent(Agent):
         else:
             self.sensitive = False
 
-        # ----------------------- SVO GLOBALS ------------------------
+        # ----------------------- SVO GLOBALS -----------------------------
+
+        # ------------------ RANDOM NETWORK GLOBALS ------------------
+
+        self.current_partner_list = []
+        self.current_partner_reputation = {}
+        self.potential_partner_list = []
+        self.potential_partner_reputation = {}
+
+
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0

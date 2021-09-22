@@ -438,7 +438,7 @@ class PDModel(Model):
                  moody_MA=1,
                  moody_opponents=True,
                  moody_startmood=50,
-                 startingBehav='C',
+                 startingBehav=None,
 
 
                  sensitivity=0,
@@ -1117,7 +1117,7 @@ br_params = {#"number_of_agents": [64],
              "moody_opponents": [True,
                                  #False
                                  ],
-             "startingBehav": ['C',
+             "startingBehav": [#'C',
                               #'D',
                               ],
              #"sensitivity": [0],
