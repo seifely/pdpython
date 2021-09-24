@@ -11,11 +11,13 @@ import csv
 import numpy as np
 import pandas as pd
 import statistics
-import sys
 import os
 import pickle
 from pdpython_model import statemaker
 from pdpython_model import statemaker_moody
+
+import matplotlib.pyplot as plt
+import networkx as nx
 
 
 def get_num_coop_agents(model):
@@ -786,6 +788,9 @@ class PDModel(Model):
     #                             new = initial_state6 + [ii6] + [iii6] + [iiii6] + [iiiii6] + [iiiiii6] + [iiiiiii6]
     #                             permutations.append(new)
     #     return permutations
+
+    def init_graph(self):
+        return
 
     def set_ppds(self):
         """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
