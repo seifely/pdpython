@@ -61,7 +61,7 @@ def initRandomGraph(nodes, probability, ids):
     # Export the Edge List of the graph, and Export the version Agents can understand
     return edgesDict, g
 
-def  convertGraph_to_dictEdges(graph, ids):
+def convertGraph_to_dictEdges(graph, ids):
     """ Output the graph instead as an ID-keyed dict that contains vectors of each agent's initial partners. """
     edgesDict = {}
 
@@ -99,7 +99,7 @@ def convertDict_to_graph(dict, ids):
     # print(G.number_of_edges())
     return G
 
-def update_graph(old_edges, additions, removals,, sorted, ids):
+def update_graph(old_edges, additions, removals, sorted, ids):
     """ Import the previous graph, get its data in dict form, get the current edge list and compare changes at regular intervals."""
     changeable = convertDict_to_graph(old_edges, ids)   # Create a graph from the old dict the agents were reading from
     for pair in additions:     # Additions should be a list of tuples that wish to have edge connections
@@ -133,18 +133,13 @@ def chooseNewPartner(untested_partners, tested_partners, allPossPartners, probab
         R = random.random()
         if R > probability:
             choice = random.choice(allPossPartners)
-
     else:
         partner_type = random.choices([untested_partners, tested_partners], weights)
         if partner_type == untested_partners:
             choice = random.choice(untested_partners)
         else:
             choice = random.choice(tested_partners)
-
     return choice
-
-
-
 
 def getPossiblePartners(ids, current_partners):
     possible = []
