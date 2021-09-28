@@ -1,6 +1,7 @@
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 
 def init_partner_list(height, width, id):
     """ Set ID to 0 to generate the full list of all agent IDs."""
@@ -94,19 +95,64 @@ def convertDict_to_graph(dict, ids):
             if not G.has_edge(*pair):
                 G.add_edge(*pair)
 
-    print(edge_counter/2)
-    print(G.number_of_edges())
+    # print(edge_counter/2)
+    # print(G.number_of_edges())
     return G
 
-def update_graph(graph, old_edges, changes):
+def update_graph(old_edges, additions, removals,, sorted, ids):
     """ Import the previous graph, get its data in dict form, get the current edge list and compare changes at regular intervals."""
-    return
+    changeable = convertDict_to_graph(old_edges, ids)   # Create a graph from the old dict the agents were reading from
+    for pair in additions:     # Additions should be a list of tuples that wish to have edge connections
+        if not changeable.has_edge(*pair):
+            changeable.add_edge(*pair)
 
-def init_connections(height, width, agents_list):
-    maxm = (height*width)-1
-    connections_list = {}
-    for i in agents_list:
-        #Random number of connections for each agent
-        n_conns = random.randint()
+    for pair in removals:
+        if changeable.has_edge(*pair):
+            changeable.remove_edge(*pair)
 
-    return
+    # Covert the new graph to something the agents can read
+    changesDict = convertGraph_to_dictEdges(changeable, ids)
+    if sorted:
+        for i in ids:               # Sort the lists for each agent - this is for readability for us when we export it, but I don't know if it will affect agent behaviour, so am making it optional for now
+            list = changesDict[i]
+            sortedList = sorted(list)
+            changesDict[i] = sortedList
+        # Then output both the graph translation and the graph itself
+        return changesDict, changeable
+    else:
+        # Then output both the graph translation and the graph itself
+        return changesDict, changeable
+
+
+
+def chooseNewPartner(untested_partners, tested_partners, allPossPartners, probability, weights):
+    """ For now, either select a partner with a random chance, or select from either untested or previously tested partners
+     with a weighting system - presumably lower weights for previously rejected partners. """
+    choice = None
+    if probability:
+        R = random.random()
+        if R > probability:
+            choice = random.choice(allPossPartners)
+
+    else:
+        partner_type = random.choices([untested_partners, tested_partners], weights)
+        if partner_type == untested_partners:
+            choice = random.choice(untested_partners)
+        else:
+            choice = random.choice(tested_partners)
+
+    return choice
+
+
+
+
+def getPossiblePartners(ids, current_partners):
+    possible = []
+    for i in ids:
+        if i not in current_partners:
+            possible.append(i)
+    return possible
+
+# The above should then be checked against each agent's personal memory of 'trustworthiness metrics' for these
+# possible partners, if they have interacted before. The should have lists of rejected partners (for the other functions
+# listed above) for use as well (added at the same time as they add to the dictionary)
