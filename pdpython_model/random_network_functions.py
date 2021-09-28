@@ -60,20 +60,47 @@ def initRandomGraph(nodes, probability, ids):
     # Export the Edge List of the graph, and Export the version Agents can understand
     return edgesDict, g
 
-def  convert_graph_to_dict(graph, ids):
-
-    return
-
-def convert_dict_to_graph(dict, ids):
-    return
-
-def update_graph(graph, changes):
-    """ Import the previous graph, get its data in dict form, get the current edge """
-
-
-def convert_graph_to_lists(graph):
+def  convertGraph_to_dictEdges(graph, ids):
     """ Output the graph instead as an ID-keyed dict that contains vectors of each agent's initial partners. """
+    edgesDict = {}
 
+    for i in ids:
+        edgesDict[i] = 0
+
+    g = graph
+
+    for k in ids:
+        current_edges = list(g.edges(k))
+        exported_edges = []
+        length = range(len(current_edges))
+        for i in length:
+            current_edge = current_edges[i]
+            exported_edges.append(current_edge[1])
+        edgesDict[k] = exported_edges
+
+    return edgesDict
+
+def convertDict_to_graph(dict, ids):
+    """ Take in a dict, construct a graph from the edge lists for each node."""
+    G = nx.Graph()
+    G.add_nodes_from(ids)
+    edge_counter = 0
+    for i in ids:
+        node = i
+        nodesEdges = dict[i]
+        for j in nodesEdges:
+            edge_counter +=1
+            pair = (i, j)
+            if not G.has_edge(*pair):
+                G.add_edge(*pair)
+
+    print(edge_counter/2)
+    print(G.number_of_edges())
+    return G
+
+def update_graph(graph, old_edges, changes):
+    """ Import the previous graph, get its data in dict form, get the current edge list and compare changes at regular intervals."""
+    return
 
 def init_connections(height, width, agents_list):
     maxm = (height*width)-1
