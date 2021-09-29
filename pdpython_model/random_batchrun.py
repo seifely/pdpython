@@ -516,6 +516,16 @@ class PDModel(Model):
 
         self.startingBehav = startingBehav
 
+        # ========================== RANDOM GRAPH VARIABLES =============================
+
+        self.initial_graph = {}
+        self.updated_graph = {}
+        self.graph_additions = []
+        self.graph_removals = []
+
+        self.agent_positions = {}
+
+
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
                          "TFT",
@@ -951,6 +961,7 @@ class PDModel(Model):
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
+                self.agent_positions[i] = (x, y)     # Add in a storage of where each agent is, by ID no.
                 self.schedule.add(pdagent)
 
         elif self.randspawn:
@@ -961,6 +972,7 @@ class PDModel(Model):
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
+                self.agent_positions[i] = (x, y)    # Add in a storage of where each agent is, by ID no.
                 self.schedule.add(pdagent)
 
     def export_q_tables(self, init):      # TODO: Does this need a moody counterpart? =============================

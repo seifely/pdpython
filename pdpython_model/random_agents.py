@@ -435,11 +435,63 @@ class PDAgent(Agent):
             # what percentage is my score of the highest score?
             self.proportional_score = ((myscore / highscore) * 100)
 
-    def iter_pick_move(self, strategy, payoffs):
+    def iter_pick_move(self, strategy, payoffs, current_partners):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
         keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
         versus_moves = {}
         x, y = self.pos
+
+        # Current Partners will be a vector of ID numbers
+        # Find, from the model storage, each partner's XY coordinates, and then access the agent in that cell
+
+
+        # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        neighbouring_cells = []
+        for partner in self.current_partner_list:
+            coordinates = self.model.agent_positions[partner]
+
+        # First, get the neighbours
+        for i in neighbouring_cells:
+            bound_checker = self.model.grid.out_of_bounds(i)
+            if not bound_checker:
+                this_cell = self.model.grid.get_cell_list_contents([i])
+                # print("This cell", this_cell)
+
+                if len(this_cell) > 0:
+                    partner = [obj for obj in this_cell
+                               if isinstance(obj, PDAgent)][0]
+
+                    partner_ID = partner.ID
+                    partner_mood = sarsa_moody.getMoodType(partner.mood)
+                    partner_move = 0
+                    if partner.itermove_result.get(self.ID) is None:
+                        partner_move = 0
+                    else:
+                        partner_move = partner.itermove_result[self.ID]
+
+                    if self.partner_states.get(partner_ID) is None:
+                        self.partner_states[partner_ID] = sarsa_moody.observe_state(partner_move, partner_ID,
+                                                                                    partner_mood,
+                                                                                    self.statemode)
+
+                    # pick a move
+                    if strategy is not "MOODYLEARN":
+                        move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
+                    else:
+                        move = self.pick_move(strategy, payoffs, partner_ID, self.partner_states)
+                    # add that move, with partner ID, to the versus choice dictionary
+                    versus_moves[partner_ID] = move
+        # print("agent", self.ID,"versus moves:", versus_moves)
+        return versus_moves
+
+    def iter_pick_move(self, strategy, payoffs,):
+        """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
+        keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
+        versus_moves = {}
+        x, y = self.pos
+
+
+
         neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
 
         # First, get the neighbours
