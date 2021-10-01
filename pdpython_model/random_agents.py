@@ -172,12 +172,13 @@ class PDAgent(Agent):
 
         # ------------------ RANDOM NETWORK GLOBALS ------------------
 
-        self.current_partner_list = []
-        self.current_partner_reputation = {}
-        self.potential_partner_list = []
-        self.potential_partner_reputation = {}
+        self.current_partner_list = []              # List of current partners we are playing against
+        self.current_partner_reputations = {}       # Mean scores against the agents we are currently playing against
+        self.potential_partner_list = []            # Agents we are not currently playing against
+        self.potential_partner_reputations = {}     # A dict of all agent's average past scores against us?
 
-
+        for possible in self.model.agentIDs:
+            self.potential_partner_reputations[possible] = 0        # Initialise the reps at zero
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0

@@ -15,6 +15,7 @@ import os
 import pickle
 from pdpython_model import statemaker
 from pdpython_model import statemaker_moody
+from pdpython_model import random_network_functions as rnf
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -444,6 +445,7 @@ class PDModel(Model):
 
 
                  sensitivity=0,
+                 graph_probability=0.4,
                  ):
 
         # ---------- Model Parameters --------
@@ -518,12 +520,16 @@ class PDModel(Model):
 
         # ========================== RANDOM GRAPH VARIABLES =============================
 
-        self.initial_graph = {}
+        self.initial_graphG = 0
+        self.initial_graphD = {}
         self.updated_graph = {}
+        self.end_graphG = 0
+        self.end_graphD = {}
         self.graph_additions = []
         self.graph_removals = []
 
         self.agent_positions = {}
+        self.graph_probability = graph_probability
 
 
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
@@ -681,6 +687,7 @@ class PDModel(Model):
         self.firstgame = self.first_game_check()
         self.agent_ppds = {}
         self.set_ppds()
+        self.init_graph()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
         self.training_data = pickle.load(open("training_data_50.p", "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -800,6 +807,11 @@ class PDModel(Model):
     #     return permutations
 
     def init_graph(self):
+        self.initial_graphD, self.initial_graphG = rnf.initRandomGraph(self.number_of_agents, self.graph_probability,
+                                                                       self.agentIDs)
+        print("I've made a graph!")
+        nx.draw(self.initial_graphG)
+        plt.savefig(self.exp_n + "-initGraph.png")
         return
 
     def set_ppds(self):
@@ -1035,6 +1047,8 @@ class PDModel(Model):
     def step(self):
 
         start = time.time()
+        # if self.step_count == 0:
+        #     self.init_graph()
         self.schedule.step()
         if self.step_count == self.rounds - 1:
             self.update_agent_ppds(self.agent_ppds)
