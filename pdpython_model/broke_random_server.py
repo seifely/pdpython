@@ -2,8 +2,8 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement
 from mesa.visualization.UserParam import UserSettableParameter
 
-from pdpython_model.random_agents import PDAgent
-from pdpython_model.random_model import PDModel
+from pdpython_model.broke_random_agents import PDAgent
+from pdpython_model.broke_random_model import PDModel
 
 # Green
 C_COLOR = "#007f7f"

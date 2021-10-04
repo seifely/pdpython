@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.space import SingleGrid
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
-from pdpython_model.random_agents import PDAgent
+from pdpython_model.fixed_random_agents import PDAgent
 
 from mesa.datacollection import DataCollector
 import random
@@ -9,6 +9,7 @@ import time
 import csv
 import numpy as np
 import pandas as pd
+import sys
 import os.path
 import pickle
 import statistics
@@ -16,9 +17,6 @@ import math
 
 from pdpython_model import statemaker
 from pdpython_model import statemaker_moody
-
-import matplotlib.pyplot as plt
-import networkx as nx
 
 """ Variables we want to be able to control from the UI include:
     Payoffs Rewards for Each Value  /
@@ -29,6 +27,10 @@ import networkx as nx
     Starting Behaviour
     Opponent Type?
     """
+
+# TODO: Make sure all the variables needed by the agents/moody_sarsa files are in here
+# TODO:
+# TODO: Due to the nature of implementing a sarsa test grid or a moody test grid, I think there would have to be two separate files - one for normal and one for moody?
 
 def get_num_coop_agents(model):
     """ return number of cooperations"""
@@ -486,7 +488,7 @@ class PDModel(Model):
                  moody_MA=1,
                  moody_opponents=True,
                  moody_startmood=50,
-                 startingBehav=None,
+                 startingBehav='C',
 
                  sensitivity=0,
                  sensitive_agents=[],

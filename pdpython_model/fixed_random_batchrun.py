@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.space import SingleGrid
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
-from pdpython_model.random_agents import PDAgent
+from pdpython_model.fixed_random_agents import PDAgent
 
 from mesa.datacollection import DataCollector
 from mesa.batchrunner import BatchRunner
@@ -11,12 +11,13 @@ import csv
 import numpy as np
 import pandas as pd
 import statistics
+import sys
 import os
 import pickle
 from pdpython_model import statemaker
 from pdpython_model import statemaker_moody
-from pdpython_model import random_network_functions as rnf
 
+from pdpython_model import random_network_functions as rnf
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -441,8 +442,7 @@ class PDModel(Model):
                  moody_MA=1,
                  moody_opponents=True,
                  moody_startmood=50,
-                 startingBehav=None,
-
+                 startingBehav='C',
 
                  sensitivity=0,
                  graph_probability=0.4,
@@ -530,7 +530,6 @@ class PDModel(Model):
 
         self.agent_positions = {}
         self.graph_probability = graph_probability
-
 
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
@@ -687,10 +686,10 @@ class PDModel(Model):
         self.firstgame = self.first_game_check()
         self.agent_ppds = {}
         self.set_ppds()
-        self.init_graph()
         self.agent_ppds = pickle.load(open("agent_ppds.p", "rb"))
         self.training_data = []
         self.training_data = pickle.load(open("training_data_50.p", "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        self.init_graph()
 
         if not kNN_spawn:
             self.make_agents()
@@ -973,7 +972,7 @@ class PDModel(Model):
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
-                self.agent_positions[i] = (x, y)     # Add in a storage of where each agent is, by ID no.
+                self.agent_positions[i] = (x, y)  # Add in a storage of where each agent is, by ID no.
                 self.schedule.add(pdagent)
 
         elif self.randspawn:
@@ -984,7 +983,7 @@ class PDModel(Model):
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
-                self.agent_positions[i] = (x, y)    # Add in a storage of where each agent is, by ID no.
+                self.agent_positions[i] = (x, y)  # Add in a storage of where each agent is, by ID no.
                 self.schedule.add(pdagent)
 
     def export_q_tables(self, init):      # TODO: Does this need a moody counterpart? =============================
@@ -1047,8 +1046,6 @@ class PDModel(Model):
     def step(self):
 
         start = time.time()
-        # if self.step_count == 0:
-        #     self.init_graph()
         self.schedule.step()
         if self.step_count == self.rounds - 1:
             self.update_agent_ppds(self.agent_ppds)
@@ -1148,7 +1145,7 @@ br_params = {#"number_of_agents": [64],
              "moody_opponents": [True,
                                  #False
                                  ],
-             "startingBehav": [#'C',
+             "startingBehav": ['C',
                               #'D',
                               ],
              #"sensitivity": [0],
