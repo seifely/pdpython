@@ -14,6 +14,7 @@ import statistics
 import sys
 import os
 import pickle
+import copy
 from pdpython_model import statemaker
 from pdpython_model import statemaker_moody
 
@@ -522,7 +523,8 @@ class PDModel(Model):
 
         self.initial_graphG = 0
         self.initial_graphD = {}
-        self.updated_graph = {}
+        self.updated_graphD = {}
+        self.updated_graphG = 0
         self.end_graphG = 0
         self.end_graphD = {}
         self.graph_additions = []
@@ -690,6 +692,7 @@ class PDModel(Model):
         self.training_data = []
         self.training_data = pickle.load(open("training_data_50.p", "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         self.init_graph()
+        self.updated_graphD = copy.deepcopy(self.initial_graphD)  # Put the first update as the initial graph
 
         if not kNN_spawn:
             self.make_agents()
@@ -812,6 +815,15 @@ class PDModel(Model):
         nx.draw(self.initial_graphG)
         plt.savefig(self.exp_n + "-initGraph.png")
         return
+
+    def change_graph(self, additions, removals, old_graph):
+        updated_graph, updated_graphG = rnf.update_graph(self. updated_graph, self.graph_additions, self.graph_removals,
+                                                         True, self.agentIDs)
+        # Reset the additions and removal request lists
+        self.graph_additions = []
+        self.graph_removals = []
+        return updated_graph, updated_graphG
+
 
     def set_ppds(self):
         """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
@@ -1059,6 +1071,9 @@ class PDModel(Model):
         self.datacollector.collect(self)
         self.get_highest_score()
         self.reset_values()
+        # Update the Graph that Agents will Read From
+        self.updated_graphD, self.updated_graphG = self.change_graph(self.graph_additions, self.graph_removals,
+                                                                     self.updated_graphD)
 
         # if self.export_q:
         #     if self.step_count == 1:

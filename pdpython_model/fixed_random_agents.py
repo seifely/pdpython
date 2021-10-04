@@ -436,12 +436,21 @@ class PDAgent(Agent):
             # what percentage is my score of the highest score?
             self.proportional_score = ((myscore / highscore) * 100)
 
-    def iter_pick_move(self, strategy, payoffs):
+    def iter_pick_move(self, strategy, payoffs, current_partners):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
         keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
         versus_moves = {}
         x, y = self.pos
-        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+
+        # Current Partners will be a vector of ID numbers
+        # Find, from the model storage, each partner's XY coordinates, and then access the agent in that cell
+        neighbouring_cells = current_partners
+
+
+        # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        neighbouring_cells = []
+        for partner in neighbouring_cells:
+            coordinates = self.model.agent_positions[partner]
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -463,8 +472,9 @@ class PDAgent(Agent):
                         partner_move = partner.itermove_result[self.ID]
 
                     if self.partner_states.get(partner_ID) is None:
-                        self.partner_states[partner_ID] = sarsa_moody.observe_state(partner_move, partner_ID, partner_mood,
-                                                                                                       self.statemode)
+                        self.partner_states[partner_ID] = sarsa_moody.observe_state(partner_move, partner_ID,
+                                                                                    partner_mood,
+                                                                                    self.statemode)
 
                     # pick a move
                     if strategy is not "MOODYLEARN":
@@ -476,12 +486,53 @@ class PDAgent(Agent):
         # print("agent", self.ID,"versus moves:", versus_moves)
         return versus_moves
 
-    def iter_pick_nextmove(self, strategy, payoffs, nextstates):
+    # def iter_pick_move(self, strategy, payoffs):
+    #     """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
+    #     keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
+    #     versus_moves = {}
+    #     x, y = self.pos
+    #     neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+    #
+    #     # First, get the neighbours
+    #     for i in neighbouring_cells:
+    #         bound_checker = self.model.grid.out_of_bounds(i)
+    #         if not bound_checker:
+    #             this_cell = self.model.grid.get_cell_list_contents([i])
+    #             # print("This cell", this_cell)
+    #
+    #             if len(this_cell) > 0:
+    #                 partner = [obj for obj in this_cell
+    #                            if isinstance(obj, PDAgent)][0]
+    #
+    #                 partner_ID = partner.ID
+    #                 partner_mood = sarsa_moody.getMoodType(partner.mood)
+    #                 partner_move = 0
+    #                 if partner.itermove_result.get(self.ID) is None:
+    #                     partner_move = 0
+    #                 else:
+    #                     partner_move = partner.itermove_result[self.ID]
+    #
+    #                 if self.partner_states.get(partner_ID) is None:
+    #                     self.partner_states[partner_ID] = sarsa_moody.observe_state(partner_move, partner_ID, partner_mood,
+    #                                                                                                    self.statemode)
+    #
+    #                 # pick a move
+    #                 if strategy is not "MOODYLEARN":
+    #                     move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
+    #                 else:
+    #                     move = self.pick_move(strategy, payoffs, partner_ID, self.partner_states)
+    #                 # add that move, with partner ID, to the versus choice dictionary
+    #                 versus_moves[partner_ID] = move
+    #     # print("agent", self.ID,"versus moves:", versus_moves)
+    #     return versus_moves
+
+    def iter_pick_nextmove(self, strategy, payoffs, nextstates, current_partners):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
         keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
         versus_moves = {}
         x, y = self.pos
-        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        #neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        neighbouring_cells = current_partners
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -2021,7 +2072,7 @@ class PDAgent(Agent):
                     self.state_working_memory = sarsa_moody.init_statememory(copy.deepcopy(self.model.moody_memory_states), 2, self.moody_delta)
                     # print('init qtable len:', len(self.moody_qtable))
                     self.moody_states = copy.deepcopy(self.model.moody_memory_states)
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.model.updated_graphD[self.ID])  # We now try and find our partners from here
 
                 self.find_average_move()
 
@@ -2045,7 +2096,7 @@ class PDAgent(Agent):
                     self.states = copy.deepcopy(self.model.moody_memory_states)
 
 
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.model.updated_graphD[self.ID])
                 self.previous_moves.append(self.move)
                 self.find_average_move()
 
@@ -2070,7 +2121,7 @@ class PDAgent(Agent):
                     if self.moody_pp_aprime:
                         self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
                 else:
-                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.model.updated_graphD[self.ID])
 
                 self.find_average_move()
 
@@ -2089,7 +2140,7 @@ class PDAgent(Agent):
                         self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
                 else:
 
-                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs)
+                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.model.updated_graphD[self.ID])
 
                 self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?
                 self.find_average_move()
@@ -2119,7 +2170,7 @@ class PDAgent(Agent):
             #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
 
             # get aprimes (next actions to do)
-            self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory)
+            self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory, self.model.updated_graphD[self.ID])
 
             # update the Q for the CURRENT sprime
 
@@ -2211,6 +2262,8 @@ class PDAgent(Agent):
                     self.outputQtable(False)
 
             self.outputData()
+            # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+            self.current_partner_list = self.model.updated_graphD[self.ID]
             self.stepCount += 1
 
             if round_payoffs is not None:
@@ -2233,7 +2286,7 @@ class PDAgent(Agent):
             #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
 
             # get aprimes (next actions to do)
-            self.moody_pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.partner_states)
+            self.moody_pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.partner_states, self.model.updated_graphD[self.ID])
 
             # update the Q for the CURRENT sprime
 
@@ -2363,6 +2416,8 @@ class PDAgent(Agent):
                     self.outputQtable(False)
 
             self.outputData()
+            # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+            self.current_partner_list = self.model.updated_graphD[self.ID]
             self.stepCount += 1
 
             if round_payoffs is not None:
@@ -2398,6 +2453,8 @@ class PDAgent(Agent):
             # self.compare_score()
 
             self.outputData()
+            # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+            self.current_partner_list = self.model.updated_graphD[self.ID]
             self.stepCount += 1
 
             if round_payoffs is not None:
@@ -2405,5 +2462,6 @@ class PDAgent(Agent):
                     print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
                 self.score += round_payoffs
                 # print("My total overall score is:", self.score)
+
                 return
 
