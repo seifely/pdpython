@@ -817,7 +817,7 @@ class PDModel(Model):
         return
 
     def change_graph(self, additions, removals, old_graph):
-        updated_graph, updated_graphG = rnf.update_graph(self. updated_graph, self.graph_additions, self.graph_removals,
+        updated_graph, updated_graphG = rnf.update_graph(self.updated_graphD, self.graph_additions, self.graph_removals,
                                                          True, self.agentIDs)
         # Reset the additions and removal request lists
         self.graph_additions = []
@@ -838,7 +838,12 @@ class PDModel(Model):
         if self.firstgame:
             for i in range(n_of_a):
                 # print("n of a", i)
-                initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+                # TODO: THIS IS A TEMPORARY FIX FOR THE PPD SITUATION, BASICALLY PPDS WERE INITIALLY SET FOR 4 PARTNERS FIXED - NOW THERE WILL BE ONE FOR ALL 25 PARTNERS - NOT SURE HOW TO HANDLE THIS IF PARTNERS CHANGE THO BUT THIS IS LEGACY CODE
+                inits = []
+                for n in range(n_of_a+1):
+                    inits.append(self.init_ppD)
+                print("inits", inits)
+                initialised[i + 1] = inits
                 with open("agent_ppds.p", "wb") as f:
                     pickle.dump(initialised, f)
 
@@ -984,7 +989,7 @@ class PDModel(Model):
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
-                self.agent_positions[i] = (x, y)  # Add in a storage of where each agent is, by ID no.
+                self.agent_positions[i+1] = (x, y)  # Add in a storage of where each agent is, by ID no.
                 self.schedule.add(pdagent)
 
         elif self.randspawn:
@@ -995,7 +1000,7 @@ class PDModel(Model):
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
-                self.agent_positions[i] = (x, y)  # Add in a storage of where each agent is, by ID no.
+                self.agent_positions[i+1] = (x, y)  # Add in a storage of where each agent is, by ID no.
                 self.schedule.add(pdagent)
 
     def export_q_tables(self, init):      # TODO: Does this need a moody counterpart? =============================

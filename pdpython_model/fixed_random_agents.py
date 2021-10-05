@@ -196,8 +196,18 @@ class PDAgent(Agent):
 
     def get_IDs(self, current_partners):
         x, y = self.pos
+        neighbouring_agents = current_partners
+        neighbouring_cells = []
+
         # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
-        neighbouring_cells = current_partners
+        for partner in neighbouring_agents:
+            neighbouring_cells.append(self.model.agent_positions[partner])
+
+        # print("model agent pos", self.model.agent_positions)
+        # print("model agent connects", self.model.updated_graphD)
+        # print("my parts", self.current_partner_list)
+        # print("neigh agents", neighbouring_agents)
+        # print("neigh cells", neighbouring_cells)
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -222,11 +232,12 @@ class PDAgent(Agent):
         # with open("agent_ppds.p", "rb") as f:
         #     agent_ppds = pickle.load(f)
         agent_ppds = copy.deepcopy(self.model.agent_ppds)
-        # print("agent ppds are,", agent_ppds)
+        print("agent ppds are,", agent_ppds)
         my_pickle = agent_ppds[self.ID]
-        # print("my defaults are", my_pickle)
+        print("my defaults are", my_pickle)
         # j = 0
         for i in ids:
+            print("eeyore", i)
             index = ids.index(i)
             self.ppD_partner[i] = my_pickle[index]
 
@@ -445,12 +456,12 @@ class PDAgent(Agent):
 
         # Current Partners will be a vector of ID numbers
         # Find, from the model storage, each partner's XY coordinates, and then access the agent in that cell
-        neighbouring_cells = current_partners
-
+        neighbouring_agents = current_partners
+        neighbouring_cells = []
 
         # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
-        for partner in neighbouring_cells:
-            coordinates = self.model.agent_positions[partner]
+        for partner in neighbouring_agents:
+            neighbouring_cells.append(self.model.agent_positions[partner])
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -531,8 +542,13 @@ class PDAgent(Agent):
         keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
         versus_moves = {}
         x, y = self.pos
-        #neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
-        neighbouring_cells = current_partners
+
+        neighbouring_agents = current_partners
+        neighbouring_cells = []
+
+        # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        for partner in neighbouring_agents:
+            neighbouring_cells.append(self.model.agent_positions[partner])
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -778,10 +794,27 @@ class PDAgent(Agent):
                             blank_list.append(0)
 
                     learning_state[j] = blank_list
+            elif len(learning_state) == 0:
+                for j in self.partner_IDs:
+                    blank_list = []
+                    if self.model.memoryPaired:
+                        # need to now vary the length of this depending on msize
+
+                        for n in range(self.delta):
+                            blank_list.append((0, 0))
+                    elif not self.model.memoryPaired:
+                        for n in range(self.delta):
+                            blank_list.append(0)
 
             if self.delta > 1:
                 egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]), self.model.memoryPaired)
             else:
+                print("pids", self.partner_IDs)
+                print("eps:", self.epsilon)
+                print("qtable", len(self.qtable))
+                print("id", id)
+                print("l state", learning_state)
+                print("learn state", learning_state[id])
                 egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, learning_state[id], self.model.memoryPaired)
             if egreedy == "C":
                 self.number_of_c += 1
@@ -986,8 +1019,12 @@ class PDAgent(Agent):
     def check_partner(self, current_partners):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
         x, y = self.pos
+        neighbouring_agents = current_partners
+        neighbouring_cells = []
+
         # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
-        neighbouring_cells = current_partners
+        for partner in neighbouring_agents:
+            neighbouring_cells.append(self.model.agent_positions[partner])
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -2005,8 +2042,12 @@ class PDAgent(Agent):
         averages = {}
 
         x, y = self.pos
+        neighbouring_agents = current_partners
+        neighbouring_cells = []
+
         # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
-        neighbouring_cells = current_partners
+        for partner in neighbouring_agents:
+            neighbouring_cells.append(self.model.agent_positions[partner])
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -2046,6 +2087,7 @@ class PDAgent(Agent):
 
         if self.stepCount == 1:
             self.set_defaults(self.partner_IDs)
+            self.current_partner_list = self.model.updated_graphD[self.ID]
             self.get_IDs(self.current_partner_list)
             for i in self.partner_IDs:
                 self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
@@ -2085,6 +2127,7 @@ class PDAgent(Agent):
             else:
 
                 self.set_defaults(self.partner_IDs)
+                self.current_partner_list = self.model.updated_graphD[self.ID]
                 # print("My ppDs are:", self.ppD_partner)
 
                 if self.strategy == 'LEARN':
