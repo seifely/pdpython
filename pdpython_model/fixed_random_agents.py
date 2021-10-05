@@ -194,9 +194,10 @@ class PDAgent(Agent):
         self.ppD_partner = {}
         self.rounds_left = self.model.rounds - self.stepCount
 
-    def get_IDs(self):
+    def get_IDs(self, current_partners):
         x, y = self.pos
-        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        neighbouring_cells = current_partners
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -448,7 +449,6 @@ class PDAgent(Agent):
 
 
         # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
-        neighbouring_cells = []
         for partner in neighbouring_cells:
             coordinates = self.model.agent_positions[partner]
 
@@ -983,10 +983,11 @@ class PDAgent(Agent):
         if state_value in bound_f:
             return theta * 6
 
-    def check_partner(self):
+    def check_partner(self, current_partners):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
         x, y = self.pos
-        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        neighbouring_cells = current_partners
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -1997,14 +1998,15 @@ class PDAgent(Agent):
                     zeroes.append((0, 0))
                 return zeroes
 
-    def averageScoreComparison(self, oppID, moodyStrat):
+    def averageScoreComparison(self, oppID, moodyStrat, current_partners):
         scores = {}
         payoffs = {}
         recent_payoffs = {}
         averages = {}
 
         x, y = self.pos
-        neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        neighbouring_cells = current_partners
 
         # First, get the neighbours
         for i in neighbouring_cells:
@@ -2044,7 +2046,7 @@ class PDAgent(Agent):
 
         if self.stepCount == 1:
             self.set_defaults(self.partner_IDs)
-            self.get_IDs()
+            self.get_IDs(self.current_partner_list)
             for i in self.partner_IDs:
                 self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
                 if self.statemode == 'stateless':
@@ -2159,7 +2161,7 @@ class PDAgent(Agent):
     def advance(self):
         #TODO: THE BELOW NEEDS MOVING INTO A FUNCTION SOMEWHERE NOW THAT IS HAS BEEN DUPLICATED
         if self.strategy == 'LEARN':
-            self.check_partner()  # We took action a, what s prime did we end up in?
+            self.check_partner(self.current_partner_list)  # We took action a, what s prime did we end up in?
             # ----- WORKING MEMORY IS NOW S-PRIME -----
             round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime
 
@@ -2216,7 +2218,7 @@ class PDAgent(Agent):
                 self.qtable[tuple(s)] = change
 
                 if self.model.moody_opponents:
-                    myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
+                    myAv, oppAv, oppScore = self.averageScoreComparison(i, False, self.current_partner_list)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
                     # if self.ID == 9:
                     #     print("It's turn ", self.stepCount)
@@ -2274,7 +2276,7 @@ class PDAgent(Agent):
                 return
 
         elif self.strategy == 'MOODYLEARN':
-            self.check_partner()  # We took action a, what s prime did we end up in?
+            self.check_partner(self.current_partner_list)  # We took action a, what s prime did we end up in?
             """This should hopefully update the state for pick_nextmove"""
             # ----- WORKING MEMORY IS NOW S-PRIME -----
             round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime  #TODO: MIGHT NEED A MOODY INCREMENT_SCORE
@@ -2360,7 +2362,7 @@ class PDAgent(Agent):
 
                 """Update mood here at the end of each interaction WITHIN a ROUND. This means that initial interactions
                     in each round will influence subsequent interactions"""
-                myAv, oppAv, oppScore = self.averageScoreComparison(i, True)
+                myAv, oppAv, oppScore = self.averageScoreComparison(i, True, self.current_partner_list)
                 #TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
                 # self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
 
@@ -2430,11 +2432,11 @@ class PDAgent(Agent):
         else:
 
             # self.move = self.next_move
-            self.check_partner()  # Update Knowledge
+            self.check_partner(self.current_partner_list)  # Update Knowledge
             round_payoffs = self.increment_score(self.payoffs)
             if self.model.moody_opponents:
                 for i in self.partner_IDs:
-                    myAv, oppAv, oppScore = self.averageScoreComparison(i, False)
+                    myAv, oppAv, oppScore = self.averageScoreComparison(i, False, self.current_partner_list)
                     # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
                     self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
 
