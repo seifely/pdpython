@@ -232,12 +232,12 @@ class PDAgent(Agent):
         # with open("agent_ppds.p", "rb") as f:
         #     agent_ppds = pickle.load(f)
         agent_ppds = copy.deepcopy(self.model.agent_ppds)
-        print("agent ppds are,", agent_ppds)
+        # print("agent ppds are,", agent_ppds)
         my_pickle = agent_ppds[self.ID]
-        print("my defaults are", my_pickle)
+        # print("my defaults are", my_pickle)
         # j = 0
         for i in ids:
-            print("eeyore", i)
+            # print("eeyore", i)
             index = ids.index(i)
             self.ppD_partner[i] = my_pickle[index]
 
@@ -809,12 +809,12 @@ class PDAgent(Agent):
             if self.delta > 1:
                 egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]), self.model.memoryPaired)
             else:
-                print("pids", self.partner_IDs)
-                print("eps:", self.epsilon)
-                print("qtable", len(self.qtable))
-                print("id", id)
-                print("l state", learning_state)
-                print("learn state", learning_state[id])
+                # print("pids", self.partner_IDs)
+                # print("eps:", self.epsilon)
+                # print("qtable", len(self.qtable))
+                # print("id", id)
+                # print("l state", learning_state)
+                # print("learn state", learning_state[id])
                 egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, learning_state[id], self.model.memoryPaired)
             if egreedy == "C":
                 self.number_of_c += 1
@@ -2087,7 +2087,7 @@ class PDAgent(Agent):
 
         if self.stepCount == 1:
             self.set_defaults(self.partner_IDs)
-            self.current_partner_list = self.model.updated_graphD[self.ID]
+            self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             self.get_IDs(self.current_partner_list)
             for i in self.partner_IDs:
                 self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
@@ -2116,7 +2116,7 @@ class PDAgent(Agent):
                     self.state_working_memory = sarsa_moody.init_statememory(copy.deepcopy(self.model.moody_memory_states), 2, self.moody_delta)
                     # print('init qtable len:', len(self.moody_qtable))
                     self.moody_states = copy.deepcopy(self.model.moody_memory_states)
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.model.updated_graphD[self.ID])  # We now try and find our partners from here
+                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list)  # We now try and find our partners from here
 
                 self.find_average_move()
 
@@ -2127,7 +2127,7 @@ class PDAgent(Agent):
             else:
 
                 self.set_defaults(self.partner_IDs)
-                self.current_partner_list = self.model.updated_graphD[self.ID]
+                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
                 # print("My ppDs are:", self.ppD_partner)
 
                 if self.strategy == 'LEARN':
@@ -2141,7 +2141,7 @@ class PDAgent(Agent):
                     self.states = copy.deepcopy(self.model.moody_memory_states)
 
 
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.model.updated_graphD[self.ID])
+                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list)
                 self.previous_moves.append(self.move)
                 self.find_average_move()
 
@@ -2166,7 +2166,7 @@ class PDAgent(Agent):
                     if self.moody_pp_aprime:
                         self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
                 else:
-                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.model.updated_graphD[self.ID])
+                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list)
 
                 self.find_average_move()
 
@@ -2185,7 +2185,7 @@ class PDAgent(Agent):
                         self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
                 else:
 
-                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.model.updated_graphD[self.ID])
+                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list)
 
                 self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?
                 self.find_average_move()
@@ -2215,7 +2215,7 @@ class PDAgent(Agent):
             #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
 
             # get aprimes (next actions to do)
-            self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory, self.model.updated_graphD[self.ID])
+            self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory, self.current_partner_list)
 
             # update the Q for the CURRENT sprime
 
@@ -2308,7 +2308,7 @@ class PDAgent(Agent):
 
             self.outputData()
             # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
-            self.current_partner_list = self.model.updated_graphD[self.ID]
+            self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             self.stepCount += 1
 
             if round_payoffs is not None:
@@ -2330,8 +2330,10 @@ class PDAgent(Agent):
             #     obs = self.partner_latest_move[i]
             #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
 
+            # print("my id is", self.ID)
+            # print("step", self.stepCount)
             # get aprimes (next actions to do)
-            self.moody_pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.partner_states, self.model.updated_graphD[self.ID])
+            self.moody_pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.partner_states, self.current_partner_list)
 
             # update the Q for the CURRENT sprime
 
@@ -2462,7 +2464,7 @@ class PDAgent(Agent):
 
             self.outputData()
             # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
-            self.current_partner_list = self.model.updated_graphD[self.ID]
+            self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             self.stepCount += 1
 
             if round_payoffs is not None:
@@ -2499,7 +2501,7 @@ class PDAgent(Agent):
 
             self.outputData()
             # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
-            self.current_partner_list = self.model.updated_graphD[self.ID]
+            self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             self.stepCount += 1
 
             if round_payoffs is not None:

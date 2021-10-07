@@ -1076,9 +1076,10 @@ class PDModel(Model):
         self.datacollector.collect(self)
         self.get_highest_score()
         self.reset_values()
+
         # Update the Graph that Agents will Read From
-        self.updated_graphD, self.updated_graphG = self.change_graph(self.graph_additions, self.graph_removals,
-                                                                     self.updated_graphD)
+        #self.updated_graphD, self.updated_graphG = self.change_graph(self.graph_additions, self.graph_removals,
+         #                                                            self.updated_graphD)
 
         # if self.export_q:
         #     if self.step_count == 1:
