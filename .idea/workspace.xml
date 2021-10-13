@@ -12,7 +12,7 @@
     <favorites_list name="pdpython" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
+    <splitter split-orientation="horizontal" split-proportion="0.5469679">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -27,7 +27,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_server.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="187">
+                <state relative-caret-position="102">
                   <caret line="11" column="6" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
                   <folding>
                     <element signature="e#0#65#0" expanded="true" />
@@ -39,8 +39,46 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="351">
-                  <caret line="249" column="20" selection-start-line="249" selection-start-column="20" selection-end-line="249" selection-end-column="20" />
+                <state relative-caret-position="288">
+                  <caret line="1547" column="52" lean-forward="true" selection-start-line="1547" selection-start-column="52" selection-end-line="1547" selection-end-column="52" />
+                  <folding>
+                    <element signature="e#0#22#0" expanded="true" />
+                    <element signature="e#62287#62329#0" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_model.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="238">
+                  <caret line="14" column="17" lean-forward="true" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/pdpython_model/random_network_functions.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="266">
+                  <caret line="67" column="9" lean-forward="true" selection-start-line="67" selection-start-column="9" selection-end-line="67" selection-end-column="9" />
+                  <folding>
+                    <element signature="e#0#13#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-3525">
+                  <caret line="1670" column="20" selection-start-line="1670" selection-start-column="20" selection-end-line="1670" selection-end-column="20" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                   </folding>
@@ -51,35 +89,10 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="368">
-                  <caret line="1078" selection-start-line="1078" selection-end-line="1078" />
+                <state relative-caret-position="169">
+                  <caret line="839" column="29" selection-start-line="839" selection-start-column="21" selection-end-line="839" selection-end-column="29" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_model.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="204">
-                  <caret line="12" column="14" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/pdpython_model/random_network_functions.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="170">
-                  <caret line="106" column="7" selection-start-line="106" selection-start-column="7" selection-end-line="106" selection-end-column="7" />
-                  <folding>
-                    <element signature="e#0#13#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -98,17 +111,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>moody_al</find>
-      <find>plt</find>
-      <find>moody_sarsa</find>
-      <find>deep</find>
-      <find>iter_pick_move</find>
-      <find>pick_next</find>
-      <find>get_ID</find>
-      <find>averageScoreComparison</find>
-      <find>check_partner</find>
-      <find>updated_graph</find>
-      <find>agent_positions</find>
       <find>updated</find>
       <find>agent_positi</find>
       <find>out</find>
@@ -128,6 +130,17 @@
       <find>self.current_partner_list</find>
       <find>self.change_graph</find>
       <find>change</find>
+      <find>simP</find>
+      <find>uv_</find>
+      <find>rnf.</find>
+      <find>partner_scores</find>
+      <find>pp_opp</find>
+      <find>self.indivAvPayoff.get(partner_ID)</find>
+      <find>self.indivAvPayoff</find>
+      <find>self.pp_PR</find>
+      <find>self.per_partner</find>
+      <find>self.pp_UR =</find>
+      <find>self.pp_UR</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -151,7 +164,6 @@
         <option value="$PROJECT_DIR$/pdpython_model/sarsa_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/random_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/random_run.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/random_network_functions.py" />
         <option value="$PROJECT_DIR$/pdpython_model/random_agents.py" />
         <option value="$PROJECT_DIR$/pdpython_model/random_model.py" />
         <option value="$PROJECT_DIR$/pdpython_model/random_batchrun.py" />
@@ -159,6 +171,7 @@
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_model.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/random_network_functions.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_agents.py" />
       </list>
@@ -175,6 +188,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -191,7 +205,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -365,7 +378,7 @@
       <window_info id="Favorites" order="2" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32827735" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49947312" visible="true" weight="0.32394367" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49947312" weight="0.32394367" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -373,7 +386,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32936078" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32827735" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50052685" side_tool="true" weight="0.2990249" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.36511377" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="10" visible="true" weight="0.36511377" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -543,13 +556,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/slaps_batch_run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="37" column="33" selection-start-line="37" selection-start-column="33" selection-end-line="37" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/slaps_batch_run.py" />
     <entry file="file://$PROJECT_DIR$/pdpython_model/broke_random_batchrun.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
@@ -594,20 +601,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="15" selection-start-line="2" selection-start-column="15" selection-end-line="2" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="14" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/agents.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="181">
@@ -618,9 +611,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="15" selection-start-line="2" selection-start-column="15" selection-end-line="2" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
+        <state relative-caret-position="102">
           <caret line="11" column="6" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
           <folding>
             <element signature="e#0#65#0" expanded="true" />
@@ -628,32 +628,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="368">
-          <caret line="1078" selection-start-line="1078" selection-end-line="1078" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/random_network_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="106" column="7" selection-start-line="106" selection-start-column="7" selection-end-line="106" selection-end-column="7" />
+        <state relative-caret-position="266">
+          <caret line="67" column="9" lean-forward="true" selection-start-line="67" selection-start-column="9" selection-end-line="67" selection-end-column="9" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="249" column="20" selection-start-line="249" selection-start-column="20" selection-end-line="249" selection-end-column="20" />
+        <state relative-caret-position="238">
+          <caret line="14" column="17" lean-forward="true" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="839" column="29" selection-start-line="839" selection-start-column="21" selection-end-line="839" selection-end-column="29" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="1547" column="52" lean-forward="true" selection-start-line="1547" selection-start-column="52" selection-end-line="1547" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#62287#62329#0" />
           </folding>
         </state>
       </provider>

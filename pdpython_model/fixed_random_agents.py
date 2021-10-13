@@ -180,6 +180,16 @@ class PDAgent(Agent):
         for possible in self.model.agentIDs:
             self.potential_partner_reputations[possible] = 0  # Initialise the reps at zero
 
+        self.connectedness = 0
+        self.utilityRatio = 0  # ratio of utility earned to number of partners
+        self.payoffRatio = 0   # average payoff that round
+        self.pp_UR = {}  # Each of my Partner's Utility Ratios (utility / n_partners)
+        self.pp_PR = {}  # Each of my Partner's Payoff Ratios (payoff / n partners)
+        self.pp_CON = {} # Each of my Partner's connectednesses
+        self.average_ppUR = 0
+        self.average_ppPR = 0
+        self.average_ppCON = 0
+
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
         self.number_of_d = 0
@@ -1045,6 +1055,8 @@ class PDAgent(Agent):
                     partner_move = partner.itermove_result[self.ID]
                     partner_moves = partner.previous_moves
                     partner_mood = sarsa_moody.getMoodType(partner.mood)
+                    partner_UR = partner.utilityRatio
+                    partner_PR = partner.payoffRatio
 
                     my_move = self.itermove_result[partner_ID]
 
@@ -1063,6 +1075,15 @@ class PDAgent(Agent):
 
                     if self.pp_payoff.get(partner_ID) is None:
                         self.pp_payoff[partner_ID] = 0
+
+                    if self.pp_UR.get(partner_ID) is None:
+                        self.pp_UR[partner_ID] = 0
+
+                    if self.pp_PR.get(partner_ID) is None:
+                        self.pp_PR[partner_ID] = 0
+
+                    if self.pp_CON.get(partner_ID) is None:
+                        self.pp_CON[partner_ID] = 0
 
                     if self.per_partner_mcoops.get(partner_ID) is None:
                         self.per_partner_mcoops[partner_ID] = 0
@@ -1098,6 +1119,10 @@ class PDAgent(Agent):
                      after it is updated and checked, we send it back to working memory
                     """
                     current_uv = self.update_value
+                    self.pp_UR[partner_ID] = partner.utilityRatio
+                    self.pp_PR[partner_ID] = partner.payoffRatio
+                    self.pp_CON[partner_ID] = partner.connectedness
+
 
                     if self.strategy == "VPP" or "LEARN":
                         if self.strategy is not "MOODYLEARN":
@@ -1382,6 +1407,259 @@ class PDAgent(Agent):
         self.model.agent_list.append('{}, {}'.format(self.ID, self.strategy))
 
         # and also time each agent's step to create a total time thingybob
+
+    def output_data_to_file(self, outcomes):
+        """ Outputs the data collected each turn on multiple agent variables to a .csv file"""
+
+        for m in self.per_partner_strategies:
+            if self.per_partner_strategies[m] == self.strategy:
+                self.similar_partners += 1
+
+
+        # List to add:
+        # Number of Partners
+        numbPartners = len(self.current_partner_list)
+
+        # Who Each Partner Is
+        partnerList = self.current_partner_list
+
+        # My Average and Median Total Utility - TODO: IS THIS TOTAL UTILITY OR PER ROUND?
+        utils = []
+        for i in self.current_partner_list:
+            utils.append(self.per_partner_utility[i])
+        print("My per partner utility is: ", utils)
+        avUtility = sum(utils)/len(utils)
+        self.utilityRatio = sum(utils)/len(utils)
+        medianUtility = statistics.median(utils)
+
+        # My Average and Median Round Score Per Partner
+        pays = []
+        for i in self.current_partner_list:
+            pays.append(self.per_partner_payoffs[i])
+        print("My per partner payoff is: ", pays)
+        avPayoff = sum(pays)/len(pays)
+        self.payoffRatio = sum(pays)/len(pays)
+        medianPayoff = statistics.median(pays)
+
+        # My Total Utility
+        totalUtility = self.score
+
+        # My Centrality Measure
+
+        # How Connected I am (out of max partners ratio)
+        self.connectedness = len(self.current_partner_list) / (self.model.number_of_agents-1)
+
+        # Number of C
+        numbC = self.number_of_c
+
+        # Number of D
+        numbD = self.number_of_d
+
+        # Number of Mutual C
+        numbMutC = self.mutual_c_outcome
+
+        # Mood
+        mood = self.mood
+
+        # Coops / N Partners
+        cooperationRatio = self.number_of_c / numbPartners
+
+        # Number of Similar Partners
+        similarPartners = self.similar_partners
+
+        # Average Scores of my Partners? Because we can't track who partners are directly
+        # Average Connectedness of my Partners? Because we can't track who partners are directly
+        partnerURs = []
+        partnerPRs = []
+        partnerCONs = []
+        # TODO: Get the other partner's self.utilityRatio values?
+        for i in self.current_partner_list:
+            partnerURs.append(self.pp_UR[i])
+            partnerPRs.append(self.pp_PR[i])
+            partnerCONs.append(self.pp_CON[i])
+
+        averagePartnerUtilityRatio = statistics.mean(partnerURs)
+        averagePartnerPayoffRatio = statistics.mean(partnerPRs)
+        averagePartnerConnectedness = statistics.mean(partnerCONs)
+        self.average_ppUR = averagePartnerUtilityRatio
+        self.average_ppPR = averagePartnerPayoffRatio
+        self.average_ppCON = averagePartnerConnectedness
+
+        # Model Connectedness
+        graphConnectedness = self.model.graph_connectedness
+
+        prob_list = []
+        util_list = []
+        move_list = []
+        average_list = []
+
+        for i in self.indivAvPayoff:
+            average_list.append(self.indivAvPayoff[i])
+
+        for i in self.ppD_partner:
+            prob_list.append(self.ppD_partner[i])
+
+        for i in self.per_partner_utility:
+            util_list.append(self.per_partner_utility[i])
+
+        for i in self.itermove_result:  # This encoding is per move type, allows graphing trends in move selection
+            if self.itermove_result[i] == 'C':
+                move_list.append(1)
+            elif self.itermove_result[i] == 'D':
+                move_list.append(2)
+
+        strategy_code = 'None'
+
+        if self.strategy == 'RANDOM':
+            strategy_code = 0
+        elif self.strategy == 'ANGEL':
+            strategy_code = 1
+        elif self.strategy == 'DEVIL':
+            strategy_code = 2
+        elif self.strategy == 'EV':
+            strategy_code = 3
+        elif self.strategy == 'VEV':
+            strategy_code = 4
+        elif self.strategy == 'TFT':
+            strategy_code = 5
+        elif self.strategy == 'VPP':
+            strategy_code = 6
+        elif self.strategy == 'WSLS':
+            strategy_code = 7
+        elif self.strategy == "LEARN":
+            strategy_code = 8
+        elif self.strategy == "MOODYLEARN":
+            strategy_code = 9
+
+        """ The above will error catch for when agents don't have those values, and will still let us print 
+            to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
+
+        #TODO: FIX DATA OUTPUTTING PLEASE?
+        if self.strategy == "MOODYLEARN":
+            try:
+                self.attempts_taken += 1
+                with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+                    fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
+                                  'move_%d' % self.ID,
+                                  'probabilities_%d' % self.ID, 'utility_%d' % self.ID, 'common_move_%d' % self.ID,
+                                  'number_coop_%d' % self.ID, 'number_defect_%d' % self.ID,
+                                  'outcomes_%d' % self.ID,
+                                  #'p1_%d' % self.ID, 'p2_%d' % self.ID, 'p3_%d' % self.ID, 'p4_%d' % self.ID,
+                                  'u1_%d' % self.ID,
+                                  'u2_%d' % self.ID,
+                                  'u3_%d' % self.ID,
+                                  'u4_%d' % self.ID,
+                                  'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID, 'm4_%d' % self.ID,
+                                  'uv_%d' % self.ID,
+                                  'ps_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
+                                  'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
+                                  'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID,
+                                  'sensitivity_%d' % self.ID]
+
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                    # moves = []
+                    # for i in self.move:
+                    #     moves.append(self.move[i])
+
+                    if self.stepCount == 1:
+                        writer.writeheader()
+
+                    writer.writerow(
+                        {'stepcount_%d' % self.ID: self.stepCount,
+                         'strategy_%d' % self.ID: self.strategy,
+                         'strat code_%d' % self.ID: strategy_code,
+                         'move_%d' % self.ID: self.itermove_result,
+                         'probabilities_%d' % self.ID: self.ppD_partner,
+                         'utility_%d' % self.ID: self.score,
+                         'common_move_%d' % self.ID: self.common_move,
+                         'number_coop_%d' % self.ID: self.number_of_c,
+                         'number_defect_%d' % self.ID: self.number_of_d,
+                         'outcomes_%d' % self.ID: outcomes,
+                         'u1_%d' % self.ID: utility_partner_1,
+                         'u2_%d' % self.ID: utility_partner_2,
+                         'u3_%d' % self.ID: utility_partner_3,
+                         'u4_%d' % self.ID: utility_partner_4,
+                         'm1_%d' % self.ID: move_partner_1,
+                         'm2_%d' % self.ID: move_partner_2,
+                         'm3_%d' % self.ID: move_partner_3,
+                         'm4_%d' % self.ID: move_partner_4,
+                         'uv_%d' % self.ID: self.update_value,
+                         'ps_%d' % self.ID: self.partner_states,
+                         'nc_%d' % self.ID: self.number_of_c,
+                         'mutC_%d' % self.ID: self.mutual_c_outcome,
+                         'simP_%d' % self.ID: self.similar_partners,
+                         'avp1_%d' % self.ID: avpay_partner_1,
+                         'avp2_%d' % self.ID: avpay_partner_2,
+                         'avp3_%d' % self.ID: avpay_partner_3,
+                         'avp4_%d' % self.ID: avpay_partner_4,
+                         'globav_%d' % self.ID: self.globalAvPayoff,
+                         'epsilon_%d' % self.ID: self.moody_epsilon,
+                         'alpha_%d' % self.ID: self.moody_alpha,
+                         'mood_%d' % self.ID: self.mood,
+                         'sensitivity_%d' % self.ID: self.sensitivity_mod})
+            except PermissionError:
+                self.output_data_to_file(self.outcome_list)
+
+        else:
+            try:
+                with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+                    fieldnames = ['stepcount_%d' % self.ID, 'strategy_%d' % self.ID, 'strat code_%d' % self.ID,
+                                  'move_%d' % self.ID, 'probabilities_%d' % self.ID,
+                                  'utility_%d' % self.ID, 'common_move_%d' % self.ID, 'number_coop_%d' % self.ID,
+                                  'number_defect_%d' % self.ID,
+                                  'outcomes_%d' % self.ID, 'u1_%d' % self.ID, 'u2_%d' % self.ID, 'u3_%d' % self.ID,
+                                  'u4_%d' % self.ID, 'm1_%d' % self.ID, 'm2_%d' % self.ID, 'm3_%d' % self.ID,
+                                  'm4_%d' % self.ID, 'uv_%d' % self.ID,
+                                  'wm_%d' % self.ID, 'nc_%d' % self.ID, 'mutC_%d' % self.ID, 'simP_%d' % self.ID,
+                                  'avp1_%d' % self.ID, 'avp2_%d' % self.ID, 'avp3_%d' % self.ID, 'avp4_%d' % self.ID,
+                                  'globav_%d' % self.ID, 'epsilon_%d' % self.ID, 'alpha_%d' % self.ID, 'mood_%d' % self.ID,
+                                  'sensitivity_%d' % self.ID]
+
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                    # moves = []
+                    # for i in self.move:
+                    #     moves.append(self.move[i])
+
+                    if self.stepCount == 1:
+                        writer.writeheader()
+
+                    writer.writerow(
+                        {'stepcount_%d' % self.ID: self.stepCount,
+                         'strategy_%d' % self.ID: self.strategy,
+                         'strat code_%d' % self.ID: strategy_code,
+                         'move_%d' % self.ID: self.itermove_result,
+                         'probabilities_%d' % self.ID: self.ppD_partner,
+                         'utility_%d' % self.ID: self.score,
+                         'common_move_%d' % self.ID: self.common_move,
+                         'number_coop_%d' % self.ID: self.number_of_c,
+                         'number_defect_%d' % self.ID: self.number_of_d,
+                         'outcomes_%d' % self.ID: outcomes,
+                         'u1_%d' % self.ID: utility_partner_1,
+                         'u2_%d' % self.ID: utility_partner_2,
+                         'u3_%d' % self.ID: utility_partner_3,
+                         'u4_%d' % self.ID: utility_partner_4,
+                         'm1_%d' % self.ID: move_partner_1,
+                         'm2_%d' % self.ID: move_partner_2,
+                         'm3_%d' % self.ID: move_partner_3,
+                         'm4_%d' % self.ID: move_partner_4,
+                         'uv_%d' % self.ID: self.update_value,
+                         'wm_%d' % self.ID: self.working_memory,
+                         'nc_%d' % self.ID: self.number_of_c,
+                         'mutC_%d' % self.ID: self.mutual_c_outcome,
+                         'simP_%d' % self.ID: self.similar_partners,
+                         'avp1_%d' % self.ID: avpay_partner_1,
+                         'avp2_%d' % self.ID: avpay_partner_2,
+                         'avp3_%d' % self.ID: avpay_partner_3,
+                         'avp4_%d' % self.ID: avpay_partner_4,
+                         'globav_%d' % self.ID: self.globalAvPayoff,
+                         'epsilon_%d' % self.ID: self.epsilon,
+                         'alpha_%d' % self.ID: self.alpha,
+                         'mood_%d' % self.ID: self.mood,
+                         'sensitivity_%d' % self.ID: self.sensitivity_mod})
+            except PermissionError:
+                self.output_data_to_file(self.outcome_list)
 
     def output_data_to_file(self, outcomes):
         """ Outputs the data collected each turn on multiple agent variables to a .csv file"""

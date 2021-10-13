@@ -532,6 +532,8 @@ class PDModel(Model):
 
         self.agent_positions = {}
         self.graph_probability = graph_probability
+        self.graph_connectedness = []
+        self.max_edges = 0
 
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
@@ -814,6 +816,8 @@ class PDModel(Model):
         print("I've made a graph!")
         nx.draw(self.initial_graphG)
         plt.savefig(self.exp_n + "-initGraph.png")
+        self.max_edges = rnf.maxEdgesPossible(self.number_of_agents, self.agentIDs)
+        self.graph_connectedness = (nx.number_of_edges(self.updated_graphG)) / self.max_edges
         return
 
     def change_graph(self, additions, removals, old_graph):
@@ -1064,6 +1068,7 @@ class PDModel(Model):
 
         start = time.time()
         self.schedule.step()
+        self.graph_connectedness = (nx.number_of_edges(self.updated_graphG))/self.max_edges
         if self.step_count == self.rounds - 1:
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()

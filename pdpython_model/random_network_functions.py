@@ -61,6 +61,50 @@ def initRandomGraph(nodes, probability, ids):
     # Export the Edge List of the graph, and Export the version Agents can understand
     return edgesDict, g
 
+def maxEdgesPossible(nodes, ids):
+    """ Produces a Random Erdos Renyi Graph, based on a probability of connecting to each next node, and a dict for
+    each agent of who their starting partners should be. """
+    N = nodes
+    P = 1
+    g = nx.Graph()
+
+    edgesDict = {}
+
+    for i in ids:
+        edgesDict[i] = 0
+
+    # Adding nodes
+    g.add_nodes_from(range(1, N + 1))
+
+    # Add edges to the graph randomly.
+    for i in g.nodes():
+        for j in g.nodes():
+            if (i < j):
+
+                # Take random number R.
+                R = random.random()
+
+                # Check if R<P add the edge to the graph else ignore.
+                if (R < P):
+                    g.add_edge(i, j)
+        pos = nx.circular_layout(g)
+
+    # for k in ids:
+    #     # Get each's nodes edges into one big nested list
+    #     bigList[k] = g.edges(k)
+
+    for k in ids:
+        current_edges = list(g.edges(k))
+        exported_edges = []
+        length = range(len(current_edges))
+        for i in length:
+            current_edge = current_edges[i]
+            exported_edges.append(current_edge[1])
+        edgesDict[k] = exported_edges
+
+    # Export the Edge List of the graph, and Export the version Agents can understand
+    return g.number_of_edges()
+
 def convertGraph_to_dictEdges(graph, ids):
     """ Output the graph instead as an ID-keyed dict that contains vectors of each agent's initial partners. """
     edgesDict = {}
