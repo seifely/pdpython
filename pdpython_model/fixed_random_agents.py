@@ -1434,7 +1434,6 @@ class PDAgent(Agent):
 
         # My Average and Median Round Score Per Partner
         pays = []
-        print("pp payoffs", self.per_partner_payoffs)
         for i in self.current_partner_list:
             end = len(self.per_partner_payoffs[i]) - 1
             item = self.per_partner_payoffs[i]
