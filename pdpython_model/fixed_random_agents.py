@@ -1427,16 +1427,19 @@ class PDAgent(Agent):
         utils = []
         for i in self.current_partner_list:
             utils.append(self.per_partner_utility[i])
-        print("My per partner utility is: ", utils)
+        # print("My per partner utility is: ", utils)
         avUtility = sum(utils)/len(utils)
         self.utilityRatio = sum(utils)/len(utils)
         medianUtility = statistics.median(utils)
 
         # My Average and Median Round Score Per Partner
         pays = []
+        print("pp payoffs", self.per_partner_payoffs)
         for i in self.current_partner_list:
-            pays.append(self.per_partner_payoffs[i])
-        print("My per partner payoff is: ", pays)
+            end = len(self.per_partner_payoffs[i]) - 1
+            item = self.per_partner_payoffs[i]
+            pays.append(item[end])
+        # print("My per partner payoff is: ", pays)
         avPayoff = sum(pays)/len(pays)
         self.payoffRatio = sum(pays)/len(pays)
         medianPayoff = statistics.median(pays)
@@ -1469,6 +1472,8 @@ class PDAgent(Agent):
 
         # Average Scores of my Partners? Because we can't track who partners are directly
         # Average Connectedness of my Partners? Because we can't track who partners are directly
+        # TODO: PR AND PAYOFF RATIO DOESN'T SEEM TO BE WORKING
+
         partnerURs = []
         partnerPRs = []
         partnerCONs = []

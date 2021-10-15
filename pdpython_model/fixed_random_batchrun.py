@@ -604,7 +604,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('payoffredo_%s-%s-%s-%s_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('payoffredo_%s-%s-%s-%s_start%s_mood%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.startingBehav, self.moody_startmood, self.graph_probability, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -817,7 +817,7 @@ class PDModel(Model):
         nx.draw(self.initial_graphG)
         plt.savefig(self.exp_n + "-initGraph.png")
         self.max_edges = rnf.maxEdgesPossible(self.number_of_agents, self.agentIDs)
-        self.graph_connectedness = (nx.number_of_edges(self.updated_graphG)) / self.max_edges
+        self.graph_connectedness = (nx.number_of_edges(self.initial_graphG)) / self.max_edges
         return
 
     def change_graph(self, additions, removals, old_graph):
@@ -1068,7 +1068,11 @@ class PDModel(Model):
 
         start = time.time()
         self.schedule.step()
-        self.graph_connectedness = (nx.number_of_edges(self.updated_graphG))/self.max_edges
+        if self.updated_graphG == 0:
+            graph_connect = self.initial_graphG
+        else:
+            graph_connect = self.updated_graphG
+        self.graph_connectedness = (nx.number_of_edges(graph_connect))/self.max_edges
         if self.step_count == self.rounds - 1:
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
@@ -1186,8 +1190,8 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
-                 max_steps=10000,
+                 iterations=3,
+                 max_steps=5000,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
