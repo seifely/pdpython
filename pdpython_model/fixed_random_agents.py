@@ -1451,11 +1451,22 @@ class PDAgent(Agent):
         # How Connected I am (out of max partners ratio)
         self.connectedness = len(self.current_partner_list) / (self.model.number_of_agents-1)
 
+        """ When changing over to random network agents, there was some kind of background bug in the data 
+        output where each round's number of c/number of d was correct for the round AFTER (some misalignment
+        in the csv) - this below is a temporary fix for that to save time. """
+        dCount = 0
+        cCount = 0
+        for n in self.current_partner_list:
+            move = self.itermove_result[n]
+            if move == 'D':
+                dCount += 1
+            elif move == 'C':
+                cCount += 1
         # Number of C
-        numbC = self.number_of_c
+        numbC = cCount
 
         # Number of D
-        numbD = self.number_of_d
+        numbD = dCount
 
         # Number of Mutual C
         numbMutC = self.mutual_c_outcome
@@ -1464,7 +1475,7 @@ class PDAgent(Agent):
         mood = self.mood
 
         # Coops / N Partners
-        cooperationRatio = self.number_of_c / numbPartners
+        cooperationRatio = cCount / numbPartners
 
         # Number of Similar Partners
         similarPartners = self.similar_partners
