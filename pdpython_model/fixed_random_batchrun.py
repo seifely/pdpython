@@ -534,6 +534,8 @@ class PDModel(Model):
         self.graph_probability = graph_probability
         self.graph_connectedness = []
         self.max_edges = 0
+        self.groupDegreeCentralities = {}
+        self.group_degree_centralization = 0
 
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
@@ -1064,6 +1066,34 @@ class PDModel(Model):
             self.grid.place_agent(pdagent, (x, y))
             self.schedule.add(pdagent)
 
+    #  ===== This was me trying to calculate GDC by myself, when in fact network x has a function for it
+    def calculate_GDC(self, centralities, IDs, nAgents):
+        highest = 0
+        highest_id = 0
+        for i in IDs:
+            if centralities[i] > highest:
+                # print(centralities[i], "is higher than", highest, "so I'll replace it")
+                highest = centralities[i]
+                highest_id = i
+        # sum the observed differences between the highest and all the others
+        summedDiff = 0
+        othersList = copy.deepcopy(centralities)
+        othersIDs = copy.deepcopy(IDs)
+        # print("I'm gonna remove", highest_id, "from the lists")
+        othersIDs.remove(highest_id)
+        othersList.pop(highest_id)
+        # othersList = othersList.remove(highest_id)
+        for i in othersIDs:
+            # print("highest is", highest, "other is ", othersList[i])
+            # print("diff was", summedDiff)
+            diff = (highest - othersList[i])
+            # print("the difference was", diff)
+            # print("diff is now", summedDiff + diff)
+            summedDiff = summedDiff + diff
+        denom = (nAgents - 1) * (nAgents - 2)
+        # print("the denom is ", denom)
+        return summedDiff / denom
+
     def step(self):
 
         start = time.time()
@@ -1073,6 +1103,7 @@ class PDModel(Model):
         else:
             graph_connect = self.updated_graphG
         self.graph_connectedness = (nx.number_of_edges(graph_connect))/self.max_edges
+        self.group_degree_centralization = self.calculate_GDC(self.groupDegreeCentralities, self.agentIDs, self.number_of_agents)
         if self.step_count == self.rounds - 1:
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()

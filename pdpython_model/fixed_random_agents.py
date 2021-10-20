@@ -180,7 +180,8 @@ class PDAgent(Agent):
         for possible in self.model.agentIDs:
             self.potential_partner_reputations[possible] = 0  # Initialise the reps at zero
 
-        self.connectedness = 0
+        self.actorDegreeCentrality = 0
+        self.normalizedActorDegreeCentrality = 0
         self.utilityRatio = 0  # ratio of utility earned to number of partners
         self.payoffRatio = 0   # average payoff that round
         self.pp_UR = {}  # Each of my Partner's Utility Ratios (utility / n_partners)
@@ -1121,7 +1122,7 @@ class PDAgent(Agent):
                     current_uv = self.update_value
                     self.pp_UR[partner_ID] = partner.utilityRatio
                     self.pp_PR[partner_ID] = partner.payoffRatio
-                    self.pp_CON[partner_ID] = partner.connectedness
+                    self.pp_CON[partner_ID] = partner.normalizedActorDegreeCentrality
 
 
                     if self.strategy == "VPP" or "LEARN":
@@ -1446,10 +1447,17 @@ class PDAgent(Agent):
         # My Total Utility
         totalUtility = self.score
 
-        # My Centrality Measure
+        # ============ Centrality Measures ===============
+        # The Normalised Actor Degree Centrality is actually the connectedness measure below
+        """ The Index of Group Degree Centralisation is the normalised (I think?) version of a measure that  measures
+        the extent to which actors in the network differ from one another in their degree centralities. """
+
 
         # How Connected I am (out of max partners ratio)
-        self.connectedness = len(self.current_partner_list) / (self.model.number_of_agents-1)
+        self.actorDegreeCentrality = len(self.current_partner_list)
+        self.normalizedActorDegreeCentrality = len(self.current_partner_list) / (self.model.number_of_agents - 1)
+        self.model.groupDegreeCentralities[self.id] = self.actorDegreeCentrality
+        IGDC = self.model.group_degree_centralization
 
         """ When changing over to random network agents, there was some kind of background bug in the data 
         output where each round's number of c/number of d was correct for the round AFTER (some misalignment
@@ -1577,6 +1585,9 @@ class PDAgent(Agent):
                                   'avPartnerPR_%d' % self.ID,
                                   'avPartnerConnected_%d' % self.ID,
                                   'graphConnectedness_%d' % self.ID,
+                                  'degree_centrality_%d' % self.ID,
+                                  'normalized_centrality_%d' % self.ID,
+                                  'groupDegreeCent_%d' % self.ID,
                                   'globav_%d' % self.ID,
                                   'sensitivity_%d' % self.ID,
                                   'epsilon_%d' % self.ID]
@@ -1614,6 +1625,9 @@ class PDAgent(Agent):
                                   'avPartnerPR_%d' % self.ID: averagePartnerPayoffRatio,
                                   'avPartnerConnected_%d' % self.ID: averagePartnerConnectedness,
                                   'graphConnectedness_%d' % self.ID: graphConnectedness,
+                                  'degree_centrality_%d' % self.ID: self.actorDegreeCentrality,
+                                  'normalized_centrality_%d' % self.ID: self.normalizedActorDegreeCentrality,
+                                  'groupDegreeCent_%d' % self.ID: IGDC,
                                   'globav_%d' % self.ID: self.globalAvPayoff,
                                   'sensitivity_%d' % self.ID: self.sensitivity_mod,
                                   'epsilon_%d' % self.ID: self.epsilon,})
@@ -1646,6 +1660,9 @@ class PDAgent(Agent):
                                   'avPartnerPR_%d' % self.ID,
                                   'avPartnerConnected_%d' % self.ID,
                                   'graphConnectedness_%d' % self.ID,
+                                  'degree_centrality_%d' % self.ID,
+                                  'normalized_centrality_%d' % self.ID,
+                                  'groupDegreeCent_%d' % self.ID,
                                   'globav_%d' % self.ID,
                                   'sensitivity_%d' % self.ID,
                                   'epsilon_%d' % self.ID]
@@ -1683,6 +1700,9 @@ class PDAgent(Agent):
                          'avPartnerPR_%d' % self.ID: averagePartnerPayoffRatio,
                          'avPartnerConnected_%d' % self.ID: averagePartnerConnectedness,
                          'graphConnectedness_%d' % self.ID: graphConnectedness,
+                         'degree_centrality_%d' % self.ID: self.actorDegreeCentrality,
+                         'normalized_centrality_%d' % self.ID: self.normalizedActorDegreeCentrality,
+                         'groupDegreeCent_%d' % self.ID: IGDC,
                          'globav_%d' % self.ID: self.globalAvPayoff,
                          'sensitivity_%d' % self.ID: self.sensitivity_mod,
                          'epsilon_%d' % self.ID: self.epsilon, })
