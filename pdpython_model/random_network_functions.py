@@ -143,7 +143,7 @@ def convertDict_to_graph(dict, ids):
     # print(G.number_of_edges())
     return G
 
-def update_graph(old_edges, additions, removals, sorted, ids):
+def update_graph(old_edges, additions, removals, sorting, ids):
     """ Import the previous graph, get its data in dict form, get the current edge list and compare changes at regular intervals."""
     changeable = convertDict_to_graph(old_edges, ids)   # Create a graph from the old dict the agents were reading from
     for pair in additions:     # Additions should be a list of tuples that wish to have edge connections
@@ -156,7 +156,7 @@ def update_graph(old_edges, additions, removals, sorted, ids):
 
     # Covert the new graph to something the agents can read
     changesDict = convertGraph_to_dictEdges(changeable, ids)
-    if sorted:
+    if sorting:
         for i in ids:               # Sort the lists for each agent - this is for readability for us when we export it, but I don't know if it will affect agent behaviour, so am making it optional for now
             list = changesDict[i]
             sortedList = sorted(list)
@@ -167,7 +167,35 @@ def update_graph(old_edges, additions, removals, sorted, ids):
         # Then output both the graph translation and the graph itself
         return changesDict, changeable
 
+def basicPartnerDecision(current_partners, rejected_partners, untested_partners, possible_partners, new_partnerProb, my_ID):
+    """ Takes in a list of current partners, drops one and requests a new one from untested list. """
+    removal_request = []
+    addition_request = []
 
+    removal = 0
+    addition = 0
+
+    # if current_partners:  # This has to be the case otherwise it will start appending None
+    # TODO: Currently the agent-side code for this actively accepts None, so we'll see if that works
+
+    removal = random.choice(current_partners)
+    removal_request.append(my_ID)
+    removal_request.append(removal)
+
+    addition = chooseNewPartner(untested_partners, rejected_partners, possible_partners, new_partnerProb, [0,0])
+    addition_request.append(my_ID)
+    addition_request.append(addition)
+
+    return tuple(removal_request), tuple(addition_request), removal, addition
+
+def partnerDecision(current_partners, untested_partners, rejected_partners, partner_history, current_mood,
+                    scores_against_partners, goal_score, mood_threshold,
+                    partner_reputaions, my_connectedness):
+    # May want things like partner mood, partner reputation?
+    """ Initially this function will , but later will be designed to make decisions based on information and rules as to
+        which new partners they desire. TODO: Do highly connected agents have a lower chance to connect?
+        TODO: Should agents be able to deny connection requests? Or are they always available? We'd then need a banned connection list stored in the model. """
+    return
 
 def chooseNewPartner(untested_partners, tested_partners, allPossPartners, probability, weights):
     """ For now, either select a partner with a random chance, or select from either untested or previously tested partners

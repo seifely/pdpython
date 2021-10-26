@@ -9,6 +9,7 @@ import copy
 from pdpython_model import sarsa
 from pdpython_model import sarsa_moody
 import math
+from pdpython_model import random_network_functions as rnf
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
@@ -174,8 +175,17 @@ class PDAgent(Agent):
 
         self.current_partner_list = []  # List of current partners we are playing against
         self.current_partner_reputations = {}  # Mean scores against the agents we are currently playing against
+
         self.potential_partner_list = []  # Agents we are not currently playing against
         self.potential_partner_reputations = {}  # A dict of all agent's average past scores against us?
+
+        self.all_possible_partners = []  # List of all agent IDs except my own
+        self.all_possible_partners = list(range(1, (self.model.number_of_agents + 1)))
+        if self.ID in self.all_possible_partners:
+            self.all_possible_partners.remove(self.ID)
+
+        self.rejected_partner_list = []  # Agents we have played against in the past and dropped
+        self.rejected_partner_reputations = {}  # Their reputations/scores
 
         for possible in self.model.agentIDs:
             self.potential_partner_reputations[possible] = 0  # Initialise the reps at zero
@@ -1456,7 +1466,7 @@ class PDAgent(Agent):
         # How Connected I am (out of max partners ratio)
         self.actorDegreeCentrality = len(self.current_partner_list)
         self.normalizedActorDegreeCentrality = len(self.current_partner_list) / (self.model.number_of_agents - 1)
-        self.model.groupDegreeCentralities[self.id] = self.actorDegreeCentrality
+        self.model.groupDegreeCentralities[self.ID] = self.actorDegreeCentrality
         IGDC = self.model.group_degree_centralization
 
         """ When changing over to random network agents, there was some kind of background bug in the data 
@@ -2015,7 +2025,6 @@ class PDAgent(Agent):
     #         except PermissionError:
     #             self.output_data_to_file(self.outcome_list)
 
-
     def reset_values(self):
         """ Resets relevant global variables to default values. """
         self.number_of_d = 0
@@ -2415,6 +2424,10 @@ class PDAgent(Agent):
             self.set_defaults(self.partner_IDs)
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             self.get_IDs(self.current_partner_list)
+            for i in self.current_partner_list:
+                for j in self.all_possible_partners:
+                    if j != i:
+                        self.potential_partner_list.append(j)
             for i in self.partner_IDs:
                 self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
                 if self.statemode == 'stateless':
@@ -2454,6 +2467,10 @@ class PDAgent(Agent):
 
                 self.set_defaults(self.partner_IDs)
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                for i in self.current_partner_list:
+                    for j in self.all_possible_partners:
+                        if j != i:
+                            self.potential_partner_list.append(j)
                 # print("My ppDs are:", self.ppD_partner)
 
                 if self.strategy == 'LEARN':
@@ -2634,7 +2651,23 @@ class PDAgent(Agent):
 
             self.outputData()
             # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+            # TODO: APPEND PARTNER REMOVAL AND ADDITION REQUEST TO THE MODEL
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+            removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list, self.rejected_partner_list,
+                                                                                     self.potential_partner_list, self.all_possible_partners,
+                                                                                     0.4, self.ID)
+            if removRequest[1] != None:
+                self.model.graph_removals.append(removRequest)
+                self.current_partner_list.remove(removals)
+            if addRequest[1] != None:
+                self.model.graph_additions.append(addRequest)
+
+            if additions not in self.current_partner_list:
+                self.current_partner_list.append(additions)
+            if removals not in self.rejected_partner_list:
+                self.rejected_partner_list.append(removals)
+            self.partner_IDs = copy.deepcopy(self.current_partner_list)
+
             self.stepCount += 1
 
             if round_payoffs is not None:
@@ -2790,7 +2823,25 @@ class PDAgent(Agent):
 
             self.outputData()
             # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+            # print("garf", self.model.updated_graphD)
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+            removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
+                                                                                     self.rejected_partner_list,
+                                                                                     self.potential_partner_list,
+                                                                                     self.all_possible_partners,
+                                                                                     0.4, self.ID)
+            if removRequest[1] != None:
+                self.model.graph_removals.append(removRequest)
+                self.current_partner_list.remove(removals)
+            if addRequest[1] != None:
+                self.model.graph_additions.append(addRequest)
+
+            if additions not in self.current_partner_list:
+                self.current_partner_list.append(additions)
+            if removals not in self.rejected_partner_list:
+                self.rejected_partner_list.append(removals)
+            self.partner_IDs = copy.deepcopy(self.current_partner_list)
+
             self.stepCount += 1
 
             if round_payoffs is not None:
@@ -2828,6 +2879,23 @@ class PDAgent(Agent):
             self.outputData()
             # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+            removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
+                                                                                     self.rejected_partner_list,
+                                                                                     self.potential_partner_list,
+                                                                                     self.all_possible_partners,
+                                                                                     0.4, self.ID)
+            if removRequest[1] != None:
+                self.model.graph_removals.append(removRequest)
+                self.current_partner_list.remove(removals)
+            if addRequest[1] != None:
+                self.model.graph_additions.append(addRequest)
+
+            if additions not in self.current_partner_list:
+                self.current_partner_list.append(additions)
+            if removals not in self.rejected_partner_list:
+                self.rejected_partner_list.append(removals)
+            self.partner_IDs = copy.deepcopy(self.current_partner_list)
+
             self.stepCount += 1
 
             if round_payoffs is not None:
