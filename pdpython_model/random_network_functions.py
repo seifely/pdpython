@@ -177,10 +177,10 @@ def basicPartnerDecision(current_partners, rejected_partners, untested_partners,
 
     # if current_partners:  # This has to be the case otherwise it will start appending None
     # TODO: Currently the agent-side code for this actively accepts None, so we'll see if that works
-
-    removal = random.choice(current_partners)
-    removal_request.append(my_ID)
-    removal_request.append(removal)
+    if len(current_partners) > 0:
+        removal = random.choice(current_partners)
+        removal_request.append(my_ID)
+        removal_request.append(removal)
 
     addition = chooseNewPartner(untested_partners, rejected_partners, possible_partners, new_partnerProb, [0,0])
     addition_request.append(my_ID)

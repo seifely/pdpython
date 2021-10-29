@@ -382,8 +382,8 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=5, width=5,    # even numbers are checkerboard fair
-                 number_of_agents=25,
+    def __init__(self, height=2, width=2,    # even numbers are checkerboard fair
+                 number_of_agents=4,
                  schedule_type="Simultaneous",
                  rounds=2500,
                  collect_data=True,
@@ -447,6 +447,7 @@ class PDModel(Model):
 
                  sensitivity=0,
                  graph_probability=0.4,
+                 changeFrequency=5,
                  ):
 
         # ---------- Model Parameters --------
@@ -536,6 +537,10 @@ class PDModel(Model):
         self.max_edges = 0
         self.groupDegreeCentralities = {}
         self.group_degree_centralization = 0
+        self.change_frequency = changeFrequency
+
+        self.checkTurn = False
+        self.resetTurn = False
 
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
@@ -1068,6 +1073,7 @@ class PDModel(Model):
 
     #  ===== This was me trying to calculate GDC by myself, when in fact network x has a function for it
     def calculate_GDC(self, centralities, IDs, nAgents):
+        print("centrals", centralities)
         highest = 0
         highest_id = 0
         if not IDs:
@@ -1097,9 +1103,16 @@ class PDModel(Model):
         # print("the denom is ", denom)
         return summedDiff / denom
 
+    def roundCheck(self, n, frequency):
+        if n % frequency == 0:
+            return True
+        else:
+            return False
+
     def step(self):
 
         start = time.time()
+        self.checkTurn = self.roundCheck(self.step_count, self.change_frequency)
         self.schedule.step()
         if self.updated_graphG == 0:
             graph_connect = self.initial_graphG
@@ -1121,12 +1134,15 @@ class PDModel(Model):
         self.datacollector.collect(self)
         self.get_highest_score()
         self.reset_values()
+        if self.checkTurn:
+            self.resetTurn = True
+        if not self.checkTurn:
+            self.resetTurn = False
 
         # Update the graph using rnf and the agent's requests for changes
-        print("graph D", self.updated_graphD)
-        print("adds", self.graph_additions)
-        print("removes", self.graph_removals)
-        print("IDs", self.agentIDs)
+        # print("graph D", self.updated_graphD)
+        # print("adds", self.graph_additions)
+        # print("removes", self.graph_removals)
         self.updated_graphD, self.updated_graphG = rnf.update_graph(self.updated_graphD, self.graph_additions, self.graph_removals, True, list(range(1, (self.number_of_agents + 1))))
         # The reset those lists to empty
         self.graph_additions = []
@@ -1224,6 +1240,7 @@ br_params = {#"number_of_agents": [64],
              "startingBehav": ['C',
                               #'D',
                               ],
+             "changeFrequency": [5],
              #"sensitivity": [0],
              "sensitive_agents": [(0,), #(0, 13]),
                                   ],  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
