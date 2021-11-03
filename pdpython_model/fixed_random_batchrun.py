@@ -536,6 +536,9 @@ class PDModel(Model):
         self.graph_connectedness = []
         self.max_edges = 0
         self.groupDegreeCentralities = {}
+        # if len(self.groupDegreeCentralities) == 0:  # Initialise the centralities in case any agent doesn't get partners initially
+        for j in self.agentIDs:
+            self.groupDegreeCentralities[j] = 0
         self.group_degree_centralization = 0
         self.change_frequency = changeFrequency
 
@@ -707,6 +710,9 @@ class PDModel(Model):
             self.make_agents()
         elif kNN_spawn:
             self.make_set_agents()
+
+
+
         self.running = True
         self.datacollector.collect(self)
 
@@ -1073,22 +1079,24 @@ class PDModel(Model):
 
     #  ===== This was me trying to calculate GDC by myself, when in fact network x has a function for it
     def calculate_GDC(self, centralities, IDs, nAgents):
-        print("centrals", centralities)
-        highest = 0
+        print("THE CENTRALITIES ARE", centralities, "and the connections are", self.updated_graphD)
+        # print("centrals", centralities)
+        highest = -1
         highest_id = 0
         if not IDs:
             IDs = list(range(1, (nAgents + 1)))
 
+        # print("model centralities", centralities)
         for i in IDs:
             if centralities[i] > highest:
-                # print(centralities[i], "is higher than", highest, "so I'll replace it")
+                print(centralities[i], "is higher than", highest, "so I'll replace it")
                 highest = centralities[i]
                 highest_id = i
         # sum the observed differences between the highest and all the others
         summedDiff = 0
         othersList = copy.deepcopy(centralities)
         othersIDs = copy.deepcopy(IDs)
-        # print("I'm gonna remove", highest_id, "from the lists")
+        print("I'm gonna remove", highest_id, "from the lists")
         othersIDs.remove(highest_id)
         othersList.pop(highest_id)
         # othersList = othersList.remove(highest_id)
@@ -1104,8 +1112,11 @@ class PDModel(Model):
         return summedDiff / denom
 
     def roundCheck(self, n, frequency):
-        if n % frequency == 0:
-            return True
+        if n > 1:
+            if n % frequency == 0:
+                return True
+            else:
+                return False
         else:
             return False
 

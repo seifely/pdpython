@@ -266,6 +266,11 @@ class PDAgent(Agent):
             # print("this partner's pickled ppd is ", my_pickle[index])
             self.default_ppds[i] = my_pickle[index]
 
+            self.itermove_result[i] = self.model.startingBehav
+            self.pp_aprime[i] = self.model.startingBehav
+            self.moody_pp_aprime[i] = self.model.startingBehav
+
+
     def export_training_data(self):
         # print("the ppds are", self.default_ppds)
         my_data = []
@@ -469,7 +474,7 @@ class PDAgent(Agent):
             # what percentage is my score of the highest score?
             self.proportional_score = ((myscore / highscore) * 100)
 
-    def iter_pick_move(self, strategy, payoffs, current_partners):
+    def iter_pick_move(self, strategy, payoffs, current_partners, new_partners):
         """ Iterative move selection uses the pick_move function PER PARTNER, then stores this in a dictionary
         keyed by the partner it picked that move for. We can then cycle through these for iter. score incrementing"""
         versus_moves = {}
@@ -508,14 +513,21 @@ class PDAgent(Agent):
                         self.partner_states[partner_ID] = sarsa_moody.observe_state(partner_move, partner_ID,
                                                                                     partner_mood,
                                                                                     self.statemode)
-
-                    # pick a move
-                    if strategy is not "MOODYLEARN":
-                        move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
                     else:
-                        move = self.pick_move(strategy, payoffs, partner_ID, self.partner_states)
-                    # add that move, with partner ID, to the versus choice dictionary
-                    versus_moves[partner_ID] = move
+                        self.partner_states[partner_ID] = sarsa_moody.observe_state(partner_move, partner_ID,
+                                                                                    partner_mood,
+                                                                                    self.statemode)
+
+                    if partner_ID not in new_partners:
+                        # pick a move
+                        if strategy is not "MOODYLEARN":
+                            move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
+                        else:
+                            move = self.pick_move(strategy, payoffs, partner_ID, self.partner_states)
+                        # add that move, with partner ID, to the versus choice dictionary
+                        versus_moves[partner_ID] = move
+                    else:
+                        versus_moves[partner_ID] = self.model.startingBehav
         # print("agent", self.ID,"versus moves:", versus_moves)
         return versus_moves
 
@@ -831,12 +843,14 @@ class PDAgent(Agent):
             if self.delta > 1:
                 egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]), self.model.memoryPaired)
             else:
-                # print("pids", self.partner_IDs)
+                print("my id is ", self.ID, "partner ids", self.partner_IDs)
                 # print("eps:", self.epsilon)
                 # print("qtable", len(self.qtable))
-                # print("id", id)
-                # print("l state", learning_state)
-                # print("learn state", learning_state[id])
+                print("my id is ", self.ID, " and the current partner is id", id, "because my partners are", self.current_partner_list)
+                print("learn states", learning_state)
+                # if learning_state.get(id) is None:
+
+                print("learn state", learning_state[id])
                 egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, learning_state[id], self.model.memoryPaired)
             if egreedy == "C":
                 self.number_of_c += 1
@@ -1066,16 +1080,22 @@ class PDAgent(Agent):
                     partner_score = partner.score
                     partner_strategy = partner.strategy
 
-                    # print("my id is", self.ID, "my partner is", partner_ID, "and their moves are", partner.itermove_result)
-                    # print("graph says", self.model.updated_graphD)
+                    print("my id is", self.ID, "my partner is", partner_ID, "and their moves are", partner.itermove_result)
+                    print("graph says", self.model.updated_graphD)
                     # TODO: If a partner drops you, it should be mutual, and you shouldn't be looking for their move against you anymore
-                    partner_move = partner.itermove_result[self.ID]
+                    if partner.itermove_result.get(self.ID) is None:
+                        partner_move = "C"  # THIS IS A HOPEFUL ESTIMATE
+                    else:
+                        partner_move = partner.itermove_result[self.ID]
                     partner_moves = partner.previous_moves
                     partner_mood = sarsa_moody.getMoodType(partner.mood)
                     partner_UR = partner.utilityRatio
                     partner_PR = partner.payoffRatio
 
-                    my_move = self.itermove_result[partner_ID]
+                    if self.itermove_result.get(partner_ID) is None:
+                        my_move = self.model.startingBehav
+                    else:
+                        my_move = self.itermove_result[partner_ID]
 
                     # Wanna add each neighbour's move, score etc. to the respective memory banks
                     if self.partner_latest_move.get(partner_ID) is None:
@@ -1330,7 +1350,11 @@ class PDAgent(Agent):
         total_utility = 0
         outcome_listicle = {}
         for i in self.partner_IDs:
-            my_move = self.itermove_result[i]
+            if self.itermove_result.get(i) is None:
+                my_move = self.model.startingBehav
+            else:
+                my_move = self.itermove_result[i]
+
 
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
@@ -1445,6 +1469,8 @@ class PDAgent(Agent):
         for i in self.current_partner_list:
             utils.append(self.per_partner_utility[i])
         # print("My per partner utility is: ", utils)
+        if len(utils) == 0:
+            utils = [0]
         avUtility = sum(utils)/len(utils)
         self.utilityRatio = sum(utils)/len(utils)
         medianUtility = statistics.median(utils)
@@ -1455,6 +1481,8 @@ class PDAgent(Agent):
             end = len(self.per_partner_payoffs[i]) - 1
             item = self.per_partner_payoffs[i]
             pays.append(item[end])
+        if len(pays) == 0:
+            pays = [0]
         # print("My per partner payoff is: ", pays)
         avPayoff = sum(pays)/len(pays)
         self.payoffRatio = sum(pays)/len(pays)
@@ -1470,8 +1498,10 @@ class PDAgent(Agent):
 
 
         # How Connected I am (out of max partners ratio)
+        print("my id is, ", self.ID, "and I have ", len(self.current_partner_list), "partners")
         self.actorDegreeCentrality = len(self.current_partner_list)
         self.normalizedActorDegreeCentrality = len(self.current_partner_list) / (self.model.number_of_agents - 1)
+        print("my id is", self.ID, "and my centralities are", self.actorDegreeCentrality, self.normalizedActorDegreeCentrality, "my partners are", self.current_partner_list)
         self.model.groupDegreeCentralities[self.ID] = self.actorDegreeCentrality
         IGDC = self.model.group_degree_centralization
 
@@ -1499,7 +1529,10 @@ class PDAgent(Agent):
         mood = self.mood
 
         # Coops / N Partners
-        cooperationRatio = cCount / numbPartners
+        if numbPartners == 0:
+            cooperationRatio = 0
+        else:
+            cooperationRatio = cCount / numbPartners
 
         # Number of Similar Partners
         similarPartners = self.similar_partners
@@ -1508,9 +1541,16 @@ class PDAgent(Agent):
         # Average Connectedness of my Partners? Because we can't track who partners are directly
         # TODO: PR AND PAYOFF RATIO DOESN'T SEEM TO BE WORKING
 
+
+
         partnerURs = []
         partnerPRs = []
         partnerCONs = []
+
+        if numbPartners == 0:
+            partnerURs = [0]
+            partnerPRs = [0]
+            partnerCONs = [0]
         # TODO: Get the other partner's self.utilityRatio values?
         for i in self.current_partner_list:
             partnerURs.append(self.pp_UR[i])
@@ -2422,527 +2462,630 @@ class PDAgent(Agent):
 
 
     def step(self):
-        self.compare_score()
-        self.reset_values()
-        self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-        # TODO: Not sure if above should be here, as I'm not sure when the graph gets updated for everyone in the scheduler.
-
-        """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
-
-        if self.stepCount == 1:
-            self.set_defaults(self.partner_IDs)
+        if not self.model.resetTurn:
+            self.compare_score()
+            self.reset_values()
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-            self.get_IDs(self.current_partner_list)
-            for i in self.current_partner_list:
-                for j in self.all_possible_partners:
-                    if j != i:
-                        self.potential_partner_list.append(j)
-            for i in self.partner_IDs:
-                self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
-                if self.statemode == 'stateless':
-                    md = 1
-                elif self.statemode == 'agentstate':
-                    md = 2
-                elif self.statemode == 'moodstate':
-                    md = 3
-                self.moody_oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.moody_learnFrom, md)
 
-            if self.strategy is None or 0 or []:
-                self.strategy = self.pick_strategy()
-                # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
-                self.previous_moves.append(self.move)
-                self.set_defaults(self.partner_IDs)
-                # print("My ppDs are:", self.ppD_partner)
-                # print("my name is agent ", self.ID, "my strategy is ", self.strategy)
-                if self.strategy == 'LEARN':
-                    # Initialise the q tables and states on the first turn
-                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
-                    self.states = copy.deepcopy(self.model.memory_states)
-                if self.strategy == 'MOODYLEARN':
-                    # Initialise the q tables and states on the first turn
-                    self.moody_qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
-                    self.state_working_memory = sarsa_moody.init_statememory(copy.deepcopy(self.model.moody_memory_states), 2, self.moody_delta)
-                    # print('init qtable len:', len(self.moody_qtable))
-                    self.moody_states = copy.deepcopy(self.model.moody_memory_states)
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list)  # We now try and find our partners from here
+            """  So a step for our agents, right now, is to calculate the utility of each option and then pick? """
+            # TODO: the below will set the starting behaviour dict for everyone to have options for every possible partner they will ever have.
+            # This will become a problem if agents leave or join the network, or if the number of agents in the network changes,
+            # but for now, this is an easier solution
 
-                self.find_average_move()
-
-                if self.model.schedule_type != "Simultaneous":
-                    self.advance()
-
-                # self.stepCount += 1
-            else:
-
-                self.set_defaults(self.partner_IDs)
+            if self.stepCount == 1:
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                self.partner_IDs = copy.deepcopy(self.current_partner_list)
+                self.set_defaults(self.partner_IDs)
+
+                self.get_IDs(self.current_partner_list)
                 for i in self.current_partner_list:
                     for j in self.all_possible_partners:
                         if j != i:
                             self.potential_partner_list.append(j)
-                # print("My ppDs are:", self.ppD_partner)
+                for i in self.partner_IDs:
+                    self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
+                    if self.statemode == 'stateless':
+                        md = 1
+                    elif self.statemode == 'agentstate':
+                        md = 2
+                    elif self.statemode == 'moodstate':
+                        md = 3
+                    self.moody_oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.moody_learnFrom, md)
 
-                if self.strategy == 'LEARN':
-                    # Initialise the q tables and states on the first turn
-                    self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
-                    self.states = copy.deepcopy(self.model.memory_states)
-                if self.strategy == 'MOODYLEARN':
-                    # Initialise the q tables and states on the first turn
-                    self.qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
-                    # print('init qtable len:', len(self.moody_qtable))
-                    self.states = copy.deepcopy(self.model.moody_memory_states)
+                if self.strategy is None or 0 or []:
+                    self.strategy = self.pick_strategy()
+                    # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
+                    self.previous_moves.append(self.move)
+                    self.set_defaults(self.partner_IDs)
+                    # print("My ppDs are:", self.ppD_partner)
+                    # print("my name is agent ", self.ID, "my strategy is ", self.strategy)
+                    if self.strategy == 'LEARN':
+                        # Initialise the q tables and states on the first turn
+                        self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
+                        self.states = copy.deepcopy(self.model.memory_states)
+                    if self.strategy == 'MOODYLEARN':
+                        # Initialise the q tables and states on the first turn
+                        self.moody_qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                        self.state_working_memory = sarsa_moody.init_statememory(copy.deepcopy(self.model.moody_memory_states), 2, self.moody_delta)
+                        # print('init qtable len:', len(self.moody_qtable))
+                        self.moody_states = copy.deepcopy(self.model.moody_memory_states)
 
+                    new_moves = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list, [0])
+                    for n in self.current_partner_list:
+                        self.itermove_result[n] = new_moves[n]
+                    # self.itermove_result =
+                    self.find_average_move()
 
-                self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list)
-                self.previous_moves.append(self.move)
-                self.find_average_move()
+                    if self.model.schedule_type != "Simultaneous":
+                        self.advance()
 
-                if self.model.schedule_type != "Simultaneous":
-                    self.advance()
-
-        else:
-            if self.strategy is None or 0 or []:
-                self.strategy = self.pick_strategy()
-                # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
-                self.previous_moves.append(self.move)
-
-                if self.strategy == 'LEARN':
-                    #if self.pp_aprime exists, itermove_result = copy.deepcopy(self.pp_aprime)
-                    #clear next_action?
-                    if self.pp_aprime:
-                        self.itermove_result = copy.deepcopy(self.pp_aprime)
-                        # TO/DO: Do I then need to wipe the aprime dict?
-                elif self.strategy == 'MOODYLEARN':
-                    # if self.pp_aprime exists, itermove_result = copy.deepcopy(self.pp_aprime)
-                    # clear next_action?
-                    if self.moody_pp_aprime:
-                        self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
+                    # self.stepCount += 1
                 else:
-                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list)
+                    self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                    self.partner_IDs = copy.deepcopy(self.current_partner_list)
+                    self.set_defaults(self.partner_IDs)
+                    for i in self.current_partner_list:
+                        for j in self.all_possible_partners:
+                            if j != i:
+                                self.potential_partner_list.append(j)
+                    # print("My ppDs are:", self.ppD_partner)
 
-                self.find_average_move()
+                    if self.strategy == 'LEARN':
+                        # Initialise the q tables and states on the first turn
+                        self.qtable = sarsa.init_qtable(copy.deepcopy(self.model.memory_states), 2, True)
+                        self.states = copy.deepcopy(self.model.memory_states)
+                    if self.strategy == 'MOODYLEARN':
+                        # Initialise the q tables and states on the first turn
+                        self.qtable = sarsa_moody.init_qtable(copy.deepcopy(self.model.moody_memory_states), 2, True)
+                        # print('init qtable len:', len(self.moody_qtable))
+                        self.states = copy.deepcopy(self.model.moody_memory_states)
 
-                if self.model.schedule_type != "Simultaneous":
-                    self.advance()
+                    new_moves = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list, [0])
+                    for n in self.current_partner_list:
+                        self.itermove_result[n] = new_moves[n]
+                    # self.itermove_result =
+                    self.previous_moves.append(self.move)
+                    self.find_average_move()
 
-                self.stepCount += 1
+                    if self.model.schedule_type != "Simultaneous":
+                        self.advance()
+
             else:
+                if self.strategy is None or 0 or []:
+                    self.strategy = self.pick_strategy()
+                    # self.next_move = self.pick_move(self.strategy, self.payoffs, 0)
+                    self.previous_moves.append(self.move)
 
-                if self.strategy == 'LEARN':
-                    if self.pp_aprime:
-                        self.itermove_result = copy.deepcopy(self.pp_aprime)
-                        # TO/DO: Do I then need to wipe the aprime dict?
-                elif self.strategy == 'MOODYLEARN':
-                    if self.moody_pp_aprime:
-                        self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
+                    if self.strategy == 'LEARN':
+                        #if self.pp_aprime exists, itermove_result = copy.deepcopy(self.pp_aprime)
+                        #clear next_action?
+                        if self.pp_aprime:
+                            primes = copy.deepcopy(self.pp_aprime)
+                            for n in self.current_partner_list:
+                                self.itermove_result[n] = primes[n]
+                            # self.itermove_result = copy.deepcopy(self.pp_aprime)
+                            # TO/DO: Do I then need to wipe the aprime dict?
+                    elif self.strategy == 'MOODYLEARN':
+                        # if self.pp_aprime exists, itermove_result = copy.deepcopy(self.pp_aprime)
+                        # clear next_action?
+                        if self.moody_pp_aprime:
+                            primes = copy.deepcopy(self.moody_pp_aprime)
+                            for n in self.current_partner_list:
+                                self.itermove_result[n] = primes[n]
+                            # self.itermove_result = copy.deepcopy(self.moody_pp_aprime)
+                    else:
+                        moves = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list, [0])
+                        for n in self.current_partner_list:
+                            self.itermove_result[n] = moves[n]
+                        # self.itermove_result =
+
+                    self.find_average_move()
+
+                    if self.model.schedule_type != "Simultaneous":
+                        self.advance()
+
+                    self.stepCount += 1
                 else:
 
-                    self.itermove_result = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list)
+                    if self.strategy == 'LEARN':
+                        if self.pp_aprime:
+                            primes = copy.deepcopy(self.pp_aprime)
+                            for n in self.current_partner_list:
+                                self.itermove_result[n] = primes[n]
+                            # TO/DO: Do I then need to wipe the aprime dict?
+                    elif self.strategy == 'MOODYLEARN':
+                        if self.moody_pp_aprime:
+                            primes = copy.deepcopy(self.moody_pp_aprime)
+                            for n in self.current_partner_list:
+                                self.itermove_result[n] = primes[n]
+                    else:
+                        moves = self.iter_pick_move(self.strategy, self.payoffs, self.current_partner_list, [0])
+                        for n in self.current_partner_list:
+                            self.itermove_result[n] = moves[n]
 
-                self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?
+                    self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?
+                    self.find_average_move()
+
+                    if self.model.schedule_type != "Simultaneous":
+                        self.advance()
+
+            if self.stepCount == (self.model.rounds - 1):
+                self.last_round = True
+
+            self.stepCount += 1
+
+            if self.printing:
+                for n in range(1):
+                    print("----------------------------------------------------------")
+        else:
+            print("IT'S A RESET TURN!")
+            self.outputData()  # Output data at the start, so it is hopefully the same as last roungd
+            """ If it's a reset round where we just change partners, all we want to do is update our partner list"""
+            self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+            new_partners = []
+            removed_partners = []
+
+            for i in self.current_partner_list:
+                if self.itermove_result.get(i) is None:
+                    new_partners.append(i)
+
+            for n in new_partners:
+                "I WILL GIVE THEM A DEFAULT"
+                self.itermove_result[n] = self.model.startingBehav
+
+            self.get_IDs(self.current_partner_list)
+            # Set defaults for any new partners, remove any old partners from the lists
+            if len(new_partners) > 0:
+                for i in new_partners:
+                    for j in self.all_possible_partners:
+                        if j != i:
+                            self.potential_partner_list.append(j)
+                for i in new_partners:
+                    self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
+                    if self.statemode == 'stateless':
+                        md = 1
+                    elif self.statemode == 'agentstate':
+                        md = 2
+                    elif self.statemode == 'moodstate':
+                        md = 3
+                    self.moody_oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.moody_learnFrom, md)
+
+                self.set_defaults(new_partners)
+                # Do an iter_pick_move ?
+                # TODO: We need to pick default moves for new partners, pickmove won't work though because we don't have any prior history with them
+                # I have set it so that if the ID appears in new_partners, they will just do they default behaviour?
+                moves = self.iter_pick_move(self.strategy, self.payoffs,
+                                                           self.current_partner_list, new_partners)
+                for n in self.current_partner_list:
+                    self.itermove_result[n] = moves[n]  # We now try and find our partners from here
+
                 self.find_average_move()
 
-                if self.model.schedule_type != "Simultaneous":
-                    self.advance()
+            for i in self.current_partner_list:
+                if i not in self.partner_IDs:
+                    self.partner_IDs.remove(j)
+                    removed_partners.append(j)
+                    print("partner I removed was", i)
 
-        if self.stepCount == (self.model.rounds - 1):
-            # print("My stepcount is", self.stepCount, "Next round is", (self.model.rounds - 1), "Next round is the last round!")
-            self.last_round = True
+            # TODO: DO WE NEED TO PREP FIRST MOVES FOR THEM?
 
-        if self.printing:
-            for n in range(1):
-                print("----------------------------------------------------------")
+            if self.stepCount == (self.model.rounds - 1):
+                self.last_round = True
+            self.find_average_move()
+            self.stepCount += 1
+            if self.model.schedule_type != "Simultaneous":
+                self.advance()
+
 
     def advance(self):
-        """ If we have partners, execute normal strategy. If we do not, find a partner? """
+        """ If we have partners, execute normal strategy. If we do not, find a partner.
+            Also, if it's a reset round - do none of these things, and just """
+        if not self.model.resetTurn:
+            if len(self.current_partner_list) > 0:
+                if self.strategy == 'LEARN':
+                    self.check_partner(self.current_partner_list)  # We took action a, what s prime did we end up in?
+                    # ----- WORKING MEMORY IS NOW S-PRIME -----
+                    round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime
 
-        if len(self.current_partner_list) > 0:
-            if self.strategy == 'LEARN':
-                self.check_partner(self.current_partner_list)  # We took action a, what s prime did we end up in?
-                # ----- WORKING MEMORY IS NOW S-PRIME -----
-                round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime
+                    # update the sprimes (the states we have found ourselves in)
+                    # for i in self.working_memory:
+                    #     state = self.working_memory[i]
+                    #     obs = self.partner_latest_move[i]
+                    #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
 
-                # update the sprimes (the states we have found ourselves in)
-                # for i in self.working_memory:
-                #     state = self.working_memory[i]
-                #     obs = self.partner_latest_move[i]
-                #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
+                    # get aprimes (next actions to do)
+                    primemoves = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory, self.current_partner_list)
+                    for n in self.current_partner_list:
+                        self.pp_aprime[n] = primemoves[n]
 
-                # get aprimes (next actions to do)
-                self.pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.working_memory, self.current_partner_list)
+                    # update the Q for the CURRENT sprime
 
-                # update the Q for the CURRENT sprime
+                    for i in self.partner_IDs:
+                        s = self.oldstates[i]           # the state I used to be in
+                        print("(line 2674)my id is", self.ID, "my partners are", self.partner_IDs, "and my moves were", self.itermove_result)
+                        a = self.itermove_result[i]     # the action I took
+                        sprime = self.working_memory[i] # the state I found myself in
+                        reward = self.pp_payoff[i]      # the reward I observed
+                        aprime = self.pp_aprime[i]      # the action I will take next
 
-                for i in self.partner_IDs:
-                    s = self.oldstates[i]           # the state I used to be in
-                    a = self.itermove_result[i]     # the action I took
-                    sprime = self.working_memory[i] # the state I found myself in
-                    reward = self.pp_payoff[i]      # the reward I observed
-                    aprime = self.pp_aprime[i]      # the action I will take next
+                        # print('ostates=', self.oldstates)
+                        # print('sstates=', self.itermove_result)
+                        # print('sprimes=', self.working_memory)
+                        if self.delta == 1:
+                            if self.model.memoryPaired:
+                                s = s[0]
+                        oldQValues = self.qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES
 
-                    # print('ostates=', self.oldstates)
-                    # print('sstates=', self.itermove_result)
-                    # print('sprimes=', self.working_memory)
-                    if self.delta == 1:
-                        if self.model.memoryPaired:
-                            s = s[0]
-                    oldQValues = self.qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES
+                        if a == 'C':  # This still works because it's keyed off the itermove_result and not part of the state
+                            idx = 0
+                        elif a == 'D':
+                            idx = 1
 
-                    if a == 'C':  # This still works because it's keyed off the itermove_result and not part of the state
-                        idx = 0
-                    elif a == 'D':
-                        idx = 1
+                        if self.delta == 1:
+                            if self.model.memoryPaired:
+                                sprime = sprime[0]
+                        newQValues = self.qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?
+                        if aprime == 'C':
+                            idxprime = 0
+                        elif aprime == 'D':
+                            idxprime = 1
 
-                    if self.delta == 1:
-                        if self.model.memoryPaired:
-                            sprime = sprime[0]
-                    newQValues = self.qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?
-                    if aprime == 'C':
-                        idxprime = 0
-                    elif aprime == 'D':
-                        idxprime = 1
+                        Qsa = oldQValues[idx]
+                        Qsaprime = newQValues[idxprime]
 
-                    Qsa = oldQValues[idx]
-                    Qsaprime = newQValues[idxprime]
+                        # update the Q value for the old state and old action
 
-                    # update the Q value for the old state and old action
+                        newQsa = sarsa.update_q(reward, self.gamma, self.alpha, Qsa, Qsaprime)
+                        # print('My old Q for this partner was:', Qsa, 'and my new Q is:', newQsa)
+                        # then put newQ in the Qtable[s] at index idx
+                        change = self.qtable[tuple(s)]
+                        change[idx] = newQsa
+                        self.qtable[tuple(s)] = change
 
-                    newQsa = sarsa.update_q(reward, self.gamma, self.alpha, Qsa, Qsaprime)
-                    # print('My old Q for this partner was:', Qsa, 'and my new Q is:', newQsa)
-                    # then put newQ in the Qtable[s] at index idx
-                    change = self.qtable[tuple(s)]
-                    change[idx] = newQsa
-                    self.qtable[tuple(s)] = change
+                        if self.model.moody_opponents:
+                            myAv, oppAv, oppScore = self.averageScoreComparison(i, False, self.current_partner_list)
+                            # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
+                            # if self.ID == 9:
+                            #     print("It's turn ", self.stepCount)
+                            #     print("My mood going into this was ", self.mood)
+                            #     print("My values were ", reward, myAv, oppScore, oppAv)
+                            self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+                            # if self.ID == 9:
+                            #     print("My mood coming out of it was ", self.mood)
 
-                    if self.model.moody_opponents:
-                        myAv, oppAv, oppScore = self.averageScoreComparison(i, False, self.current_partner_list)
-                        # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
+
+                    # for i in self.working_memory:
+                    #     state = self.working_memory[i]
+                    #     my_move = self.itermove_result[i]
+                    #     reward = self.pp_payoff[i]  # the unmanipulated value
+                    #
+                    #     # for the states I'm in, update the relevant q value
+                    #     # access the qtable value we already have
+                    #     oldQValues = self.qtable[state]   # THIS MIGHT BREAK BECAUSE OF TUPLES
+                    #     if my_move == 'C':
+                    #         idx = 0
+                    #     elif my_move == 'D':
+                    #         idx = 1
+                    #
+                    #     next_state = self.pp_sprime[i]
+                    #     nextQValues = self.qtable[next_state]
+                    #     nextQValue = nextQValues[idx]  # this is wrong, just want
+                    #
+                    #     oldQValue = oldQValues[idx]
+                    #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
+
+                    # update epsilon
+                    self.epsilon = sarsa.decay_value(self.model.epsilon, self.epsilon, self.model.rounds, True, self.model.epsilon_floor)
+                    self.alpha = sarsa.decay_value(self.model.alpha, self.alpha, self.model.rounds, True, self.model.alpha_floor)
+
+                    # update s to be sprime
+                    for i in self.partner_IDs:
+                        self.oldstates[i] = self.working_memory[i]
+
+                    if self.model.export_q:
+                        if self.stepCount == 1:
+                            self.outputQtable(True)
+                        elif self.stepCount == self.model.rounds - 1:
+                            self.outputQtable(False)
+
+                    self.outputData()
+                    # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+                    # TODO: APPEND PARTNER REMOVAL AND ADDITION REQUEST TO THE MODEL
+                    self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                    if self.model.checkTurn:
+                        removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list, self.rejected_partner_list,
+                                                                                                 self.potential_partner_list, self.all_possible_partners,
+                                                                                                 0.4, self.ID)
+
+                        if removRequest:
+                            if removRequest[1] != None:
+                                self.model.graph_removals.append(removRequest)
+                                self.current_partner_list.remove(removals)
+                        if addRequest:
+                            if addRequest[1] != None:
+                                self.model.graph_additions.append(addRequest)
+
+                    # if additions not in self.current_partner_list:
+                    #     self.current_partner_list.append(additions)
+                    # if removals not in self.rejected_partner_list:
+                    #     self.rejected_partner_list.append(removals)
+                    # self.partner_IDs = copy.deepcopy(self.current_partner_list)
+
+                    self.stepCount += 1
+
+                    if round_payoffs is not None:
+                        if self.printing:
+                            print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
+                        self.score += round_payoffs
+                        # print("My total overall score is:", self.score)
+                        return
+
+                elif self.strategy == 'MOODYLEARN':
+                    self.check_partner(self.current_partner_list)  # We took action a, what s prime did we end up in?
+                    """This should hopefully update the state for pick_nextmove"""
+                    # ----- WORKING MEMORY IS NOW S-PRIME -----
+                    round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime  #TODO: MIGHT NEED A MOODY INCREMENT_SCORE
+
+                    # update the sprimes (the states we have found ourselves in)
+                    # for i in self.working_memory:
+                    #     state = self.working_memory[i]
+                    #     obs = self.partner_latest_move[i]
+                    #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
+
+                    # print("my id is", self.ID)
+                    # print("step", self.stepCount)
+                    # get aprimes (next actions to do)
+                    moodyPrimemoves = self.iter_pick_nextmove(self.strategy, self.payoffs, self.partner_states, self.current_partner_list)
+                    for n in self.current_partner_list:
+                        self.moody_pp_aprime[n] = moodyPrimemoves[n]
+
+                    # update the Q for the CURRENT sprime
+
+                    for i in self.partner_IDs:
+                        s = self.moody_oldstates[i]           # the state I used to be in
+                        print("(line 810) my id is", self.ID, "my partners are", self.partner_IDs, "and my moves were", self.itermove_result)
+                        a = self.itermove_result[i]           # the action I took
+                        """ This part below is different. Our sprime is now the state we observe from our opponent, not just our 
+                            payoff memory. """
+                        sprime = sarsa_moody.observe_state(self.partner_latest_move[i], i, self.partner_moods[i],
+                                                           self.statemode)       # the state I found myself in
+                        reward = self.moody_pp_payoff[i]      # the reward I observed
+                        print(self.ID, " is my ID and my aprimes are", self.moody_pp_aprime, "my partners are", self.partner_IDs)
+                        aprime = self.moody_pp_aprime[i]      # the action I will take next
+
+                        # print('ostates=', self.oldstates)
+                        # print('sstates=', self.itermove_result)
+                        # print('sprimes=', self.working_memory)
+                        if self.moody_delta == 1:
+                            if self.model.moody_memoryPaired:
+                                s = s[0]
+                        oldQValues = self.moody_qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES
+
+
+                        # Get the Q value we want to change, based on our state and our action
+                        # qToChange = self.moody_qtable[tuple(s)]
+
+                        # if a == 'C':
+                        #     idx = 0
+                        # elif a == 'D':
+                        #     idx = 1
+                        #
+                        # qToChange = qToChange[idx]
+
+                        # get the updated Qs according to the function provided
+
+                        stateMem = self.state_working_memory[tuple(sprime)]
+                        if aprime == 'C':
+                            stateActionMem = stateMem[0]
+                        else:
+                            stateActionMem = stateMem[1]
+                        # So now we have the list (memory) of the payoffs for the (sprime, aprime) that we want to do next
+                        # We want to send that to be used to estimate future rewards
+                        # TODO: Important warning! The memories are initialised at 0, so averaging over them will produce 0
+                        # as an estimated future reward (of course, unless we have explored there before
+
+
+                        # updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward, self.working_memory[i], self.mood)
+                        updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward,
+                                                                        stateActionMem, self.mood)
+
+                        # if self.moody_delta == 1:
+                        #     if self.model.moody_memoryPaired:
+                        #         sprime = sprime[0]  #TODO: WILL WE NEED 4 SPRIMES? - OR WAIT, ========= DO WE DO THIS WHOLE SECTION PER PARTNER?=====
+                        # newQValues = self.moody_qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?  #TODO: SEE ONE TODO ABOVE -> THIS IS GONNA CHANGE FROM MOODY_QTABLE TO ID_QTABLE, POSSIBLY
+                        # if aprime == 'C':
+                        #     idxprime = 0
+                        # elif aprime == 'D':
+                        #     idxprime = 1
+                        #
+                        # Qsa = oldQValues[idx]
+                        # Qsaprime = newQValues[idxprime]
+                        #
+                        # # update the Q value for the old state and old action
+                        #
+                        # newQsa = sarsa_moody.update_q(reward, self.moody_gamma, self.moody_alpha, Qsa, Qsaprime)
+                        # print('My old Q for this partner was:', Qsa, 'and my new Q is:', newQsa)
+                        # then put newQ in the Qtable[s] at index idx
+                        # change = self.moody_qtable[tuple(s)]
+                        # change[idx] = newQsa
+                        self.moody_qtable[tuple(s)][0] = updatedQone
+                        self.moody_qtable[tuple(s)][1] = updatedQtwo
+
+                        """Update mood here at the end of each interaction WITHIN a ROUND. This means that initial interactions
+                            in each round will influence subsequent interactions"""
+                        myAv, oppAv, oppScore = self.averageScoreComparison(i, True, self.current_partner_list)
+                        #TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
+                        # self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+
                         # if self.ID == 9:
                         #     print("It's turn ", self.stepCount)
                         #     print("My mood going into this was ", self.mood)
                         #     print("My values were ", reward, myAv, oppScore, oppAv)
                         self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                         # if self.ID == 9:
-                        #     print("My mood coming out of it was ", self.mood)
+                            # print("My mood coming out of it was ", self.mood)
 
 
-                # for i in self.working_memory:
-                #     state = self.working_memory[i]
-                #     my_move = self.itermove_result[i]
-                #     reward = self.pp_payoff[i]  # the unmanipulated value
-                #
-                #     # for the states I'm in, update the relevant q value
-                #     # access the qtable value we already have
-                #     oldQValues = self.qtable[state]   # THIS MIGHT BREAK BECAUSE OF TUPLES
-                #     if my_move == 'C':
-                #         idx = 0
-                #     elif my_move == 'D':
-                #         idx = 1
-                #
-                #     next_state = self.pp_sprime[i]
-                #     nextQValues = self.qtable[next_state]
-                #     nextQValue = nextQValues[idx]  # this is wrong, just want
-                #
-                #     oldQValue = oldQValues[idx]
-                #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
-
-                # update epsilon
-                self.epsilon = sarsa.decay_value(self.model.epsilon, self.epsilon, self.model.rounds, True, self.model.epsilon_floor)
-                self.alpha = sarsa.decay_value(self.model.alpha, self.alpha, self.model.rounds, True, self.model.alpha_floor)
-
-                # update s to be sprime
-                for i in self.partner_IDs:
-                    self.oldstates[i] = self.working_memory[i]
-
-                if self.model.export_q:
-                    if self.stepCount == 1:
-                        self.outputQtable(True)
-                    elif self.stepCount == self.model.rounds - 1:
-                        self.outputQtable(False)
-
-                self.outputData()
-                # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
-                # TODO: APPEND PARTNER REMOVAL AND ADDITION REQUEST TO THE MODEL
-                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list, self.rejected_partner_list,
-                                                                                         self.potential_partner_list, self.all_possible_partners,
-                                                                                         0.4, self.ID)
-
-                if removRequest:
-                    if removRequest[1] != None:
-                        self.model.graph_removals.append(removRequest)
-                        self.current_partner_list.remove(removals)
-                if addRequest:
-                    if addRequest[1] != None:
-                        self.model.graph_additions.append(addRequest)
-
-                # if additions not in self.current_partner_list:
-                #     self.current_partner_list.append(additions)
-                # if removals not in self.rejected_partner_list:
-                #     self.rejected_partner_list.append(removals)
-                # self.partner_IDs = copy.deepcopy(self.current_partner_list)
-
-                self.stepCount += 1
-
-                if round_payoffs is not None:
-                    if self.printing:
-                        print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
-                    self.score += round_payoffs
-                    # print("My total overall score is:", self.score)
-                    return
-
-            elif self.strategy == 'MOODYLEARN':
-                self.check_partner(self.current_partner_list)  # We took action a, what s prime did we end up in?
-                """This should hopefully update the state for pick_nextmove"""
-                # ----- WORKING MEMORY IS NOW S-PRIME -----
-                round_payoffs = self.increment_score(self.payoffs)  # Accept the reward for that s prime  #TODO: MIGHT NEED A MOODY INCREMENT_SCORE
-
-                # update the sprimes (the states we have found ourselves in)
-                # for i in self.working_memory:
-                #     state = self.working_memory[i]
-                #     obs = self.partner_latest_move[i]
-                #     self.pp_sprime[i] = sarsa.output_sprime(state, obs)
-
-                # print("my id is", self.ID)
-                # print("step", self.stepCount)
-                # get aprimes (next actions to do)
-                self.moody_pp_aprime = self.iter_pick_nextmove(self.strategy, self.payoffs, self.partner_states, self.current_partner_list)
-
-                # update the Q for the CURRENT sprime
-
-                for i in self.partner_IDs:
-                    s = self.moody_oldstates[i]           # the state I used to be in
-                    a = self.itermove_result[i]           # the action I took
-                    """ This part below is different. Our sprime is now the state we observe from our opponent, not just our 
-                        payoff memory. """
-                    sprime = sarsa_moody.observe_state(self.partner_latest_move[i], i, self.partner_moods[i],
-                                                       self.statemode)       # the state I found myself in
-                    reward = self.moody_pp_payoff[i]      # the reward I observed
-                    print(self.ID, " is my ID and my aprimes are", self.moody_pp_aprime)
-                    aprime = self.moody_pp_aprime[i]      # the action I will take next
-
-                    # print('ostates=', self.oldstates)
-                    # print('sstates=', self.itermove_result)
-                    # print('sprimes=', self.working_memory)
-                    if self.moody_delta == 1:
-                        if self.model.moody_memoryPaired:
-                            s = s[0]
-                    oldQValues = self.moody_qtable[tuple(s)]  # THIS MIGHT BREAK BECAUSE OF TUPLES
-
-
-                    # Get the Q value we want to change, based on our state and our action
-                    # qToChange = self.moody_qtable[tuple(s)]
-
-                    # if a == 'C':
-                    #     idx = 0
-                    # elif a == 'D':
-                    #     idx = 1
+                    # for i in self.working_memory:
+                    #     state = self.working_memory[i]
+                    #     my_move = self.itermove_result[i]
+                    #     reward = self.pp_payoff[i]  # the unmanipulated value
                     #
-                    # qToChange = qToChange[idx]
-
-                    # get the updated Qs according to the function provided
-
-                    stateMem = self.state_working_memory[tuple(sprime)]
-                    if aprime == 'C':
-                        stateActionMem = stateMem[0]
-                    else:
-                        stateActionMem = stateMem[1]
-                    # So now we have the list (memory) of the payoffs for the (sprime, aprime) that we want to do next
-                    # We want to send that to be used to estimate future rewards
-                    # TODO: Important warning! The memories are initialised at 0, so averaging over them will produce 0
-                    # as an estimated future reward (of course, unless we have explored there before
-
-
-                    # updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward, self.working_memory[i], self.mood)
-                    updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward,
-                                                                    stateActionMem, self.mood)
-
-                    # if self.moody_delta == 1:
-                    #     if self.model.moody_memoryPaired:
-                    #         sprime = sprime[0]  #TODO: WILL WE NEED 4 SPRIMES? - OR WAIT, ========= DO WE DO THIS WHOLE SECTION PER PARTNER?=====
-                    # newQValues = self.moody_qtable[tuple(sprime)]  # THIS ISN'T RIGHT IS IT?  #TODO: SEE ONE TODO ABOVE -> THIS IS GONNA CHANGE FROM MOODY_QTABLE TO ID_QTABLE, POSSIBLY
-                    # if aprime == 'C':
-                    #     idxprime = 0
-                    # elif aprime == 'D':
-                    #     idxprime = 1
+                    #     # for the states I'm in, update the relevant q value
+                    #     # access the qtable value we already have
+                    #     oldQValues = self.qtable[state]   # THIS MIGHT BREAK BECAUSE OF TUPLES
+                    #     if my_move == 'C':
+                    #         idx = 0
+                    #     elif my_move == 'D':
+                    #         idx = 1
                     #
-                    # Qsa = oldQValues[idx]
-                    # Qsaprime = newQValues[idxprime]
+                    #     next_state = self.pp_sprime[i]
+                    #     nextQValues = self.qtable[next_state]
+                    #     nextQValue = nextQValues[idx]  # this is wrong, just want
                     #
-                    # # update the Q value for the old state and old action
-                    #
-                    # newQsa = sarsa_moody.update_q(reward, self.moody_gamma, self.moody_alpha, Qsa, Qsaprime)
-                    # print('My old Q for this partner was:', Qsa, 'and my new Q is:', newQsa)
-                    # then put newQ in the Qtable[s] at index idx
-                    # change = self.moody_qtable[tuple(s)]
-                    # change[idx] = newQsa
-                    self.moody_qtable[tuple(s)][0] = updatedQone
-                    self.moody_qtable[tuple(s)][1] = updatedQtwo
+                    #     oldQValue = oldQValues[idx]
+                    #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
 
-                    """Update mood here at the end of each interaction WITHIN a ROUND. This means that initial interactions
-                        in each round will influence subsequent interactions"""
-                    myAv, oppAv, oppScore = self.averageScoreComparison(i, True, self.current_partner_list)
-                    #TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                    # self.mood = sarsa_moody.update_mood(self.mood, self.score, myAv, oppScore, oppAv)
+                    # update epsilon
+                    # self.moody_epsilon = sarsa_moody.decay_value(self.model.moody_epsilon, self.moody_epsilon, self.model.rounds, True, self.model.moody_epsilon_floor)
+                    # self.moody_alpha = sarsa_moody.decay_value(self.model.moody_alpha, self.moody_alpha, self.model.rounds, True, self.model.moody_alpha_floor)
+                    #TODO: I don't believe they decay any values?
 
-                    # if self.ID == 9:
-                    #     print("It's turn ", self.stepCount)
-                    #     print("My mood going into this was ", self.mood)
-                    #     print("My values were ", reward, myAv, oppScore, oppAv)
-                    self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
-                    # if self.ID == 9:
-                        # print("My mood coming out of it was ", self.mood)
-
-
-                # for i in self.working_memory:
-                #     state = self.working_memory[i]
-                #     my_move = self.itermove_result[i]
-                #     reward = self.pp_payoff[i]  # the unmanipulated value
-                #
-                #     # for the states I'm in, update the relevant q value
-                #     # access the qtable value we already have
-                #     oldQValues = self.qtable[state]   # THIS MIGHT BREAK BECAUSE OF TUPLES
-                #     if my_move == 'C':
-                #         idx = 0
-                #     elif my_move == 'D':
-                #         idx = 1
-                #
-                #     next_state = self.pp_sprime[i]
-                #     nextQValues = self.qtable[next_state]
-                #     nextQValue = nextQValues[idx]  # this is wrong, just want
-                #
-                #     oldQValue = oldQValues[idx]
-                #     new_value = sarsa.update_q(reward, self.gamma, self.alpha, oldQValue)
-
-                # update epsilon
-                # self.moody_epsilon = sarsa_moody.decay_value(self.model.moody_epsilon, self.moody_epsilon, self.model.rounds, True, self.model.moody_epsilon_floor)
-                # self.moody_alpha = sarsa_moody.decay_value(self.model.moody_alpha, self.moody_alpha, self.model.rounds, True, self.model.moody_alpha_floor)
-                #TODO: I don't believe they decay any values?
-
-                # update s to be sprime
-                for i in self.partner_IDs:
-                    # self.moody_oldstates[i] = self.working_memory[i]
-                    self.moody_oldstates[i] = sarsa_moody.observe_state(self.partner_latest_move[i], i, self.partner_moods[i],
-                                                                        self.statemode)
-
-                    # Update how we feel
-                    # TODO: update mood earlier, after each Q value update??
-                    # myAv, oppAv, oppScore = self.averageScoreComparison(i)
-                    # self.mood = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
-
-                if self.model.moody_export_q:
-                    if self.stepCount == 1:
-                        self.outputQtable(True)
-                    elif self.stepCount == self.model.rounds - 1:
-                        self.outputQtable(False)
-
-                self.outputData()
-                # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
-                # print("garf", self.model.updated_graphD)
-                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
-                                                                                         self.rejected_partner_list,
-                                                                                         self.potential_partner_list,
-                                                                                         self.all_possible_partners,
-                                                                                         0.4, self.ID)
-                if removRequest:
-                    if removRequest[1] != None:
-                        self.model.graph_removals.append(removRequest)
-                if addRequest:
-                    if addRequest[1] != None:
-                        self.model.graph_additions.append(addRequest)
-
-                # if additions not in self.current_partner_list:
-                #     self.current_partner_list.append(additions)
-                # if removals not in self.rejected_partner_list:
-                #     self.rejected_partner_list.append(removals)
-                # self.partner_IDs = copy.deepcopy(self.current_partner_list)
-
-                self.stepCount += 1
-
-                if round_payoffs is not None:
-                    if self.printing:
-                        print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
-                    self.score += round_payoffs
-                    # print("My total overall score is:", self.score)
-                    return
-
-            else:
-
-                # self.move = self.next_move
-                self.check_partner(self.current_partner_list)  # Update Knowledge
-                round_payoffs = self.increment_score(self.payoffs)
-                if self.model.moody_opponents:
+                    # update s to be sprime
                     for i in self.partner_IDs:
-                        myAv, oppAv, oppScore = self.averageScoreComparison(i, False, self.current_partner_list)
-                        # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                        self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+                        # self.moody_oldstates[i] = self.working_memory[i]
+                        self.moody_oldstates[i] = sarsa_moody.observe_state(self.partner_latest_move[i], i, self.partner_moods[i],
+                                                                            self.statemode)
 
-                if self.last_round:
-                    if self.strategy == 'VPP':
-                        if self.model.kNN_training:
-                            self.training_data = self.export_training_data()
+                        # Update how we feel
+                        # TODO: update mood earlier, after each Q value update??
+                        # myAv, oppAv, oppScore = self.averageScoreComparison(i)
+                        # self.mood = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
 
-                if self.stepCount == self.model.rounds - 1:
-                    if self.strategy == 'VPP':
-                        if not self.model.kNN_training:
-                            self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_mcoops,
-                                              self.per_partner_tcoops, self.per_partner_mutc, self.default_ppds)
-                            # Only use this if we are not training as presumably we will have no training data because we will be training
-                """ Because model outputting is below, we can add update values to the list before it *may get reset """
-                # self.compare_score()
+                    if self.model.moody_export_q:
+                        if self.stepCount == 1:
+                            self.outputQtable(True)
+                        elif self.stepCount == self.model.rounds - 1:
+                            self.outputQtable(False)
 
-                self.outputData()
-                # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+                    self.outputData()
+                    # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+                    # print("garf", self.model.updated_graphD)
+                    self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                    if self.model.checkTurn:
+                        removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
+                                                                                                 self.rejected_partner_list,
+                                                                                                 self.potential_partner_list,
+                                                                                                 self.all_possible_partners,
+                                                                                                 0.4, self.ID)
+                        if removRequest:
+                            if removRequest[1] != None:
+                                self.model.graph_removals.append(removRequest)
+                        if addRequest:
+                            if addRequest[1] != None:
+                                self.model.graph_additions.append(addRequest)
+
+                    # if additions not in self.current_partner_list:
+                    #     self.current_partner_list.append(additions)
+                    # if removals not in self.rejected_partner_list:
+                    #     self.rejected_partner_list.append(removals)
+                    # self.partner_IDs = copy.deepcopy(self.current_partner_list)
+
+                    self.stepCount += 1
+
+                    if round_payoffs is not None:
+                        if self.printing:
+                            print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
+                        self.score += round_payoffs
+                        # print("My total overall score is:", self.score)
+                        return
+
+                else:
+
+                    # self.move = self.next_move
+                    self.check_partner(self.current_partner_list)  # Update Knowledge
+                    round_payoffs = self.increment_score(self.payoffs)
+                    if self.model.moody_opponents:
+                        for i in self.partner_IDs:
+                            myAv, oppAv, oppScore = self.averageScoreComparison(i, False, self.current_partner_list)
+                            # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
+                            self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+
+                    if self.last_round:
+                        if self.strategy == 'VPP':
+                            if self.model.kNN_training:
+                                self.training_data = self.export_training_data()
+
+                    if self.stepCount == self.model.rounds - 1:
+                        if self.strategy == 'VPP':
+                            if not self.model.kNN_training:
+                                self.knn_decision(self.partner_IDs, self.per_partner_utility, self.per_partner_mcoops,
+                                                  self.per_partner_tcoops, self.per_partner_mutc, self.default_ppds)
+                                # Only use this if we are not training as presumably we will have no training data because we will be training
+                    """ Because model outputting is below, we can add update values to the list before it *may get reset """
+                    # self.compare_score()
+
+                    self.outputData()
+                    # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
+                    self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                    if self.model.checkTurn:
+                        removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
+                                                                                                 self.rejected_partner_list,
+                                                                                                 self.potential_partner_list,
+                                                                                                 self.all_possible_partners,
+                                                                                                 0.4, self.ID)
+                        if removRequest:
+                            if removRequest[1] != None:
+                                self.model.graph_removals.append(removRequest)
+                                self.current_partner_list.remove(removals)
+                        if addRequest:
+                            if addRequest[1] != None:
+                                self.model.graph_additions.append(addRequest)
+
+                    # if additions not in self.current_partner_list:
+                    #     self.current_partner_list.append(additions)
+                    # if removals not in self.rejected_partner_list:
+                    #     self.rejected_partner_list.append(removals)
+                    # self.partner_IDs = copy.deepcopy(self.current_partner_list)
+
+                    self.stepCount += 1
+
+                    if round_payoffs is not None:
+                        if self.printing:
+                            print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
+                        self.score += round_payoffs
+                        # print("My total overall score is:", self.score)
+
+                        return
+            else:
+                # Find a new partner?
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
-                                                                                         self.rejected_partner_list,
-                                                                                         self.potential_partner_list,
-                                                                                         self.all_possible_partners,
-                                                                                         0.4, self.ID)
-                if removRequest:
-                    if removRequest[1] != None:
-                        self.model.graph_removals.append(removRequest)
-                        self.current_partner_list.remove(removals)
-                if addRequest:
-                    if addRequest[1] != None:
-                        self.model.graph_additions.append(addRequest)
+                if self.model.checkTurn:
+                    removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
+                                                                                             self.rejected_partner_list,
+                                                                                             self.potential_partner_list,
+                                                                                             self.all_possible_partners,
+                                                                                             0.4, self.ID)
+                    # if removRequest:
+                    #     if removRequest[1] != None:
+                    #         self.model.graph_removals.append(removRequest)
+                    #         self.current_partner_list.remove(removals)
+                    if addRequest:
+                        if addRequest[1] != None:
+                            self.model.graph_additions.append(addRequest)
 
                 # if additions not in self.current_partner_list:
                 #     self.current_partner_list.append(additions)
                 # if removals not in self.rejected_partner_list:
                 #     self.rejected_partner_list.append(removals)
                 # self.partner_IDs = copy.deepcopy(self.current_partner_list)
-
-                self.stepCount += 1
-
-                if round_payoffs is not None:
-                    if self.printing:
-                        print("I am agent", self.ID, ", and I have earned", round_payoffs, "this round")
-                    self.score += round_payoffs
-                    # print("My total overall score is:", self.score)
-
-                    return
+                return
         else:
-            # Find a new partner?
+            print("This was a reset round, so all I did was update my partners")
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-            removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
-                                                                                     self.rejected_partner_list,
-                                                                                     self.potential_partner_list,
-                                                                                     self.all_possible_partners,
-                                                                                     0.4, self.ID)
-            if removRequest:
-                if removRequest[1] != None:
-                    self.model.graph_removals.append(removRequest)
-                    self.current_partner_list.remove(removals)
-            if addRequest:
-                if addRequest[1] != None:
-                    self.model.graph_additions.append(addRequest)
-
-            # if additions not in self.current_partner_list:
-            #     self.current_partner_list.append(additions)
-            # if removals not in self.rejected_partner_list:
-            #     self.rejected_partner_list.append(removals)
-            # self.partner_IDs = copy.deepcopy(self.current_partner_list)
+            self.partner_IDs = copy.deepcopy(self.current_partner_list)
+            # self.check_partner(self.current_partner_list)
             return
+
+        #TODO: This may not work, as agents will not have some starting moves against new partners (aa primes and whatnot) but hopefully it does?
 
