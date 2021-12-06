@@ -450,7 +450,7 @@ class PDAgent(Agent):
                             # choosing
                             return
                 elif self.checkerboard:
-                    print("My ID is...", self.ID)
+                    # print("My ID is...", self.ID)
                     if len(choices) == 2:
                         check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
                                    42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
@@ -843,14 +843,14 @@ class PDAgent(Agent):
             if self.delta > 1:
                 egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, tuple(learning_state[id]), self.model.memoryPaired)
             else:
-                print("my id is ", self.ID, "partner ids", self.partner_IDs)
+                # print("my id is ", self.ID, "partner ids", self.partner_IDs)
                 # print("eps:", self.epsilon)
                 # print("qtable", len(self.qtable))
-                print("my id is ", self.ID, " and the current partner is id", id, "because my partners are", self.current_partner_list)
-                print("learn states", learning_state)
+                # print("my id is ", self.ID, " and the current partner is id", id, "because my partners are", self.current_partner_list)
+                # print("learn states", learning_state)
                 # if learning_state.get(id) is None:
 
-                print("learn state", learning_state[id])
+                # print("learn state", learning_state[id])
                 egreedy = sarsa.egreedy_action(self.epsilon, self.qtable, learning_state[id], self.model.memoryPaired)
             if egreedy == "C":
                 self.number_of_c += 1
@@ -1062,7 +1062,7 @@ class PDAgent(Agent):
         for partner in neighbouring_agents:
             neighbouring_cells.append(self.model.agent_positions[partner])
 
-        print("My ID is", self.ID, "and my current partners are", current_partners)
+        # print("My ID is", self.ID, "and my current partners are", current_partners)
         # First, get the neighbours
         for i in neighbouring_cells:
             bound_checker = self.model.grid.out_of_bounds(i)
@@ -1080,8 +1080,8 @@ class PDAgent(Agent):
                     partner_score = partner.score
                     partner_strategy = partner.strategy
 
-                    print("my id is", self.ID, "my partner is", partner_ID, "and their moves are", partner.itermove_result)
-                    print("graph says", self.model.updated_graphD)
+                    # print("my id is", self.ID, "my partner is", partner_ID, "and their moves are", partner.itermove_result)
+                    # print("graph says", self.model.updated_graphD)
                     # TODO: If a partner drops you, it should be mutual, and you shouldn't be looking for their move against you anymore
                     if partner.itermove_result.get(self.ID) is None:
                         partner_move = "C"  # THIS IS A HOPEFUL ESTIMATE
@@ -1466,6 +1466,7 @@ class PDAgent(Agent):
 
         # My Average and Median Total Utility - TODO: IS THIS TOTAL UTILITY OR PER ROUND?
         utils = []
+        print("my partners are", self.current_partner_list, "and my per partner utilities are", self.per_partner_utility)
         for i in self.current_partner_list:
             utils.append(self.per_partner_utility[i])
         # print("My per partner utility is: ", utils)
@@ -1498,10 +1499,10 @@ class PDAgent(Agent):
 
 
         # How Connected I am (out of max partners ratio)
-        print("my id is, ", self.ID, "and I have ", len(self.current_partner_list), "partners")
+        # print("my id is, ", self.ID, "and I have ", len(self.current_partner_list), "partners")
         self.actorDegreeCentrality = len(self.current_partner_list)
         self.normalizedActorDegreeCentrality = len(self.current_partner_list) / (self.model.number_of_agents - 1)
-        print("my id is", self.ID, "and my centralities are", self.actorDegreeCentrality, self.normalizedActorDegreeCentrality, "my partners are", self.current_partner_list)
+        # print("my id is", self.ID, "and my centralities are", self.actorDegreeCentrality, self.normalizedActorDegreeCentrality, "my partners are", self.current_partner_list)
         self.model.groupDegreeCentralities[self.ID] = self.actorDegreeCentrality
         IGDC = self.model.group_degree_centralization
 
@@ -2619,7 +2620,8 @@ class PDAgent(Agent):
                     print("----------------------------------------------------------")
         else:
             print("IT'S A RESET TURN!")
-            self.outputData()  # Output data at the start, so it is hopefully the same as last roungd
+            # self.outputData()  # Output data at the start, so it is hopefully the same as last roungd
+            # TODO: Is outputData() okay here? it should be in advance, right?
             """ If it's a reset round where we just change partners, all we want to do is update our partner list"""
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             new_partners = []
@@ -2665,7 +2667,7 @@ class PDAgent(Agent):
                 if i not in self.partner_IDs:
                     self.partner_IDs.remove(j)
                     removed_partners.append(j)
-                    print("partner I removed was", i)
+                    # print("partner I removed was", i)
 
             # TODO: DO WE NEED TO PREP FIRST MOVES FOR THEM?
 
@@ -2702,7 +2704,7 @@ class PDAgent(Agent):
 
                     for i in self.partner_IDs:
                         s = self.oldstates[i]           # the state I used to be in
-                        print("(line 2674)my id is", self.ID, "my partners are", self.partner_IDs, "and my moves were", self.itermove_result)
+                        # print("(line 2674)my id is", self.ID, "my partners are", self.partner_IDs, "and my moves were", self.itermove_result)
                         a = self.itermove_result[i]     # the action I took
                         sprime = self.working_memory[i] # the state I found myself in
                         reward = self.pp_payoff[i]      # the reward I observed
@@ -2843,14 +2845,14 @@ class PDAgent(Agent):
 
                     for i in self.partner_IDs:
                         s = self.moody_oldstates[i]           # the state I used to be in
-                        print("(line 810) my id is", self.ID, "my partners are", self.partner_IDs, "and my moves were", self.itermove_result)
+                        # print("(line 810) my id is", self.ID, "my partners are", self.partner_IDs, "and my moves were", self.itermove_result)
                         a = self.itermove_result[i]           # the action I took
                         """ This part below is different. Our sprime is now the state we observe from our opponent, not just our 
                             payoff memory. """
                         sprime = sarsa_moody.observe_state(self.partner_latest_move[i], i, self.partner_moods[i],
                                                            self.statemode)       # the state I found myself in
                         reward = self.moody_pp_payoff[i]      # the reward I observed
-                        print(self.ID, " is my ID and my aprimes are", self.moody_pp_aprime, "my partners are", self.partner_IDs)
+                        # print(self.ID, " is my ID and my aprimes are", self.moody_pp_aprime, "my partners are", self.partner_IDs)
                         aprime = self.moody_pp_aprime[i]      # the action I will take next
 
                         # print('ostates=', self.oldstates)
@@ -3059,6 +3061,7 @@ class PDAgent(Agent):
                         return
             else:
                 # Find a new partner?
+                self.outputData()
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
                 if self.model.checkTurn:
                     removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
@@ -3082,8 +3085,11 @@ class PDAgent(Agent):
                 return
         else:
             print("This was a reset round, so all I did was update my partners")
+            self.outputData()  # TODO: need to find out where to put this so that it doesn't break
+            # TODO: Or, make it output a null/zeroes for this turn because it's a changeover round/can we duplicate the last round's outputs
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             self.partner_IDs = copy.deepcopy(self.current_partner_list)
+
             # self.check_partner(self.current_partner_list)
             return
 
