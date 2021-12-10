@@ -1449,6 +1449,350 @@ class PDAgent(Agent):
 
         # and also time each agent's step to create a total time thingybob
 
+    def fake_data_to_file(self, outcomes):
+        """ Outputs Zero Data on a Partner Switch Round"""
+
+        # for m in self.per_partner_strategies:
+        #     if self.per_partner_strategies[m] == self.strategy:
+        #         self.similar_partners += 1
+        #
+        #
+        # # List to add:
+        # # Number of Partners
+        # numbPartners = len(self.current_partner_list)
+        #
+        # # Who Each Partner Is
+        # partnerList = self.current_partner_list
+        #
+        # # My Average and Median Total Utility -
+        # utils = []
+        # print("my partners are", self.current_partner_list, "and my per partner utilities are", self.per_partner_utility)
+        # for i in self.current_partner_list:
+        #     utils.append(self.per_partner_utility[i])
+        # # print("My per partner utility is: ", utils)
+        # if len(utils) == 0:
+        #     utils = [0]
+        # avUtility = sum(utils)/len(utils)
+        # self.utilityRatio = sum(utils)/len(utils)
+        # medianUtility = statistics.median(utils)
+        #
+        # # My Average and Median Round Score Per Partner
+        # pays = []
+        # for i in self.current_partner_list:
+        #     end = len(self.per_partner_payoffs[i]) - 1
+        #     item = self.per_partner_payoffs[i]
+        #     pays.append(item[end])
+        # if len(pays) == 0:
+        #     pays = [0]
+        # # print("My per partner payoff is: ", pays)
+        # avPayoff = sum(pays)/len(pays)
+        # self.payoffRatio = sum(pays)/len(pays)
+        # medianPayoff = statistics.median(pays)
+        #
+        # # My Total Utility
+        # totalUtility = self.score
+        #
+        # # ============ Centrality Measures ===============
+        # # The Normalised Actor Degree Centrality is actually the connectedness measure below
+        # """ The Index of Group Degree Centralisation is the normalised (I think?) version of a measure that  measures
+        # the extent to which actors in the network differ from one another in their degree centralities. """
+        #
+        #
+        # # How Connected I am (out of max partners ratio)
+        # # print("my id is, ", self.ID, "and I have ", len(self.current_partner_list), "partners")
+        # self.actorDegreeCentrality = len(self.current_partner_list)
+        # self.normalizedActorDegreeCentrality = len(self.current_partner_list) / (self.model.number_of_agents - 1)
+        # # print("my id is", self.ID, "and my centralities are", self.actorDegreeCentrality, self.normalizedActorDegreeCentrality, "my partners are", self.current_partner_list)
+        # self.model.groupDegreeCentralities[self.ID] = self.actorDegreeCentrality
+        # IGDC = self.model.group_degree_centralization
+        #
+        # """ When changing over to random network agents, there was some kind of background bug in the data
+        # output where each round's number of c/number of d was correct for the round AFTER (some misalignment
+        # in the csv) - this below is a temporary fix for that to save time. """
+        # dCount = 0
+        # cCount = 0
+        # for n in self.current_partner_list:
+        #     move = self.itermove_result[n]
+        #     if move == 'D':
+        #         dCount += 1
+        #     elif move == 'C':
+        #         cCount += 1
+        # # Number of C
+        # numbC = cCount
+        #
+        # # Number of D
+        # numbD = dCount
+        #
+        # # Number of Mutual C
+        # numbMutC = self.mutual_c_outcome
+        #
+        # # Mood
+        # mood = self.mood
+        #
+        # # Coops / N Partners
+        # if numbPartners == 0:
+        #     cooperationRatio = 0
+        # else:
+        #     cooperationRatio = cCount / numbPartners
+        #
+        # # Number of Similar Partners
+        # similarPartners = self.similar_partners
+        #
+        # # Average Scores of my Partners? Because we can't track who partners are directly
+        # # Average Connectedness of my Partners? Because we can't track who partners are directly
+
+        #
+        #
+        #
+        # partnerURs = []
+        # partnerPRs = []
+        # partnerCONs = []
+        #
+        # if numbPartners == 0:
+        #     partnerURs = [0]
+        #     partnerPRs = [0]
+        #     partnerCONs = [0]
+
+        # for i in self.current_partner_list:
+        #     partnerURs.append(self.pp_UR[i])
+        #     partnerPRs.append(self.pp_PR[i])
+        #     partnerCONs.append(self.pp_CON[i])
+        #
+        # averagePartnerUtilityRatio = statistics.mean(partnerURs)
+        # averagePartnerPayoffRatio = statistics.mean(partnerPRs)
+        # averagePartnerConnectedness = statistics.mean(partnerCONs)
+        # self.average_ppUR = averagePartnerUtilityRatio
+        # self.average_ppPR = averagePartnerPayoffRatio
+        # self.average_ppCON = averagePartnerConnectedness
+        #
+        # # Model Connectedness
+        # graphConnectedness = self.model.graph_connectedness
+        #
+        # prob_list = []
+        # util_list = []
+        # move_list = []
+        # average_list = []
+        #
+        # for i in self.indivAvPayoff:
+        #     average_list.append(self.indivAvPayoff[i])
+        #
+        # for i in self.ppD_partner:
+        #     prob_list.append(self.ppD_partner[i])
+        #
+        # for i in self.per_partner_utility:
+        #     util_list.append(self.per_partner_utility[i])
+        #
+        # for i in self.itermove_result:  # This encoding is per move type, allows graphing trends in move selection
+        #     if self.itermove_result[i] == 'C':
+        #         move_list.append(1)
+        #     elif self.itermove_result[i] == 'D':
+        #         move_list.append(2)
+
+        strategy_code = 'None'
+
+        if self.strategy == 'RANDOM':
+            strategy_code = 0
+        elif self.strategy == 'ANGEL':
+            strategy_code = 1
+        elif self.strategy == 'DEVIL':
+            strategy_code = 2
+        elif self.strategy == 'EV':
+            strategy_code = 3
+        elif self.strategy == 'VEV':
+            strategy_code = 4
+        elif self.strategy == 'TFT':
+            strategy_code = 5
+        elif self.strategy == 'VPP':
+            strategy_code = 6
+        elif self.strategy == 'WSLS':
+            strategy_code = 7
+        elif self.strategy == "LEARN":
+            strategy_code = 8
+        elif self.strategy == "MOODYLEARN":
+            strategy_code = 9
+
+        """ The above will error catch for when agents don't have those values, and will still let us print 
+            to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
+
+
+        # Here are the false values we should use for outputting this round
+        # stepCount we can keep the same?
+        # strategy we keep the same
+        # strategy code we keep the same
+        # itermove result can stay the same, as it's just the dict
+        totalUtility = self.score
+        # common move can stay the same, unless it breaks?
+        numbC = 0
+        numbD = 0
+        numbMutC = 0
+        # outcomes we can keep the same
+        numbPartners = 0
+        partnerList = {}
+        avUtility = 0
+        medianUtility = 0
+        avPayoff = 0
+        medianPayoff = 0
+        mood = self.mood
+        cooperationRatio = 0
+        similarPartners = 0
+        averagePartnerUtilityRatio = 0
+        averagePartnerPayoffRatio = 0
+        averagePartnerConnectedness = 0
+        graphConnectedness = self.model.graph_connectedness
+        IGDC = 0
+
+
+        if self.strategy == "MOODYLEARN":
+            try:
+                self.attempts_taken += 1
+                with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+                    fieldnames = ['stepcount_%d' % self.ID,
+                                  'strategy_%d' % self.ID,
+                                  'strat_code_%d' % self.ID,
+                                  'move_%d' % self.ID,
+                                  'utility_%d' % self.ID,
+                                  'common_move_%d' % self.ID,
+                                  'number_coop_%d' % self.ID,
+                                  'number_defect_%d' % self.ID,
+                                  'mutualC_%d' % self.ID,
+                                  'outcomes_%d' % self.ID,
+                                  'n_partners_%d' % self.ID,
+                                  'partner_list_%d' % self.ID,
+                                  'av_utility_%d' % self.ID,
+                                  'median_utility_%d' % self.ID,
+                                  'av_payoff_%d' % self.ID,
+                                  'median_payoff_%d' % self.ID,
+                                  'mood_%d' % self.ID,
+                                  'coop_ratio_%d' % self.ID,
+                                  'similarPartners_%d' % self.ID,
+                                  'avPartnerUR_%d' % self.ID,
+                                  'avPartnerPR_%d' % self.ID,
+                                  'avPartnerConnected_%d' % self.ID,
+                                  'graphConnectedness_%d' % self.ID,
+                                  'degree_centrality_%d' % self.ID,
+                                  'normalized_centrality_%d' % self.ID,
+                                  'groupDegreeCent_%d' % self.ID,
+                                  'globav_%d' % self.ID,
+                                  'sensitivity_%d' % self.ID,
+                                  'epsilon_%d' % self.ID]
+
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                    # moves = []
+                    # for i in self.move:
+                    #     moves.append(self.move[i])
+
+                    if self.stepCount == 1:
+                        writer.writeheader()
+
+                    writer.writerow(
+                        {'stepcount_%d' % self.ID: self.stepCount,
+                                  'strategy_%d' % self.ID: self.strategy,
+                                  'strat_code_%d' % self.ID: strategy_code,
+                                  'move_%d' % self.ID: self.itermove_result,
+                                  'utility_%d' % self.ID: totalUtility,
+                                  'common_move_%d' % self.ID: self.common_move,
+                                  'number_coop_%d' % self.ID: numbC,
+                                  'number_defect_%d' % self.ID: numbD,
+                                  'mutualC_%d' % self.ID: numbMutC,
+                                  'outcomes_%d' % self.ID: outcomes,
+                                  'n_partners_%d' % self.ID: numbPartners,
+                                  'partner_list_%d' % self.ID: partnerList,
+                                  'av_utility_%d' % self.ID: avUtility,
+                                  'median_utility_%d' % self.ID: medianUtility,
+                                  'av_payoff_%d' % self.ID: avPayoff,
+                                  'median_payoff_%d' % self.ID: medianPayoff,
+                                  'mood_%d' % self.ID: mood,
+                                  'coop_ratio_%d' % self.ID: cooperationRatio,
+                                  'similarPartners_%d' % self.ID: similarPartners,
+                                  'avPartnerUR_%d' % self.ID: averagePartnerUtilityRatio,
+                                  'avPartnerPR_%d' % self.ID: averagePartnerPayoffRatio,
+                                  'avPartnerConnected_%d' % self.ID: averagePartnerConnectedness,
+                                  'graphConnectedness_%d' % self.ID: graphConnectedness,
+                                  'degree_centrality_%d' % self.ID: self.actorDegreeCentrality,
+                                  'normalized_centrality_%d' % self.ID: self.normalizedActorDegreeCentrality,
+                                  'groupDegreeCent_%d' % self.ID: IGDC,
+                                  'globav_%d' % self.ID: self.globalAvPayoff,
+                                  'sensitivity_%d' % self.ID: self.sensitivity_mod,
+                                  'epsilon_%d' % self.ID: self.epsilon,})
+            except PermissionError:
+                self.output_data_to_file(self.outcome_list)
+
+        else:
+            try:
+                with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+                    fieldnames = ['stepcount_%d' % self.ID,
+                                  'strategy_%d' % self.ID,
+                                  'strat_code_%d' % self.ID,
+                                  'move_%d' % self.ID,
+                                  'utility_%d' % self.ID,
+                                  'common_move_%d' % self.ID,
+                                  'number_coop_%d' % self.ID,
+                                  'number_defect_%d' % self.ID,
+                                  'mutualC_%d' % self.ID,
+                                  'outcomes_%d' % self.ID,
+                                  'n_partners_%d' % self.ID,
+                                  'partner_list_%d' % self.ID,
+                                  'av_utility_%d' % self.ID,
+                                  'median_utility_%d' % self.ID,
+                                  'av_payoff_%d' % self.ID,
+                                  'median_payoff_%d' % self.ID,
+                                  'mood_%d' % self.ID,
+                                  'coop_ratio_%d' % self.ID,
+                                  'similarPartners_%d' % self.ID,
+                                  'avPartnerUR_%d' % self.ID,
+                                  'avPartnerPR_%d' % self.ID,
+                                  'avPartnerConnected_%d' % self.ID,
+                                  'graphConnectedness_%d' % self.ID,
+                                  'degree_centrality_%d' % self.ID,
+                                  'normalized_centrality_%d' % self.ID,
+                                  'groupDegreeCent_%d' % self.ID,
+                                  'globav_%d' % self.ID,
+                                  'sensitivity_%d' % self.ID,
+                                  'epsilon_%d' % self.ID]
+
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                    # moves = []
+                    # for i in self.move:
+                    #     moves.append(self.move[i])
+
+                    if self.stepCount == 1:
+                        writer.writeheader()
+
+                    writer.writerow(
+                        {'stepcount_%d' % self.ID: self.stepCount,
+                         'strategy_%d' % self.ID: self.strategy,
+                         'strat_code_%d' % self.ID: strategy_code,
+                         'move_%d' % self.ID: self.itermove_result,
+                         'utility_%d' % self.ID: totalUtility,
+                         'common_move_%d' % self.ID: self.common_move,
+                         'number_coop_%d' % self.ID: numbC,
+                         'number_defect_%d' % self.ID: numbD,
+                         'mutualC_%d' % self.ID: numbMutC,
+                         'outcomes_%d' % self.ID: outcomes,
+                         'n_partners_%d' % self.ID: numbPartners,
+                         'partner_list_%d' % self.ID: partnerList,
+                         'av_utility_%d' % self.ID: avUtility,
+                         'median_utility_%d' % self.ID: medianUtility,
+                         'av_payoff_%d' % self.ID: avPayoff,
+                         'median_payoff_%d' % self.ID: medianPayoff,
+                         'mood_%d' % self.ID: mood,
+                         'coop_ratio_%d' % self.ID: cooperationRatio,
+                         'similarPartners_%d' % self.ID: similarPartners,
+                         'avPartnerUR_%d' % self.ID: averagePartnerUtilityRatio,
+                         'avPartnerPR_%d' % self.ID: averagePartnerPayoffRatio,
+                         'avPartnerConnected_%d' % self.ID: averagePartnerConnectedness,
+                         'graphConnectedness_%d' % self.ID: graphConnectedness,
+                         'degree_centrality_%d' % self.ID: self.actorDegreeCentrality,
+                         'normalized_centrality_%d' % self.ID: self.normalizedActorDegreeCentrality,
+                         'groupDegreeCent_%d' % self.ID: IGDC,
+                         'globav_%d' % self.ID: self.globalAvPayoff,
+                         'sensitivity_%d' % self.ID: self.sensitivity_mod,
+                         'epsilon_%d' % self.ID: self.epsilon, })
+            except PermissionError:
+                self.output_data_to_file(self.outcome_list)
+
     def output_data_to_file(self, outcomes):
         """ Outputs the data collected each turn on multiple agent variables to a .csv file"""
 
@@ -1466,7 +1810,7 @@ class PDAgent(Agent):
 
         # My Average and Median Total Utility - TODO: IS THIS TOTAL UTILITY OR PER ROUND?
         utils = []
-        print("my partners are", self.current_partner_list, "and my per partner utilities are", self.per_partner_utility)
+        # print("my partners are", self.current_partner_list, "and my per partner utilities are", self.per_partner_utility)
         for i in self.current_partner_list:
             utils.append(self.per_partner_utility[i])
         # print("My per partner utility is: ", utils)
@@ -1945,7 +2289,6 @@ class PDAgent(Agent):
     #     """ The above will error catch for when agents don't have those values, and will still let us print
     #         to csv. **** WOULD ALSO LIKE TO DO THIS FOR MOVE PER PARTNER """
     #
-    #     #TODO: FIX DATA OUTPUTTING PLEASE?
     #     if self.strategy == "MOODYLEARN":
     #         try:
     #             self.attempts_taken += 1
@@ -2375,13 +2718,21 @@ class PDAgent(Agent):
                     # writer.writeheader()
                     writer.writerow({'q': i})
 
-    def outputData(self):
-        self.output_data_to_model()
-        if self.model.collect_data:
-            self.output_data_to_file(self.outcome_list)
-            #if self.attempts_taken > 1:
+    def outputData(self, fake):
+        if not fake:
+            self.output_data_to_model()
+            if self.model.collect_data:
+                self.output_data_to_file(self.outcome_list)
+                #if self.attempts_taken > 1:
+                    # print("Agent", self.ID, "on step", self.stepCount, "took", self.attempts_taken, "attempt/s to export.")
+                self.attempts_taken = 0
+        else:
+            self.output_data_to_model()
+            if self.model.collect_data:
+                self.fake_data_to_file(self.outcome_list)
+                # if self.attempts_taken > 1:
                 # print("Agent", self.ID, "on step", self.stepCount, "took", self.attempts_taken, "attempt/s to export.")
-            self.attempts_taken = 0
+                self.attempts_taken = 0
 
     def set_starting_oldstates(self, strategy, learning_from, size):
         if strategy is not 'MOODYLEARN':
@@ -2619,7 +2970,7 @@ class PDAgent(Agent):
                 for n in range(1):
                     print("----------------------------------------------------------")
         else:
-            print("IT'S A RESET TURN!")
+            # print("IT'S A RESET TURN!")
             # self.outputData()  # Output data at the start, so it is hopefully the same as last roungd
             # TODO: Is outputData() okay here? it should be in advance, right?
             """ If it's a reset round where we just change partners, all we want to do is update our partner list"""
@@ -2790,7 +3141,7 @@ class PDAgent(Agent):
                         elif self.stepCount == self.model.rounds - 1:
                             self.outputQtable(False)
 
-                    self.outputData()
+                    self.outputData(False)
                     # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
                     # TODO: APPEND PARTNER REMOVAL AND ADDITION REQUEST TO THE MODEL
                     self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
@@ -2970,7 +3321,7 @@ class PDAgent(Agent):
                         elif self.stepCount == self.model.rounds - 1:
                             self.outputQtable(False)
 
-                    self.outputData()
+                    self.outputData(False)
                     # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
                     # print("garf", self.model.updated_graphD)
                     self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
@@ -3027,7 +3378,7 @@ class PDAgent(Agent):
                     """ Because model outputting is below, we can add update values to the list before it *may get reset """
                     # self.compare_score()
 
-                    self.outputData()
+                    self.outputData(False)
                     # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
                     self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
                     if self.model.checkTurn:
@@ -3061,7 +3412,7 @@ class PDAgent(Agent):
                         return
             else:
                 # Find a new partner?
-                self.outputData()
+                self.outputData(False)
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
                 if self.model.checkTurn:
                     removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
@@ -3084,8 +3435,8 @@ class PDAgent(Agent):
                 # self.partner_IDs = copy.deepcopy(self.current_partner_list)
                 return
         else:
-            print("This was a reset round, so all I did was update my partners")
-            self.outputData()  # TODO: need to find out where to put this so that it doesn't break
+            #print("This was a reset round, so all I did was update my partners")
+            self.outputData(True)  # TODO: need to find out where to put this so that it doesn't break
             # TODO: Or, make it output a null/zeroes for this turn because it's a changeover round/can we duplicate the last round's outputs
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             self.partner_IDs = copy.deepcopy(self.current_partner_list)
