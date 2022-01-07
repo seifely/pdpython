@@ -827,7 +827,8 @@ class PDModel(Model):
         self.initial_graphD, self.initial_graphG = rnf.initRandomGraph(self.number_of_agents, self.graph_probability,
                                                                        self.agentIDs)
         print("I've made a graph!")
-        nx.draw_networkx(self.initial_graphG)
+        plt.figure()
+        nx.draw_networkx(self.initial_graphG, ax=None)
         plt.savefig(self.exp_n + "-initGraph.png")
         self.max_edges = rnf.maxEdgesPossible(self.number_of_agents, self.agentIDs)
         self.graph_connectedness = (nx.number_of_edges(self.initial_graphG)) / self.max_edges
@@ -1137,17 +1138,17 @@ class PDModel(Model):
         self.graph_connectedness = (nx.number_of_edges(graph_connect))/self.max_edges
         self.group_degree_centralization = self.calculate_GDC(self.groupDegreeCentralities, self.agentIDs, self.number_of_agents)
 
-        #TODO: REMOVE ME WHEN WE GET GRAPH OUTPUTS WORKING
-        if self.step_count !=0:
-            with open('latest_sim_output.csv', 'a') as ff:
-                # Overwrite the old file with the modified rows
-                writer = csv.writer(ff)
-                writer.writerow(rnf.analysis(self.updated_graphD, self.updated_graphG))
+        # if self.step_count !=0:
+        #     with open('latest_sim_output.csv', 'a') as ff:
+        #         # Overwrite the old file with the modified rows
+        #         writer = csv.writer(ff)
+        #         writer.writerow(rnf.analysis(self.updated_graphD, self.updated_graphG))
 
         if self.step_count == self.rounds - 1:
+            plt.figure()
             # print("gonna make an output graph")
             # print(rnf.analysis(self.updated_graphD, self.updated_graphG))
-            nx.draw_networkx(self.updated_graphG)
+            nx.draw_networkx(self.updated_graphG, ax=None)
             plt.savefig(self.exp_n + "-finalGraph.png")
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
