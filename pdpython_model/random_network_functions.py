@@ -161,10 +161,14 @@ def update_graph(old_edges, additions, removals, sorting, ids):
             list = changesDict[i]
             sortedList = sorted(list)
             changesDict[i] = sortedList
+            # print("the changes were", changesDict)
         # Then output both the graph translation and the graph itself
         return changesDict, changeable
     else:
         # Then output both the graph translation and the graph itself
+        # print("the changes were", changesDict)
+        print(type(changeable))
+        print("Density:", nx.density(changeable), " Nodes:", nx.number_of_nodes(changeable), " Edges:", nx.number_of_edges(changeable))
         return changesDict, changeable
 
 def basicPartnerDecision(current_partners, rejected_partners, untested_partners, possible_partners, new_partnerProb, my_ID):
@@ -223,3 +227,8 @@ def getPossiblePartners(ids, current_partners):
 # The above should then be checked against each agent's personal memory of 'trustworthiness metrics' for these
 # possible partners, if they have interacted before. The should have lists of rejected partners (for the other functions
 # listed above) for use as well (added at the same time as they add to the dictionary)
+
+def analysis(D, G):
+    analy = ("Density:", nx.density(G), " Nodes:", nx.number_of_nodes(G), " Edges:", nx.number_of_edges(G),
+             "nodes", nx.nodes(G), "info", nx.info(G))
+    return(analy)

@@ -385,7 +385,7 @@ class PDModel(Model):
     def __init__(self, height=2, width=2,    # even numbers are checkerboard fair
                  number_of_agents=4,
                  schedule_type="Simultaneous",
-                 rounds=2500,
+                 rounds=50,
                  collect_data=True,
                  agent_printing=False,
                  randspawn=False,
@@ -827,20 +827,25 @@ class PDModel(Model):
         self.initial_graphD, self.initial_graphG = rnf.initRandomGraph(self.number_of_agents, self.graph_probability,
                                                                        self.agentIDs)
         print("I've made a graph!")
-        nx.draw(self.initial_graphG)
+        nx.draw_networkx(self.initial_graphG)
         plt.savefig(self.exp_n + "-initGraph.png")
         self.max_edges = rnf.maxEdgesPossible(self.number_of_agents, self.agentIDs)
         self.graph_connectedness = (nx.number_of_edges(self.initial_graphG)) / self.max_edges
         return
 
     def change_graph(self, additions, removals, old_graph):
+        #Previous Graph Stata
+        print("OLD Density:", nx.density(self.updated_graphG), " Nodes:", nx.number_of_nodes(self.updated_graphG), " Edges:", nx.number_of_edges(self.updated_graphG))
+
         updated_graph, updated_graphG = rnf.update_graph(self.updated_graphD, self.graph_additions, self.graph_removals,
                                                          True, self.agentIDs)
         # Reset the additions and removal request lists
         self.graph_additions = []
         self.graph_removals = []
-        return updated_graph, updated_graphG
 
+        #New Graph Stats
+        print("OLD Density:", nx.density(updated_graphG), " Nodes:", nx.number_of_nodes(updated_graphG), " Edges:", nx.number_of_edges(updated_graphG))
+        return updated_graph, updated_graphG
 
     def set_ppds(self):
         """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
@@ -1131,8 +1136,18 @@ class PDModel(Model):
             graph_connect = self.updated_graphG
         self.graph_connectedness = (nx.number_of_edges(graph_connect))/self.max_edges
         self.group_degree_centralization = self.calculate_GDC(self.groupDegreeCentralities, self.agentIDs, self.number_of_agents)
+
+        #TODO: REMOVE ME WHEN WE GET GRAPH OUTPUTS WORKING
+        if self.step_count !=0:
+            with open('latest_sim_output.csv', 'a') as ff:
+                # Overwrite the old file with the modified rows
+                writer = csv.writer(ff)
+                writer.writerow(rnf.analysis(self.updated_graphD, self.updated_graphG))
+
         if self.step_count == self.rounds - 1:
-            nx.draw(self.updated_graphG)
+            # print("gonna make an output graph")
+            # print(rnf.analysis(self.updated_graphD, self.updated_graphG))
+            nx.draw_networkx(self.updated_graphG)
             plt.savefig(self.exp_n + "-finalGraph.png")
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
@@ -1190,7 +1205,7 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=5000):
+    def run_model(self, rounds=50):
         for i in range(self.rounds):
             self.step()
 
@@ -1264,8 +1279,8 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
-                 max_steps=5000,  # This should be 10k, but have set it to 5k because it now takes ages to run
+                 iterations=1,
+                 max_steps=50,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

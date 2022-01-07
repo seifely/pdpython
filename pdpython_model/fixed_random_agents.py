@@ -1627,7 +1627,7 @@ class PDAgent(Agent):
         numbMutC = 0
         # outcomes we can keep the same
         numbPartners = 0
-        partnerList = {}
+        partnerList = {'SWAP'}
         avUtility = 0
         medianUtility = 0
         avPayoff = 0
@@ -2719,6 +2719,7 @@ class PDAgent(Agent):
                     writer.writerow({'q': i})
 
     def outputData(self, fake):
+        # print("It's round", self.stepCount, "and I exported data whilst fake was ", fake)
         if not fake:
             self.output_data_to_model()
             if self.model.collect_data:
@@ -2936,7 +2937,7 @@ class PDAgent(Agent):
                     if self.model.schedule_type != "Simultaneous":
                         self.advance()
 
-                    self.stepCount += 1
+                    # self.stepCount += 1
                 else:
 
                     if self.strategy == 'LEARN':
@@ -2964,15 +2965,14 @@ class PDAgent(Agent):
             if self.stepCount == (self.model.rounds - 1):
                 self.last_round = True
 
-            self.stepCount += 1
+            # self.stepCount += 1
 
             if self.printing:
                 for n in range(1):
                     print("----------------------------------------------------------")
         else:
             # print("IT'S A RESET TURN!")
-            # self.outputData()  # Output data at the start, so it is hopefully the same as last roungd
-            # TODO: Is outputData() okay here? it should be in advance, right?
+
             """ If it's a reset round where we just change partners, all we want to do is update our partner list"""
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             new_partners = []
@@ -3025,7 +3025,9 @@ class PDAgent(Agent):
             if self.stepCount == (self.model.rounds - 1):
                 self.last_round = True
             self.find_average_move()
-            self.stepCount += 1
+            # self.outputData(True)  # Output data at the start, so it is hopefully the same as last roungd
+            # TODO: Is outputData() okay here? it should be in advance, right?
+            # self.stepCount += 1
             if self.model.schedule_type != "Simultaneous":
                 self.advance()
 
@@ -3433,6 +3435,7 @@ class PDAgent(Agent):
                 # if removals not in self.rejected_partner_list:
                 #     self.rejected_partner_list.append(removals)
                 # self.partner_IDs = copy.deepcopy(self.current_partner_list)
+                self.stepCount += 1
                 return
         else:
             #print("This was a reset round, so all I did was update my partners")
@@ -3440,7 +3443,7 @@ class PDAgent(Agent):
             # TODO: Or, make it output a null/zeroes for this turn because it's a changeover round/can we duplicate the last round's outputs
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
             self.partner_IDs = copy.deepcopy(self.current_partner_list)
-
+            self.stepCount += 1
             # self.check_partner(self.current_partner_list)
             return
 

@@ -12,7 +12,7 @@
     <favorites_list name="pdpython" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.4557945">
+    <splitter split-orientation="horizontal" split-proportion="0.45878136">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -39,43 +39,23 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="181">
-                  <caret line="2972" column="14" selection-start-line="2972" selection-start-column="14" selection-end-line="2972" selection-end-column="14" />
+                <state relative-caret-position="305">
+                  <caret line="1646" column="40" lean-forward="true" selection-start-line="1646" selection-start-column="40" selection-end-line="1646" selection-end-column="40" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                     <element signature="e#72850#72889#0" />
-                    <element signature="e#72792#88186#0" />
-                    <element signature="e#88192#88234#0" />
-                    <element signature="e#103052#103244#0" />
-                    <element signature="e#103452#105499#0" />
-                    <element signature="e#105569#106216#0" />
-                    <element signature="e#106285#107565#0" />
-                    <element signature="e#107620#108014#0" />
-                    <element signature="e#108115#111990#0" />
-                    <element signature="e#112069#113692#0" />
-                    <element signature="e#113735#115141#0" />
-                    <element signature="e#115185#116303#0" />
-                    <element signature="e#132828#133616#0" />
-                    <element signature="e#132136#140040#0" />
-                    <element signature="e#133171#136259#0" />
-                    <element signature="e#136282#136313#0" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/pdpython_model/random_network_functions.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="867">
-                  <caret line="177" column="4" selection-start-line="177" selection-start-column="4" selection-end-line="177" selection-end-column="4" />
-                  <folding>
-                    <element signature="e#0#13#0" expanded="true" />
-                    <element signature="e#134#366#0" />
-                    <element signature="e#492#1719#0" />
-                    <element signature="e#1759#2983#0" />
-                    <element signature="e#3032#3529#0" />
-                    <element signature="e#3572#4008#0" />
+                    <element signature="e#104722#104764#0" />
+                    <element signature="e#119937#121984#0" />
+                    <element signature="e#122054#122701#0" />
+                    <element signature="e#122770#124050#0" />
+                    <element signature="e#124105#124499#0" />
+                    <element signature="e#124600#128475#0" />
+                    <element signature="e#128554#130177#0" />
+                    <element signature="e#130220#131626#0" />
+                    <element signature="e#131670#132788#0" />
+                    <element signature="e#137019#145680#0" />
+                    <element signature="e#157435#157495#0" />
+                    <element signature="e#163865#163896#0" />
                   </folding>
                 </state>
               </provider>
@@ -90,15 +70,11 @@
               </provider>
             </entry>
           </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pdpython_model/random_network_functions.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="238">
-                  <caret line="106" selection-start-line="106" selection-end-line="106" />
+                <state relative-caret-position="51">
+                  <caret line="162" column="39" lean-forward="true" selection-start-line="162" selection-start-column="39" selection-end-line="162" selection-end-column="39" />
                   <folding>
                     <element signature="e#0#13#0" expanded="true" />
                     <element signature="e#134#366#0" />
@@ -111,13 +87,70 @@
               </provider>
             </entry>
           </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/pdpython_model/random_network_functions.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="276">
+                  <caret line="225" lean-forward="true" selection-start-line="225" selection-end-line="225" />
+                  <folding>
+                    <element signature="e#0#13#0" expanded="true" />
+                    <element signature="e#134#366#0" />
+                    <element signature="e#492#1719#0" />
+                    <element signature="e#1759#2983#0" />
+                    <element signature="e#3032#3529#0" />
+                    <element signature="e#3572#4008#0" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="461">
-                  <caret line="1262" lean-forward="true" selection-start-line="1262" selection-end-line="1262" />
+                <state relative-caret-position="407">
+                  <caret line="843" column="32" lean-forward="true" selection-start-line="843" selection-start-column="32" selection-end-line="843" selection-end-column="32" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
+                    <element signature="e#653#936#0" />
+                    <element signature="e#977#1246#0" />
+                    <element signature="e#1281#1503#0" />
+                    <element signature="e#1536#1757#0" />
+                    <element signature="e#1796#2430#0" />
+                    <element signature="e#2470#3104#0" />
+                    <element signature="e#3143#3777#0" />
+                    <element signature="e#3817#4451#0" />
+                    <element signature="e#4491#5127#0" />
+                    <element signature="e#5168#5806#0" />
+                    <element signature="e#5847#6483#0" />
+                    <element signature="e#6525#7163#0" />
+                    <element signature="e#7204#7840#0" />
+                    <element signature="e#7874#8511#0" />
+                    <element signature="e#8553#9189#0" />
+                    <element signature="e#9235#9876#0" />
+                    <element signature="e#9915#10557#0" />
+                    <element signature="e#10604#11245#0" />
+                    <element signature="e#11277#11531#0" />
+                    <element signature="e#11569#11808#0" />
+                    <element signature="e#11844#11989#0" />
+                    <element signature="e#27615#27932#0" />
+                    <element signature="e#27979#29709#0" />
+                    <element signature="e#29296#29385#0" />
+                    <element signature="e#29715#29757#0" />
+                    <element signature="e#33328#34681#0" />
+                    <element signature="e#34735#36363#0" />
+                    <element signature="e#36423#38063#0" />
+                    <element signature="e#38106#38195#0" />
+                    <element signature="e#38233#38386#0" />
+                    <element signature="e#38435#39613#0" />
+                    <element signature="e#39650#40881#0" />
+                    <element signature="e#41007#42290#0" />
+                    <element signature="e#42339#42409#0" />
+                    <element signature="e#42450#43259#0" />
+                    <element signature="e#43431#44791#0" />
                   </folding>
                 </state>
               </provider>
@@ -136,16 +169,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>partner ids</find>
-      <find>working memory</find>
-      <find>first</find>
-      <find>self.model.star</find>
-      <find>iter_pick</find>
-      <find>my_move =</find>
-      <find>my_move</find>
-      <find>a = self.it</find>
-      <find>self.iterm</find>
-      <find>a =</find>
       <find>set_defa</find>
       <find>set_default</find>
       <find>starting</find>
@@ -162,10 +185,20 @@
       <find>print</find>
       <find>per_partner</find>
       <find>my partners are</find>
-      <find>outputData</find>
       <find>and my per pa</find>
       <find>per_partner_utili</find>
       <find>and my per</find>
+      <find>outputData(</find>
+      <find>changeFreq</find>
+      <find>reset</find>
+      <find>resetTurn</find>
+      <find>checkTurn</find>
+      <find>outputData</find>
+      <find>stepcount</find>
+      <find>stepcount += 1</find>
+      <find>nx.draw</find>
+      <find>50</find>
+      <find>draw</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -196,9 +229,9 @@
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_run.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_model.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/random_network_functions.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py" />
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_agents.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/random_network_functions.py" />
       </list>
     </option>
   </component>
@@ -660,10 +693,79 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="305">
+          <caret line="1646" column="40" lean-forward="true" selection-start-line="1646" selection-start-column="40" selection-end-line="1646" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#72850#72889#0" />
+            <element signature="e#104722#104764#0" />
+            <element signature="e#119937#121984#0" />
+            <element signature="e#122054#122701#0" />
+            <element signature="e#122770#124050#0" />
+            <element signature="e#124105#124499#0" />
+            <element signature="e#124600#128475#0" />
+            <element signature="e#128554#130177#0" />
+            <element signature="e#130220#131626#0" />
+            <element signature="e#131670#132788#0" />
+            <element signature="e#137019#145680#0" />
+            <element signature="e#157435#157495#0" />
+            <element signature="e#163865#163896#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="407">
+          <caret line="843" column="32" lean-forward="true" selection-start-line="843" selection-start-column="32" selection-end-line="843" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#653#936#0" />
+            <element signature="e#977#1246#0" />
+            <element signature="e#1281#1503#0" />
+            <element signature="e#1536#1757#0" />
+            <element signature="e#1796#2430#0" />
+            <element signature="e#2470#3104#0" />
+            <element signature="e#3143#3777#0" />
+            <element signature="e#3817#4451#0" />
+            <element signature="e#4491#5127#0" />
+            <element signature="e#5168#5806#0" />
+            <element signature="e#5847#6483#0" />
+            <element signature="e#6525#7163#0" />
+            <element signature="e#7204#7840#0" />
+            <element signature="e#7874#8511#0" />
+            <element signature="e#8553#9189#0" />
+            <element signature="e#9235#9876#0" />
+            <element signature="e#9915#10557#0" />
+            <element signature="e#10604#11245#0" />
+            <element signature="e#11277#11531#0" />
+            <element signature="e#11569#11808#0" />
+            <element signature="e#11844#11989#0" />
+            <element signature="e#27615#27932#0" />
+            <element signature="e#27979#29709#0" />
+            <element signature="e#29296#29385#0" />
+            <element signature="e#29715#29757#0" />
+            <element signature="e#33328#34681#0" />
+            <element signature="e#34735#36363#0" />
+            <element signature="e#36423#38063#0" />
+            <element signature="e#38106#38195#0" />
+            <element signature="e#38233#38386#0" />
+            <element signature="e#38435#39613#0" />
+            <element signature="e#39650#40881#0" />
+            <element signature="e#41007#42290#0" />
+            <element signature="e#42339#42409#0" />
+            <element signature="e#42450#43259#0" />
+            <element signature="e#43431#44791#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/random_network_functions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="106" selection-start-line="106" selection-end-line="106" />
+        <state relative-caret-position="276">
+          <caret line="225" lean-forward="true" selection-start-line="225" selection-end-line="225" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
             <element signature="e#134#366#0" />
@@ -671,42 +773,6 @@
             <element signature="e#1759#2983#0" />
             <element signature="e#3032#3529#0" />
             <element signature="e#3572#4008#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="2972" column="14" selection-start-line="2972" selection-start-column="14" selection-end-line="2972" selection-end-column="14" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#72850#72889#0" />
-            <element signature="e#72792#88186#0" />
-            <element signature="e#88192#88234#0" />
-            <element signature="e#103052#103244#0" />
-            <element signature="e#103452#105499#0" />
-            <element signature="e#105569#106216#0" />
-            <element signature="e#106285#107565#0" />
-            <element signature="e#107620#108014#0" />
-            <element signature="e#108115#111990#0" />
-            <element signature="e#112069#113692#0" />
-            <element signature="e#113735#115141#0" />
-            <element signature="e#115185#116303#0" />
-            <element signature="e#132828#133616#0" />
-            <element signature="e#132136#140040#0" />
-            <element signature="e#133171#136259#0" />
-            <element signature="e#136282#136313#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="461">
-          <caret line="1262" lean-forward="true" selection-start-line="1262" selection-end-line="1262" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
           </folding>
         </state>
       </provider>
