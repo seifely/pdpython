@@ -310,11 +310,13 @@ class PDAgent(Agent):
                 # print("My id is", self.ID)
                 strat = "RANDOM"
                 strat = self.model.kNN_strategies[self.ID]
+                self.model.agent_strategies[self.ID] = str(strat)
                 return str(strat)
             elif self.model.kNN_testing:
                 # print("My id is", self.ID)
                 strat = "RANDOM"
                 strat = self.model.kNN_strategies[self.ID]
+                self.model.agent_strategies[self.ID] = str(strat)
                 return str(strat)
 
         elif self.model.sarsa_spawn:
@@ -322,6 +324,7 @@ class PDAgent(Agent):
             if self.model.sarsa_distro > 0:
                 weights = [self.model.sarsa_distro, 1-self.model.sarsa_distro]
                 strat = np.random.choice(choices, 1, replace=False, p=weights)
+                self.model.agent_strategies[self.ID] = str(strat[0])
                 return str(strat[0])
             else:
                 if len(choices) == 2:
@@ -354,17 +357,20 @@ class PDAgent(Agent):
                     # print("My ID is:", self.ID, "and my coordinates are", self)
                     if self.ID in check_a:
                         strat = choices[0]
+                        self.model.agent_strategies[self.ID] = str(strat)
                         return str(strat)
                     elif self.ID in check_b:
                         strat = choices[1]
                         if strat == 'MIXED':
                             # Then we should randomly pick from this list without weighting
                             strat = random.choice(self.model.oppoList)
+                            self.model.agent_strategies[self.ID] = str(strat)
                             return str(strat)
                         # if type(strat) == list:
                         #     # Then we should randomly pick from this list without weighting
                         #     strat = random.choice(strat)
                         #     return str(strat)
+                        self.model.agent_strategies[self.ID] = str(strat)
                         return str(strat)
 
         elif self.model.moody_sarsa_spawn:
@@ -372,6 +378,7 @@ class PDAgent(Agent):
             if self.model.sarsa_distro > 0:                                                               # THIS SECTION ISN'T SET TO MOODY_ --> might need changing in future
                 weights = [self.model.sarsa_distro, 1-self.model.sarsa_distro]
                 strat = np.random.choice(choices, 1, replace=False, p=weights)
+                self.model.agent_strategies[self.ID] = str(strat[0])
                 return str(strat[0])
             else:
                 if len(choices) == 2:
@@ -408,17 +415,20 @@ class PDAgent(Agent):
                     if self.ID in check_a:
                         strat = choices[0]
                         # print("I am in check_a and my strategy is now", strat)
+                        self.model.agent_strategies[self.ID] = str(strat)
                         return str(strat)
                     elif self.ID in check_b:
                         strat = choices[1]
                         if strat == 'MIXED':
                             # Then we should randomly pick from this list without weighting
                             strat = random.choice(self.model.oppoList)
+                            self.model.agent_strategies[self.ID] = str(strat)
                             return str(strat)
                         # if type(strat) == list:
                         #     # Then we should randomly pick from this list without weighting
                         #     strat = random.choice(strat)
                         #     return str(strat)
+                        self.model.agent_strategies[self.ID] = str(strat)
                         return str(strat)
 
         else:
@@ -426,6 +436,7 @@ class PDAgent(Agent):
                 choices = ["EV", "ANGEL", "RANDOM", "DEVIL", "VEV", "TFT", "WSLS", "VPP", "iWSLS"]
                 strat = random.choice(choices)
                 # print("strat is", strat)
+                self.model.agent_strategies[self.ID] = str(strat)
                 return str(strat)
             elif self.pickstrat == "DISTRIBUTION":
                 """ This is for having x agents start on y strategy and the remaining p agents
@@ -436,14 +447,17 @@ class PDAgent(Agent):
                 if not self.checkerboard:
                     if not self.lineplace:
                         strat = random.choice(choices)
+                        self.model.agent_strategies[self.ID] = str(strat)
                         return str(strat)
                     elif self.lineplace:
                         if len(choices) == 2:
                             if (self.ID % 2) == 0:
                                 strat = choices[0]
+                                self.model.agent_strategies[self.ID] = str(strat)
                                 return str(strat)
                             else:
                                 strat = choices[1]
+                                self.model.agent_strategies[self.ID] = str(strat)
                                 return str(strat)
                         elif len(choices) == 3:
                             # make choices into a popped queue, take the front most and then add it in at the back after
@@ -458,9 +472,11 @@ class PDAgent(Agent):
                                    43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
                         if self.ID in check_a:
                             strat = choices[0]
+                            self.model.agent_strategies[self.ID] = str(strat)
                             return str(strat)
                         elif self.ID in check_b:
                             strat = choices[1]
+                            self.model.agent_strategies[self.ID] = str(strat)
                             return str(strat)
 
     def change_strategy(self):

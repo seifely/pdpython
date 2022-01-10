@@ -382,8 +382,8 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=2, width=2,    # even numbers are checkerboard fair
-                 number_of_agents=4,
+    def __init__(self, height=5, width=5,    # even numbers are checkerboard fair
+                 number_of_agents=25,
                  schedule_type="Simultaneous",
                  rounds=50,
                  collect_data=True,
@@ -532,6 +532,7 @@ class PDModel(Model):
         self.graph_removals = []
 
         self.agent_positions = {}
+        self.agent_strategies = {}
         self.graph_probability = graph_probability
         self.graph_connectedness = []
         self.max_edges = 0
@@ -1126,6 +1127,36 @@ class PDModel(Model):
         else:
             return False
 
+    def colorPicker(self, strategy):
+        if strategy == 'RANDOM':
+            return('gray')
+        elif strategy == 'ANGEL':
+            return ('yellow')
+        elif strategy == 'DEVIL':
+            return ('red')
+        elif strategy == 'EV':
+            return ('plum')
+        elif strategy == 'VEV':
+            return ('violet')
+        elif strategy == 'TFT':
+            return ('deepskyblue')
+        elif strategy == 'VPP':
+            return ('magenta')
+        elif strategy == 'WSLS':
+            return ('lime')
+        elif strategy == "LEARN":
+            return ('blue')
+        elif strategy == "MOODYLEARN":
+            return ('darkorange')
+
+    def getColorMap(self, strategies, graph):
+        color_map = []
+        for node in graph:
+            #if the node number is in strategies
+            color = self.colorPicker(strategies[node])
+            color_map.append(color)
+        return color_map
+
     def step(self):
 
         start = time.time()
@@ -1145,10 +1176,11 @@ class PDModel(Model):
         #         writer.writerow(rnf.analysis(self.updated_graphD, self.updated_graphG))
 
         if self.step_count == self.rounds - 1:
+            color_map = self.getColorMap(self.agent_strategies, self.updated_graphG)
             plt.figure()
             # print("gonna make an output graph")
             # print(rnf.analysis(self.updated_graphD, self.updated_graphG))
-            nx.draw_networkx(self.updated_graphG, ax=None)
+            nx.draw_networkx(self.updated_graphG, node_color=color_map)
             plt.savefig(self.exp_n + "-finalGraph.png")
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
