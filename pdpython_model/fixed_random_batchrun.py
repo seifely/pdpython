@@ -824,6 +824,17 @@ class PDModel(Model):
     #                             permutations.append(new)
     #     return permutations
 
+    def plotGraph(self, G, rnd, color):
+        if color:
+            color_map = self.getColorMap(self.agent_strategies, G)
+            plt.figure()
+            nx.draw_networkx(G, node_color=color_map)
+            plt.savefig(self.exp_n + "-round-" + str(rnd))
+        elif not color:
+            plt.figure()
+            nx.draw_networkx(G, ax=None)
+            plt.savefig(self.exp_n + "-round-" + str(rnd))
+
     def init_graph(self):
         self.initial_graphD, self.initial_graphG = rnf.initRandomGraph(self.number_of_agents, self.graph_probability,
                                                                        self.agentIDs)
@@ -1184,6 +1195,9 @@ class PDModel(Model):
             plt.savefig(self.exp_n + "-finalGraph.png")
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
+
+        # if self.step_count == 2:
+        #     self.plotGraph(self.updated_graphG, self.step_count, True)
         self.step_count += 1
         # print("Step:", self.step_count)
         end = time.time()
@@ -1312,7 +1326,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=1,
+                 iterations=5,
                  max_steps=50,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
