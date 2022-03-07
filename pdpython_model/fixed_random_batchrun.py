@@ -448,6 +448,8 @@ class PDModel(Model):
                  sensitivity=0,
                  graph_probability=0.4,
                  changeFrequency=5,
+                 forgivenessPeriod=0,
+                 maximumPartners=None,
                  ):
 
         # ---------- Model Parameters --------
@@ -541,7 +543,15 @@ class PDModel(Model):
         for j in self.agentIDs:
             self.groupDegreeCentralities[j] = 0
         self.group_degree_centralization = 0
-        self.change_frequency = changeFrequency
+        self.change_frequency = changeFrequency  # this is how often there will be a restructuring of edges
+
+        self.reputationBlackboard = {}
+        # this is the reputation of every agent, aka the sum count of each agent's betrayals against a partner
+        self.forgivenessPeriod = forgivenessPeriod
+        # how often we forgive previously bad agents (in number of play segments)
+        self.maximumPartners = maximumPartners
+        # how many partners an agent is allowed to have (i.e. up to a third of the network, etc.
+        # TODO: Add these as inputs in the batchrunner? Or are we keeping these consistent?
 
         self.checkTurn = False
         self.resetTurn = False

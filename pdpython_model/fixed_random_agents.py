@@ -201,6 +201,15 @@ class PDAgent(Agent):
         self.average_ppPR = 0
         self.average_ppCON = 0
 
+        self.betrayals = 0
+        # the number of times I have betrayed someone else who was cooperating with me
+        self.partnerSelectionStrat = "DEFAULT"
+        # Options for the above should be "DEFAULT", "SCORE", "REP",
+        # Default is random partner changes
+        self.currentForgiveness = copy.deepcopy(self.model.forgivenessPeriod)
+        # initialises and then decreases as each round goes by
+        self.agentsToRestructure = 0  # TODO: This needs to be a random number within some parameters
+
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
         self.number_of_d = 0
@@ -2988,64 +2997,93 @@ class PDAgent(Agent):
                     print("----------------------------------------------------------")
         else:
             # print("IT'S A RESET TURN!")
+            if self.partnerSelectionStrat == "DEFAULT":
+                """ If it's a reset round where we just change partners, all we want to do is update our partner list.
+                    The method by which I do this is randomly, for this section. """
+                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                new_partners = []
+                removed_partners = []
 
-            """ If it's a reset round where we just change partners, all we want to do is update our partner list"""
-            self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-            new_partners = []
-            removed_partners = []
+                for i in self.current_partner_list:
+                    if self.itermove_result.get(i) is None:
+                        new_partners.append(i)
 
-            for i in self.current_partner_list:
-                if self.itermove_result.get(i) is None:
-                    new_partners.append(i)
+                for n in new_partners:
+                    "I WILL GIVE THEM A DEFAULT"
+                    self.itermove_result[n] = self.model.startingBehav
 
-            for n in new_partners:
-                "I WILL GIVE THEM A DEFAULT"
-                self.itermove_result[n] = self.model.startingBehav
+                self.get_IDs(self.current_partner_list)
+                # Set defaults for any new partners, remove any old partners from the lists
+                if len(new_partners) > 0:
+                    for i in new_partners:
+                        for j in self.all_possible_partners:
+                            if j != i:
+                                self.potential_partner_list.append(j)
+                    for i in new_partners:
+                        self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
+                        if self.statemode == 'stateless':
+                            md = 1
+                        elif self.statemode == 'agentstate':
+                            md = 2
+                        elif self.statemode == 'moodstate':
+                            md = 3
+                        self.moody_oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.moody_learnFrom, md)
 
-            self.get_IDs(self.current_partner_list)
-            # Set defaults for any new partners, remove any old partners from the lists
-            if len(new_partners) > 0:
-                for i in new_partners:
-                    for j in self.all_possible_partners:
-                        if j != i:
-                            self.potential_partner_list.append(j)
-                for i in new_partners:
-                    self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
-                    if self.statemode == 'stateless':
-                        md = 1
-                    elif self.statemode == 'agentstate':
-                        md = 2
-                    elif self.statemode == 'moodstate':
-                        md = 3
-                    self.moody_oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.moody_learnFrom, md)
+                    self.set_defaults(new_partners)
+                    # Do an iter_pick_move ?
+                    # We need to pick default moves for new partners...
+                    # pickmove won't work though because we don't have any prior history with them
+                    # I have set it so that if the ID appears in new_partners, they will just do they default behaviour?
+                    moves = self.iter_pick_move(self.strategy, self.payoffs,
+                                                               self.current_partner_list, new_partners)
+                    for n in self.current_partner_list:
+                        self.itermove_result[n] = moves[n]  # We now try and find our partners from here
 
-                self.set_defaults(new_partners)
-                # Do an iter_pick_move ?
-                # TODO: We need to pick default moves for new partners, pickmove won't work though because we don't have any prior history with them
-                # I have set it so that if the ID appears in new_partners, they will just do they default behaviour?
-                moves = self.iter_pick_move(self.strategy, self.payoffs,
-                                                           self.current_partner_list, new_partners)
-                for n in self.current_partner_list:
-                    self.itermove_result[n] = moves[n]  # We now try and find our partners from here
+                    self.find_average_move()
 
+                for i in self.current_partner_list:
+                    if i not in self.partner_IDs:
+                        self.partner_IDs.remove(j)
+                        removed_partners.append(j)
+                        # print("partner I removed was", i)
+
+                # TODO: DO WE NEED TO PREP FIRST MOVES FOR THEM?
+
+                if self.stepCount == (self.model.rounds - 1):
+                    self.last_round = True
                 self.find_average_move()
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
 
-            for i in self.current_partner_list:
-                if i not in self.partner_IDs:
-                    self.partner_IDs.remove(j)
-                    removed_partners.append(j)
-                    # print("partner I removed was", i)
+            elif self.partnerSelectionStrat == "SCORE":
+                """ If it's a reset round where we just change partners, all we want to do is update our partner list.
+                    The method by which I do this is randomly in terms of acquiring new partners, and seeing if 
+                    they satisfy my need for a certain average score, for this section. """
 
-            # TODO: DO WE NEED TO PREP FIRST MOVES FOR THEM?
+                if self.stepCount == (self.model.rounds - 1):
+                    self.last_round = True
+                self.find_average_move()
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
+                pass
 
-            if self.stepCount == (self.model.rounds - 1):
-                self.last_round = True
-            self.find_average_move()
-            # self.outputData(True)  # Output data at the start, so it is hopefully the same as last roungd
-            # TODO: Is outputData() okay here? it should be in advance, right?
-            # self.stepCount += 1
-            if self.model.schedule_type != "Simultaneous":
-                self.advance()
+            elif self.partnerSelectionStrat == "REP":
+                """ If it's a reset round where we just change partners, all we want to do is update our partner list.
+                    The method by which I do this is [TO BE FINALISED]"""
+
+                if self.stepCount == (self.model.rounds - 1):
+                    self.last_round = True
+                self.find_average_move()
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
+                pass
+
+            else:
+                if self.stepCount == (self.model.rounds - 1):
+                    self.last_round = True
+                self.find_average_move()
+                if self.model.schedule_type != "Simultaneous":
+                    self.advance()
 
 
     def advance(self):
