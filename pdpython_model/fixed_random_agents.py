@@ -2996,8 +2996,9 @@ class PDAgent(Agent):
                 for n in range(1):
                     print("----------------------------------------------------------")
         else:
-            # print("IT'S A RESET TURN!")
-            if self.partnerSelectionStrat == "DEFAULT":
+
+            if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
+                print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
                 """ If it's a reset round where we just change partners, all we want to do is update our partner list.
                     The method by which I do this is randomly, for this section. """
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
@@ -3047,15 +3048,14 @@ class PDAgent(Agent):
                         removed_partners.append(j)
                         # print("partner I removed was", i)
 
-                # TODO: DO WE NEED TO PREP FIRST MOVES FOR THEM?
-
                 if self.stepCount == (self.model.rounds - 1):
                     self.last_round = True
                 self.find_average_move()
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
 
-            elif self.partnerSelectionStrat == "SCORE":
+            elif self.partnerSelectionStrat == "SCORE":  # ===========================================================
+                print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
                 """ If it's a reset round where we just change partners, all we want to do is update our partner list.
                     The method by which I do this is randomly in terms of acquiring new partners, and seeing if 
                     they satisfy my need for a certain average score, for this section. """
@@ -3065,9 +3065,9 @@ class PDAgent(Agent):
                 self.find_average_move()
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
-                pass
 
-            elif self.partnerSelectionStrat == "REP":
+            elif self.partnerSelectionStrat == "REP":  # ===========================================================
+                print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
                 """ If it's a reset round where we just change partners, all we want to do is update our partner list.
                     The method by which I do this is [TO BE FINALISED]"""
 
@@ -3076,9 +3076,9 @@ class PDAgent(Agent):
                 self.find_average_move()
                 if self.model.schedule_type != "Simultaneous":
                     self.advance()
-                pass
 
             else:
+                print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
                 if self.stepCount == (self.model.rounds - 1):
                     self.last_round = True
                 self.find_average_move()
@@ -3492,14 +3492,34 @@ class PDAgent(Agent):
                 self.stepCount += 1
                 return
         else:
-            #print("This was a reset round, so all I did was update my partners")
-            self.outputData(True)  # TODO: need to find out where to put this so that it doesn't break
-            # TODO: Or, make it output a null/zeroes for this turn because it's a changeover round/can we duplicate the last round's outputs
-            self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-            self.partner_IDs = copy.deepcopy(self.current_partner_list)
-            self.stepCount += 1
-            # self.check_partner(self.current_partner_list)
-            return
+            if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
+                print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
+                self.outputData(True)  # TODO: need to find out where to put this so that it doesn't break
+                # TODO: Or, make it output a null/zeroes for this turn because it's a changeover round/can we duplicate the last round's outputs
+                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                self.partner_IDs = copy.deepcopy(self.current_partner_list)
+                self.stepCount += 1
+                # self.check_partner(self.current_partner_list)
+                return
+            elif self.partnerSelectionStrat == "REP":  # ===========================================================
+                print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
+                self.outputData(True)
+                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                self.partner_IDs = copy.deepcopy(self.current_partner_list)
+                self.stepCount += 1
+                # self.check_partner(self.current_partner_list)
+                return
+            elif self.partnerSelectionStrat == "SCORE":  # ===========================================================
+                print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
+                self.outputData(True)
+                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                self.partner_IDs = copy.deepcopy(self.current_partner_list)
+                self.stepCount += 1
+                # self.check_partner(self.current_partner_list)
+                return
+            else:
+                return
+
 
         #TODO: This may not work, as agents will not have some starting moves against new partners (aa primes and whatnot) but hopefully it does?
 
