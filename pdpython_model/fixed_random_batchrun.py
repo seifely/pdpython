@@ -446,10 +446,11 @@ class PDModel(Model):
                  startingBehav='C',
 
                  sensitivity=0,
-                 graph_probability=0.4,
+                 graph_probability=0.2,
                  changeFrequency=5,
                  forgivenessPeriod=0,
-                 maximumPartners=None,
+                 maximumPartners=0,
+                 rewirePercentage=0.1,
                  ):
 
         # ---------- Model Parameters --------
@@ -549,8 +550,12 @@ class PDModel(Model):
         # this is the reputation of every agent, aka the sum count of each agent's betrayals against a partner
         self.forgivenessPeriod = forgivenessPeriod
         # how often we forgive previously bad agents (in number of play segments)
-        self.maximumPartners = maximumPartners
-        # how many partners an agent is allowed to have (i.e. up to a third of the network, etc.
+        self.maximumPartners = self.number_of_agents // 2
+        # how many partners an agent is allowed to have (i.e. up to a half of the network, etc.)
+        self.rewirePercentage = rewirePercentage
+        # a random number between x and number_of_agents. we then select this number of switchers
+        self.agentsToRestructure = []
+        # how many
         # TODO: Add these as inputs in the batchrunner? Or are we keeping these consistent?
 
         self.checkTurn = False
@@ -1182,6 +1187,11 @@ class PDModel(Model):
 
         start = time.time()
         self.checkTurn = self.roundCheck(self.step_count, self.change_frequency)
+        if self.checkTurn:
+            # if it's a reset round, we should generate a list of agents to rewite
+            self.agentsToRestructure = rnf.generateRewireList(self.number_of_agents, self.rewirePercentage)
+            # now we have the list of agents who need to rewire, each of these needs to check on a
+            # reset round and take this data in
         self.schedule.step()
         if self.updated_graphG == 0:
             graph_connect = self.initial_graphG

@@ -208,7 +208,10 @@ class PDAgent(Agent):
         # Default is random partner changes
         self.currentForgiveness = copy.deepcopy(self.model.forgivenessPeriod)
         # initialises and then decreases as each round goes by
-        self.agentsToRestructure = 0  # TODO: This needs to be a random number within some parameters
+        #self.agentsToRestructure = 0  # TODO: This needs to be a random number within some parameters
+        self.Switcher = False
+        # check for this value from the model each round, and see if we are allowed to switch partners or not
+
 
         # ----------------------- DATA TO OUTPUT --------------------------
         self.number_of_c = 0
@@ -2838,7 +2841,6 @@ class PDAgent(Agent):
         else:
             return my_average, averages[oppID], self.pp_oppPayoff[partner_ID]
 
-
     def step(self):
         if not self.model.resetTurn:
             self.compare_score()
@@ -2996,7 +2998,7 @@ class PDAgent(Agent):
                 for n in range(1):
                     print("----------------------------------------------------------")
         else:
-
+            # We need to generate a number of partners that are allowed to switch and w/ whom they form a new connection
             if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
                 print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
                 """ If it's a reset round where we just change partners, all we want to do is update our partner list.
@@ -3059,6 +3061,48 @@ class PDAgent(Agent):
                 """ If it's a reset round where we just change partners, all we want to do is update our partner list.
                     The method by which I do this is randomly in terms of acquiring new partners, and seeing if 
                     they satisfy my need for a certain average score, for this section. """
+
+                # First, check if I am in the list of agents to restructure
+                connections = []
+                for i in self.model.agentsToRestrcture:
+                    item = i
+                    if i[0] == self.ID:
+                        # if we have a connection to evaluate,
+                        connections.append(i)
+                    else:
+                        pass
+
+                break_check = []
+                gain_check = []
+                # then, for each of these, we check if that connection already exists, and what task to do with it
+                if len(connections) > 0:
+                    for i in connections:
+                        if i[1] not in self.current_partner_list:
+                            gain_check.append(i[1])
+                        else:
+                            if i[1] in self.current_partner_list:
+                                break_check.append(i[1])
+
+                # we should do breakcheck first, in case it frees up new partners
+                if len(break_check) > 0:
+                    for i in break_check:
+                        # get an average of what I remember my scores against them were
+                        myAv = statistics.mean(self.working_memory[i])
+                        theirAv = 0  # this is a placeholder for now
+                        threshold = self.model.CC
+                        if rnf.scoreCheck(myAv, theirAv, threshold):
+                            # then we add this partner to the partners to remove
+                        else:
+                            pass
+
+                # once we have a list of agents to gaincheck and breakcheck, let's make a decision on each one
+                if len(gain_check) > 0:
+                    for i in gain_check:
+                        # use the strategy to decide if we want this as a partner
+                        #
+
+                if len(break_check) > 0:
+
 
                 if self.stepCount == (self.model.rounds - 1):
                     self.last_round = True

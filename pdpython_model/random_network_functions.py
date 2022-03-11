@@ -192,6 +192,7 @@ def basicPartnerDecision(current_partners, rejected_partners, untested_partners,
 
     return tuple(removal_request), tuple(addition_request), removal, addition
 
+
 def partnerDecision(current_partners, untested_partners, rejected_partners, partner_history, current_mood,
                     scores_against_partners, goal_score, mood_threshold,
                     partner_reputaions, my_connectedness):
@@ -200,6 +201,7 @@ def partnerDecision(current_partners, untested_partners, rejected_partners, part
         which new partners they desire. TODO: Do highly connected agents have a lower chance to connect?
         TODO: Should agents be able to deny connection requests? Or are they always available? We'd then need a banned connection list stored in the model. """
     return
+
 
 def chooseNewPartner(untested_partners, tested_partners, allPossPartners, probability, weights):
     """ For now, either select a partner with a random chance, or select from either untested or previously tested partners
@@ -217,6 +219,7 @@ def chooseNewPartner(untested_partners, tested_partners, allPossPartners, probab
             choice = random.choice(tested_partners)
     return choice
 
+
 def getPossiblePartners(ids, current_partners):
     possible = []
     for i in ids:
@@ -228,7 +231,35 @@ def getPossiblePartners(ids, current_partners):
 # possible partners, if they have interacted before. The should have lists of rejected partners (for the other functions
 # listed above) for use as well (added at the same time as they add to the dictionary)
 
+
 def analysis(D, G):
     analy = ("Density:", nx.density(G), " Nodes:", nx.number_of_nodes(G), " Edges:", nx.number_of_edges(G),
              "nodes", nx.nodes(G), "info", nx.info(G))
     return(analy)
+
+
+def allPossibleCombinations(n_agents):
+    pair_list = []
+    all_agents = [i for i in range(n_agents+1)]
+    all_agents = all_agents[1:n_agents]  #  remove the initial zero? I don't think there's any 0 agents
+    for i in all_agents:
+        for j in all_agents:
+            if i != j:
+                pair = [i, j]
+                pair_list.append(pair)
+    return pair_list
+
+def generateRewireList(n_agents, percentage_rewiring):
+    # we should be okay just returning a list, as we only need to know the ID numbers of who is switching
+    allCombinations = allPossibleCombinations(n_agents)
+    total_count = len(allCombinations)
+    to_select = round(total_count*percentage_rewiring)
+    rewire_list = random.sample(allCombinations, to_select)
+    rewire_list.sort()  # sort them into
+    return rewire_list
+
+
+def scoreCheck(my_av, their_av, threshold):
+    breakCheck = False
+
+    return breakCheck
