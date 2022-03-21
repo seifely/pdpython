@@ -3223,17 +3223,37 @@ class PDAgent(Agent):
                                 for partnerID in break_check:
                                     toBreak = True
 
+                                    request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
+                                                                  self.ID, self.rejected_partner_list,
+                                                                  self.working_memory[partnerID],
+                                                                  statistics.mean(self.working_memory[partnerID]),
+                                                                  statistics.mean(self.pp_oppPayoff[partnerID]),
+                                                                  self.model.CC,
+                                                                  self.model.reputationBlackboard[self.ID],
+                                                                  self.mood,
+                                                                  50, self.model.reputationBlackboard[partnerID],
+                                                                  self.normalizedActorDegreeCentrality)
+                                    # check if the request is valid (aka, not Null) - if it is, send it to the model
+                                    #   if it isn't, ignore it
+                                    if request[1] != None:
+                                        self.model.graph_removals.append(request)
+                                        self.rejected_partner_list.append(partnerID)
+                                        self.current_partner_list.remove(partnerID)
 
                             if len(self.current_partner_list) < self.model.maximumPartners:
                                 if len(gain_check) > 0:
                                     for partnerID in gain_check:
                                         toBreak = False
                                         # then do the partner decision line
-                                        # TODO: THE ZEROES NEED TO BE FILLED WITH THEIR ACTUAL VARIABLES PLEASE
+                                        # TODO: the zero needs to be replaced with my partner's scores against me
                                         request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
-                                                                      self.ID, self.rejected_partner_list, self.working_memory[partnerID],
-                                                                      statistics.mean(self.working_memory[partnerID]), 0, self.model.CC,
-                                                                      self.model.reputationBlackboard[self.ID], self.mood,
+                                                                      self.ID, self.rejected_partner_list,
+                                                                      self.working_memory[partnerID],
+                                                                      statistics.mean(self.working_memory[partnerID]),
+                                                                      statistics.mean(self.pp_oppPayoff[partnerID]),
+                                                                      self.model.CC,
+                                                                      self.model.reputationBlackboard[self.ID],
+                                                                      self.mood,
                                                                       50, self.model.reputationBlackboard[partnerID],
                                                                       self.normalizedActorDegreeCentrality)
                                         # check if the request is valid (aka, not Null) - if it is, send it to the model
@@ -3241,7 +3261,7 @@ class PDAgent(Agent):
                                         if request[1] != None:
                                             self.model.graph_additions.append(request)
                             # else:
-                            #   some kind of pruning behaviour
+                            #   todo: some kind of pruning behaviour
 
                         else:
                             removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list, self.rejected_partner_list,
@@ -3251,6 +3271,7 @@ class PDAgent(Agent):
                                 if removRequest[1] != None:
                                     self.model.graph_removals.append(removRequest)
                                     self.current_partner_list.remove(removals)
+                                    self.rejected_partner_list.append(removals)
                             if addRequest:
                                 if addRequest[1] != None:
                                     self.model.graph_additions.append(addRequest)
