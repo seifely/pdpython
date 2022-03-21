@@ -17,6 +17,7 @@ def init_partner_list(height, width, id):
 def init_pot_partner_reps(potential_partner_list, rep_type):
     return
 
+
 def initRandomGraph(nodes, probability, ids):
     """ Produces a Random Erdos Renyi Graph, based on a probability of connecting to each next node, and a dict for
     each agent of who their starting partners should be. """
@@ -60,6 +61,7 @@ def initRandomGraph(nodes, probability, ids):
 
     # Export the Edge List of the graph, and Export the version Agents can understand
     return edgesDict, g
+
 
 def maxEdgesPossible(nodes, ids):
     """ Produces a Random Erdos Renyi Graph, based on a probability of connecting to each next node, and a dict for
@@ -105,6 +107,7 @@ def maxEdgesPossible(nodes, ids):
     # Export the Edge List of the graph, and Export the version Agents can understand
     return g.number_of_edges()
 
+
 def convertGraph_to_dictEdges(graph, ids):
     """ Output the graph instead as an ID-keyed dict that contains vectors of each agent's initial partners. """
     edgesDict = {}
@@ -125,6 +128,7 @@ def convertGraph_to_dictEdges(graph, ids):
 
     return edgesDict
 
+
 def convertDict_to_graph(dict, ids):
     """ Take in a dict, construct a graph from the edge lists for each node."""
     G = nx.Graph()
@@ -142,6 +146,7 @@ def convertDict_to_graph(dict, ids):
     # print(edge_counter/2)
     # print(G.number_of_edges())
     return G
+
 
 def update_graph(old_edges, additions, removals, sorting, ids):
     """ Import the previous graph, get its data in dict form, get the current edge list and compare changes at regular intervals."""
@@ -171,7 +176,9 @@ def update_graph(old_edges, additions, removals, sorting, ids):
         print("Density:", nx.density(changeable), " Nodes:", nx.number_of_nodes(changeable), " Edges:", nx.number_of_edges(changeable))
         return changesDict, changeable
 
-def basicPartnerDecision(current_partners, rejected_partners, untested_partners, possible_partners, new_partnerProb, my_ID):
+
+def basicPartnerDecision(current_partners, rejected_partners, untested_partners,
+                         possible_partners, new_partnerProb, my_ID):
     """ Takes in a list of current partners, drops one and requests a new one from untested list. """
     removal_request = []
     addition_request = []
@@ -192,15 +199,54 @@ def basicPartnerDecision(current_partners, rejected_partners, untested_partners,
 
     return tuple(removal_request), tuple(addition_request), removal, addition
 
+def scoreCheck(my_av, their_av, threshold):
+    breakCheck = False
+    if my_av < threshold:
+        breakCheck = True
+    return breakCheck
 
-def partnerDecision(current_partners, untested_partners, rejected_partners, partner_history, current_mood,
-                    scores_against_partners, goal_score, mood_threshold,
-                    partner_reputaions, my_connectedness):
-    # May want things like partner mood, partner reputation?
+def partnerDecision(breakCheck, selectionStrategy, partnerID, myID, rejectedPartners, partnerHistory,
+                    scoreAgainst, partnerScore, scoreThreshold, myRep, mood, moodThreshold,
+                    partnerRep, myConnectedness):
+    # May want things like partner mood, current_mood,
     """ Initially this function will , but later will be designed to make decisions based on information and rules as to
-        which new partners they desire. TODO: Do highly connected agents have a lower chance to connect?
-        TODO: Should agents be able to deny connection requests? Or are they always available? We'd then need a banned connection list stored in the model. """
-    return
+        which new partners they desire. TODO: Do highly connected agents have a lower chance to connect? """
+    request = []
+    #removal = 0
+    #addition = 0
+
+    if selectionStrategy == "DEFAULT":
+        # the default is to make these decisions at random, so we will gain and lose them randomly
+        if breakCheck:
+            r = random.random()
+            if r > 0.5:
+                request.append(myID)
+                request.append(partnerID)
+                #removal = partnerID
+        else:
+            if partnerID not in rejectedPartners:
+                r = random.random()
+                if r > 0.5:
+                    request.append(myID)
+                    request.append(partnerID)
+                    #addition = partnerID
+
+    elif selectionStrategy == "SCORE":
+        if breakCheck:
+            if scoreCheck(scoreAgainst, partnerScore, scoreThreshold):
+                request.append(myID)
+                request.append(partnerID)
+        else:
+            if partnerID not in rejectedPartners:
+                request.append(myID)
+                request.append(partnerID)
+
+    elif selectionStrategy == "REP":
+        pass
+    else:
+        pass
+
+    return tuple(request)  # , removal, addition
 
 
 def chooseNewPartner(untested_partners, tested_partners, allPossPartners, probability, weights):
@@ -259,7 +305,4 @@ def generateRewireList(n_agents, percentage_rewiring):
     return rewire_list
 
 
-def scoreCheck(my_av, their_av, threshold):
-    breakCheck = False
 
-    return breakCheck

@@ -2999,135 +2999,83 @@ class PDAgent(Agent):
                     print("----------------------------------------------------------")
         else:
             # We need to generate a number of partners that are allowed to switch and w/ whom they form a new connection
-            if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
-                print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
-                """ If it's a reset round where we just change partners, all we want to do is update our partner list.
-                    The method by which I do this is randomly, for this section. """
-                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                new_partners = []
-                removed_partners = []
+            print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
+            """ If it's a reset round where we just change partners, all we want to do is update our partner list.
+                The method by which I do this is randomly, for this section. """
+            self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+            new_partners = []
+            removed_partners = []
 
-                for i in self.current_partner_list:
-                    if self.itermove_result.get(i) is None:
-                        new_partners.append(i)
+            for i in self.current_partner_list:
+                if self.itermove_result.get(i) is None:
+                    new_partners.append(i)
 
-                for n in new_partners:
-                    "I WILL GIVE THEM A DEFAULT"
-                    self.itermove_result[n] = self.model.startingBehav
+            for n in new_partners:
+                "I WILL GIVE THEM A DEFAULT"
+                self.itermove_result[n] = self.model.startingBehav
 
-                self.get_IDs(self.current_partner_list)
-                # Set defaults for any new partners, remove any old partners from the lists
-                if len(new_partners) > 0:
-                    for i in new_partners:
-                        for j in self.all_possible_partners:
-                            if j != i:
-                                self.potential_partner_list.append(j)
-                    for i in new_partners:
-                        self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
-                        if self.statemode == 'stateless':
-                            md = 1
-                        elif self.statemode == 'agentstate':
-                            md = 2
-                        elif self.statemode == 'moodstate':
-                            md = 3
-                        self.moody_oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.moody_learnFrom, md)
+            self.get_IDs(self.current_partner_list)
+            # Set defaults for any new partners, remove any old partners from the lists
+            if len(new_partners) > 0:
+                for i in new_partners:
+                    for j in self.all_possible_partners:
+                        if j != i:
+                            self.potential_partner_list.append(j)
+                for i in new_partners:
+                    self.oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.learnFrom, self.delta)
+                    if self.statemode == 'stateless':
+                        md = 1
+                    elif self.statemode == 'agentstate':
+                        md = 2
+                    elif self.statemode == 'moodstate':
+                        md = 3
+                    self.moody_oldstates[i] = self.set_starting_oldstates(self.strategy, self.model.moody_learnFrom, md)
 
-                    self.set_defaults(new_partners)
-                    # Do an iter_pick_move ?
-                    # We need to pick default moves for new partners...
-                    # pickmove won't work though because we don't have any prior history with them
-                    # I have set it so that if the ID appears in new_partners, they will just do they default behaviour?
-                    moves = self.iter_pick_move(self.strategy, self.payoffs,
-                                                               self.current_partner_list, new_partners)
-                    for n in self.current_partner_list:
-                        self.itermove_result[n] = moves[n]  # We now try and find our partners from here
+                self.set_defaults(new_partners)
+                # Do an iter_pick_move ?
+                # We need to pick default moves for new partners...
+                # pickmove won't work though because we don't have any prior history with them
+                # I have set it so that if the ID appears in new_partners, they will just do they default behaviour?
+                moves = self.iter_pick_move(self.strategy, self.payoffs,
+                                                            self.current_partner_list, new_partners)
+                for n in self.current_partner_list:
+                    self.itermove_result[n] = moves[n]  # We now try and find our partners from here
 
-                    self.find_average_move()
-
-                for i in self.current_partner_list:
-                    if i not in self.partner_IDs:
-                        self.partner_IDs.remove(j)
-                        removed_partners.append(j)
-                        # print("partner I removed was", i)
-
-                if self.stepCount == (self.model.rounds - 1):
-                    self.last_round = True
                 self.find_average_move()
-                if self.model.schedule_type != "Simultaneous":
-                    self.advance()
 
-            elif self.partnerSelectionStrat == "SCORE":  # ===========================================================
-                print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
-                """ If it's a reset round where we just change partners, all we want to do is update our partner list.
-                    The method by which I do this is randomly in terms of acquiring new partners, and seeing if 
-                    they satisfy my need for a certain average score, for this section. """
+            for i in self.current_partner_list:
+                if i not in self.partner_IDs:
+                    self.partner_IDs.remove(j)
+                    removed_partners.append(j)
+                    # print("partner I removed was", i)
 
-                # First, check if I am in the list of agents to restructure
-                connections = []
-                for i in self.model.agentsToRestrcture:
-                    item = i
-                    if i[0] == self.ID:
-                        # if we have a connection to evaluate,
-                        connections.append(i)
-                    else:
-                        pass
+            if self.stepCount == (self.model.rounds - 1):
+                self.last_round = True
+            self.find_average_move()
+            if self.model.schedule_type != "Simultaneous":
+                self.advance()
 
-                break_check = []
-                gain_check = []
-                # then, for each of these, we check if that connection already exists, and what task to do with it
-                if len(connections) > 0:
-                    for i in connections:
-                        if i[1] not in self.current_partner_list:
-                            gain_check.append(i[1])
-                        else:
-                            if i[1] in self.current_partner_list:
-                                break_check.append(i[1])
-
-                # we should do breakcheck first, in case it frees up new partners
-                if len(break_check) > 0:
-                    for i in break_check:
-                        # get an average of what I remember my scores against them were
-                        myAv = statistics.mean(self.working_memory[i])
-                        theirAv = 0  # this is a placeholder for now
-                        threshold = self.model.CC
-                        if rnf.scoreCheck(myAv, theirAv, threshold):
-                            # then we add this partner to the partners to remove
-                        else:
-                            pass
-
-                # once we have a list of agents to gaincheck and breakcheck, let's make a decision on each one
-                if len(gain_check) > 0:
-                    for i in gain_check:
-                        # use the strategy to decide if we want this as a partner
-                        #
-
-                if len(break_check) > 0:
-
-
-                if self.stepCount == (self.model.rounds - 1):
-                    self.last_round = True
-                self.find_average_move()
-                if self.model.schedule_type != "Simultaneous":
-                    self.advance()
-
-            elif self.partnerSelectionStrat == "REP":  # ===========================================================
-                print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
-                """ If it's a reset round where we just change partners, all we want to do is update our partner list.
-                    The method by which I do this is [TO BE FINALISED]"""
-
-                if self.stepCount == (self.model.rounds - 1):
-                    self.last_round = True
-                self.find_average_move()
-                if self.model.schedule_type != "Simultaneous":
-                    self.advance()
-
-            else:
-                print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
-                if self.stepCount == (self.model.rounds - 1):
-                    self.last_round = True
-                self.find_average_move()
-                if self.model.schedule_type != "Simultaneous":
-                    self.advance()
+            # elif self.partnerSelectionStrat == "SCORE":  # ===========================================================
+            #
+            #
+            # elif self.partnerSelectionStrat == "REP":  # ===========================================================
+            #     print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
+            #     """ If it's a reset round where we just change partners, all we want to do is update our partner list.
+            #         The method by which I do this is [TO BE FINALISED]"""
+            #
+            #     if self.stepCount == (self.model.rounds - 1):
+            #         self.last_round = True
+            #     self.find_average_move()
+            #     if self.model.schedule_type != "Simultaneous":
+            #         self.advance()
+            #
+            # else:
+            #     print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
+            #     if self.stepCount == (self.model.rounds - 1):
+            #         self.last_round = True
+            #     self.find_average_move()
+            #     if self.model.schedule_type != "Simultaneous":
+            #         self.advance()
 
 
     def advance(self):
@@ -3242,21 +3190,70 @@ class PDAgent(Agent):
                             self.outputQtable(False)
 
                     self.outputData(False)
+
                     # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
-                    # TODO: APPEND PARTNER REMOVAL AND ADDITION REQUEST TO THE MODEL
                     self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
                     if self.model.checkTurn:
-                        removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list, self.rejected_partner_list,
+                        # =============== CHECK IF YOU ARE ELIGIBLE FOR RESTRUCTURING =============
+                        connections = []
+                        for i in self.model.agentsToRestructure:
+                            if i[0] == self.ID:
+                                # if we have a connection to evaluate,
+                                connections.append(i)
+                            else:
+                                pass
+
+                        # =============== CHECK IF RESTRUCTURE CONNECTION EXISTS AND WHAT TO DO W/ IT ==========
+                        break_check = []
+                        gain_check = []
+                        # then, for each of these, we check if that connection exists, and what to do with it
+                        if len(connections) > 0:
+                            for i in connections:
+                                if i[1] not in self.current_partner_list:
+                                    gain_check.append(i[1])
+                                else:
+                                    if i[1] in self.current_partner_list:
+                                        break_check.append(i[1])
+
+                        # TODO: this only happens once, when actually it needs to happen for each connection in the restructuring list.
+                        # TODO: partnerDecision needs to be a decision per partner, returning single removRequest over and over, which are each removed in that moment from the model
+
+                        if self.model.complexRestructuring:
+                            if len(break_check) > 0:
+                                for partnerID in break_check:
+                                    toBreak = True
+
+
+                            if len(self.current_partner_list) < self.model.maximumPartners:
+                                if len(gain_check) > 0:
+                                    for partnerID in gain_check:
+                                        toBreak = False
+                                        # then do the partner decision line
+                                        # TODO: THE ZEROES NEED TO BE FILLED WITH THEIR ACTUAL VARIABLES PLEASE
+                                        request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
+                                                                      self.ID, self.rejected_partner_list, self.working_memory[partnerID],
+                                                                      statistics.mean(self.working_memory[partnerID]), 0, self.model.CC,
+                                                                      self.model.reputationBlackboard[self.ID], self.mood,
+                                                                      50, self.model.reputationBlackboard[partnerID],
+                                                                      self.normalizedActorDegreeCentrality)
+                                        # check if the request is valid (aka, not Null) - if it is, send it to the model
+                                        #   if it isn't, ignore it
+                                        if request[1] != None:
+                                            self.model.graph_additions.append(request)
+                            # else:
+                            #   some kind of pruning behaviour
+
+                        else:
+                            removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list, self.rejected_partner_list,
                                                                                                  self.potential_partner_list, self.all_possible_partners,
                                                                                                  0.4, self.ID)
-
-                        if removRequest:
-                            if removRequest[1] != None:
-                                self.model.graph_removals.append(removRequest)
-                                self.current_partner_list.remove(removals)
-                        if addRequest:
-                            if addRequest[1] != None:
-                                self.model.graph_additions.append(addRequest)
+                            if removRequest:
+                                if removRequest[1] != None:
+                                    self.model.graph_removals.append(removRequest)
+                                    self.current_partner_list.remove(removals)
+                            if addRequest:
+                                if addRequest[1] != None:
+                                    self.model.graph_additions.append(addRequest)
 
                     # if additions not in self.current_partner_list:
                     #     self.current_partner_list.append(additions)
@@ -3548,8 +3545,8 @@ class PDAgent(Agent):
             elif self.partnerSelectionStrat == "REP":  # ===========================================================
                 print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
                 self.outputData(True)
-                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                self.partner_IDs = copy.deepcopy(self.current_partner_list)
+                #self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                #self.partner_IDs = copy.deepcopy(self.current_partner_list)
                 self.stepCount += 1
                 # self.check_partner(self.current_partner_list)
                 return

@@ -525,6 +525,8 @@ class PDModel(Model):
 
         # ========================== RANDOM GRAPH VARIABLES =============================
 
+        self.complexRestructuring = True
+
         self.initial_graphG = 0
         self.initial_graphD = {}
         self.updated_graphD = {}
@@ -548,6 +550,9 @@ class PDModel(Model):
 
         self.reputationBlackboard = {}
         # this is the reputation of every agent, aka the sum count of each agent's betrayals against a partner
+        # ======= this should be initialised with zeroes =======
+        for i in self.agentIDs:
+            self.reputationBlackboard[i] = 0
         self.forgivenessPeriod = forgivenessPeriod
         # how often we forgive previously bad agents (in number of play segments)
         self.maximumPartners = self.number_of_agents // 2
