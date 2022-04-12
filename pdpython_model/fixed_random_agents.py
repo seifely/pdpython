@@ -116,7 +116,7 @@ class PDAgent(Agent):
         self.globalAvPayoff = 0
         self.globalHighPayoff = 0  # effectively the highscore
         self.indivAvPayoff = {}
-        # self.oppAvPayoff = {}
+        self.oppAvPayoff = {}  # a store of our opponents' average scored against us
         self.proportional_score = 0  # this is used by the visualiser
 
         # self.average_payoff = 0  # should this be across partners or between them?
@@ -146,7 +146,7 @@ class PDAgent(Agent):
         self.moody_pp_aprime = {}
         self.moody_pp_payoff = {}
         self.moody_pp_oppPayoff = {}
-        self.pp_oppPayoff = {}  #  a version of the above (history of what my opponent scored against me) for normies to use
+        self.pp_oppPayoff = {}  #  a version of the above (history of what my opponent scored against me) for normies to use  # I think this is just one round long...
         self.moody_oldstates = {}
 
         self.moody_epsilon = copy.deepcopy(self.model.moody_epsilon)
@@ -203,7 +203,7 @@ class PDAgent(Agent):
 
         self.betrayals = 0
         # the number of times I have betrayed someone else who was cooperating with me
-        self.partnerSelectionStrat = "DEFAULT"
+        self.partnerSelectionStrat = self.model.selectionStrategy
         # Options for the above should be "DEFAULT", "SCORE", "REP",
         # Default is random partner changes
         self.currentForgiveness = copy.deepcopy(self.model.forgivenessPeriod)
@@ -1119,6 +1119,10 @@ class PDAgent(Agent):
                     partner_mood = sarsa_moody.getMoodType(partner.mood)
                     partner_UR = partner.utilityRatio
                     partner_PR = partner.payoffRatio
+                    if partner.indivAvPayoff.get(self.ID) is None:  # check if my opponent has an average payoff for me as a partner
+                        partner_avAgainstMe = 0  # if they don't, use zero as the placeholder for now
+                    else:
+                        partner_avAgainstMe = partner.indivAvPayoff[self.ID]  # if it's available, please use it
 
                     if self.itermove_result.get(partner_ID) is None:
                         my_move = self.model.startingBehav
@@ -1155,6 +1159,11 @@ class PDAgent(Agent):
 
                     if self.per_partner_tcoops.get(partner_ID) is None:
                         self.per_partner_tcoops[partner_ID] = 0
+
+                    if self.oppAvPayoff.get(partner_ID) is None:
+                        self.oppAvPayoff[partner_ID] = 0
+                    else:
+                        self.oppAvPayoff[partner_ID] = partner_avAgainstMe  # todo: this hopefully shouldn't break as i checked this up above
 
                     if self.per_partner_mutc.get(partner_ID) is None:
                         self.per_partner_mutc[partner_ID] = 0
@@ -1386,7 +1395,9 @@ class PDAgent(Agent):
 
             this_partner_move = self.partner_latest_move[i]
             outcome = [my_move, this_partner_move]
-
+            if my_move == 'D':
+                if this_partner_move == 'C':
+                    self.model.reputationBlackboard[self.ID] += 1  # Here we increment our model rep each time we betray
 
             if my_move == 'C':
                 self.per_partner_mcoops[i] += 1
@@ -2798,6 +2809,7 @@ class PDAgent(Agent):
                 return zeroes
 
     def averageScoreComparison(self, oppID, moodyStrat, current_partners):
+        """ Returns my average score, compared with a specific partner? """
         scores = {}
         payoffs = {}
         recent_payoffs = {}
@@ -3193,7 +3205,7 @@ class PDAgent(Agent):
 
                     # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
                     self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                    if self.model.checkTurn:
+                    if self.model.checkTurn:      # todo: this needs to  be repeated on all the other checkturns
                         # =============== CHECK IF YOU ARE ELIGIBLE FOR RESTRUCTURING =============
                         connections = []
                         for i in self.model.agentsToRestructure:
@@ -3202,6 +3214,7 @@ class PDAgent(Agent):
                                 connections.append(i)
                             else:
                                 pass
+
 
                         # =============== CHECK IF RESTRUCTURE CONNECTION EXISTS AND WHAT TO DO W/ IT ==========
                         break_check = []
@@ -3222,12 +3235,14 @@ class PDAgent(Agent):
                             if len(break_check) > 0:
                                 for partnerID in break_check:
                                     toBreak = True
-
+                                    #print("1my partners are", self.current_partner_list)
+                                    #print("1my wm is:", self.working_memory)
+                                    #print("1my pp_oppP is:", self.pp_oppPayoff[partnerID])
                                     request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
                                                                   self.ID, self.rejected_partner_list,
                                                                   self.working_memory[partnerID],
-                                                                  statistics.mean(self.working_memory[partnerID]),
-                                                                  statistics.mean(self.pp_oppPayoff[partnerID]),
+                                                                  self.indivAvPayoff[partnerID],  # using this instead of working memory as sometimes wm breaks
+                                                                  self.oppAvPayoff[partnerID],
                                                                   self.model.CC,
                                                                   self.model.reputationBlackboard[self.ID],
                                                                   self.mood,
@@ -3235,6 +3250,7 @@ class PDAgent(Agent):
                                                                   self.normalizedActorDegreeCentrality)
                                     # check if the request is valid (aka, not Null) - if it is, send it to the model
                                     #   if it isn't, ignore it
+                                    #print("1request outcome was ", request)
                                     if request[1] != None:
                                         self.model.graph_removals.append(request)
                                         self.rejected_partner_list.append(partnerID)
@@ -3245,12 +3261,14 @@ class PDAgent(Agent):
                                     for partnerID in gain_check:
                                         toBreak = False
                                         # then do the partner decision line
-                                        # TODO: the zero needs to be replaced with my partner's scores against me
+                                        #print("2my partners are", self.current_partner_list)
+                                        #print("2my wm is:", self.working_memory)
+                                        #print("2my pp_oppP is:", 0)
                                         request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
                                                                       self.ID, self.rejected_partner_list,
-                                                                      self.working_memory[partnerID],
-                                                                      statistics.mean(self.working_memory[partnerID]),
-                                                                      statistics.mean(self.pp_oppPayoff[partnerID]),
+                                                                      [0, 0, 0, 0, 0, 0, 0],
+                                                                      0,
+                                                                      0,
                                                                       self.model.CC,
                                                                       self.model.reputationBlackboard[self.ID],
                                                                       self.mood,
@@ -3258,6 +3276,7 @@ class PDAgent(Agent):
                                                                       self.normalizedActorDegreeCentrality)
                                         # check if the request is valid (aka, not Null) - if it is, send it to the model
                                         #   if it isn't, ignore it
+                                        #print("2request outcome was ", request)
                                         if request[1] != None:
                                             self.model.graph_additions.append(request)
                             # else:
@@ -3443,18 +3462,95 @@ class PDAgent(Agent):
                     # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
                     # print("garf", self.model.updated_graphD)
                     self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                    if self.model.checkTurn:
-                        removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
-                                                                                                 self.rejected_partner_list,
-                                                                                                 self.potential_partner_list,
-                                                                                                 self.all_possible_partners,
+                    if self.model.checkTurn:      # todo: this needs to  be repeated on all the other checkturns
+                        # =============== CHECK IF YOU ARE ELIGIBLE FOR RESTRUCTURING =============
+                        connections = []
+                        for i in self.model.agentsToRestructure:
+                            if i[0] == self.ID:
+                                # if we have a connection to evaluate,
+                                connections.append(i)
+                            else:
+                                pass
+
+
+                        # =============== CHECK IF RESTRUCTURE CONNECTION EXISTS AND WHAT TO DO W/ IT ==========
+                        break_check = []
+                        gain_check = []
+                        # then, for each of these, we check if that connection exists, and what to do with it
+                        if len(connections) > 0:
+                            for i in connections:
+                                if i[1] not in self.current_partner_list:
+                                    gain_check.append(i[1])
+                                else:
+                                    if i[1] in self.current_partner_list:
+                                        break_check.append(i[1])
+
+                        # TODO: this only happens once, when actually it needs to happen for each connection in the restructuring list.
+                        # TODO: partnerDecision needs to be a decision per partner, returning single removRequest over and over, which are each removed in that moment from the model
+
+                        if self.model.complexRestructuring:
+                            if len(break_check) > 0:
+                                for partnerID in break_check:
+                                    toBreak = True
+                                    #print("3my partners are", self.current_partner_list)
+                                    #print("3my wm is:", self.working_memory)
+                                    #print("3my pp_oppP is:", self.moody_pp_oppPayoff[partnerID])
+                                    request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
+                                                                  self.ID, self.rejected_partner_list,
+                                                                  self.working_memory[partnerID],
+                                                                  self.indivAvPayoff[partnerID],  # using this instead of working memory as sometimes wm breaks
+                                                                  self.oppAvPayoff[partnerID],
+                                                                  self.model.CC,
+                                                                  self.model.reputationBlackboard[self.ID],
+                                                                  self.mood,
+                                                                  50, self.model.reputationBlackboard[partnerID],
+                                                                  self.normalizedActorDegreeCentrality)
+                                    # check if the request is valid (aka, not Null) - if it is, send it to the model
+                                    #   if it isn't, ignore it
+                                    # print("3request outcome was ", request)
+                                    if request[1] != None:
+                                        self.model.graph_removals.append(request)
+                                        self.rejected_partner_list.append(partnerID)
+                                        self.current_partner_list.remove(partnerID)
+
+                            if len(self.current_partner_list) < self.model.maximumPartners:
+                                if len(gain_check) > 0:
+                                    for partnerID in gain_check:
+                                        toBreak = False
+                                        # then do the partner decision line
+                                        #print("4my partners are", self.current_partner_list)
+                                        #print("4my wm is:", self.working_memory)
+                                        #print("4my pp_oppP is:", 0)
+                                        request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
+                                                                      self.ID, self.rejected_partner_list,
+                                                                      [0,0,0,0,0,0,0],
+                                                                      0,
+                                                                      0,
+                                                                      self.model.CC,
+                                                                      self.model.reputationBlackboard[self.ID],
+                                                                      self.mood,
+                                                                      50, self.model.reputationBlackboard[partnerID],
+                                                                      self.normalizedActorDegreeCentrality)
+                                        # check if the request is valid (aka, not Null) - if it is, send it to the model
+                                        #   if it isn't, ignore it
+                                        #print("4request outcome was ", request)
+                                        if request[1] != None:
+                                            self.model.graph_additions.append(request)
+                            # else:
+                            #   todo: some kind of pruning behaviour
+
+                        else:
+                            removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list, self.rejected_partner_list,
+                                                                                                 self.potential_partner_list, self.all_possible_partners,
                                                                                                  0.4, self.ID)
-                        if removRequest:
-                            if removRequest[1] != None:
-                                self.model.graph_removals.append(removRequest)
-                        if addRequest:
-                            if addRequest[1] != None:
-                                self.model.graph_additions.append(addRequest)
+                            if removRequest:
+                                if removRequest[1] != None:
+                                    self.model.graph_removals.append(removRequest)
+                                    self.current_partner_list.remove(removals)
+                                    self.rejected_partner_list.append(removals)
+                            if addRequest:
+                                if addRequest[1] != None:
+                                    self.model.graph_additions.append(addRequest)
 
                     # if additions not in self.current_partner_list:
                     #     self.current_partner_list.append(additions)
@@ -3499,19 +3595,93 @@ class PDAgent(Agent):
                     self.outputData(False)
                     # =============== UPDATE YOUR PARTNERS AND WHO U WANT AS PARTNERS =========
                     self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                    if self.model.checkTurn:
-                        removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
-                                                                                                 self.rejected_partner_list,
-                                                                                                 self.potential_partner_list,
-                                                                                                 self.all_possible_partners,
+                    if self.model.checkTurn:      # todo: this needs to  be repeated on all the other checkturns
+                        # =============== CHECK IF YOU ARE ELIGIBLE FOR RESTRUCTURING =============
+                        connections = []
+                        for i in self.model.agentsToRestructure:
+                            if i[0] == self.ID:
+                                # if we have a connection to evaluate,
+                                connections.append(i)
+                            else:
+                                pass
+
+
+                        # =============== CHECK IF RESTRUCTURE CONNECTION EXISTS AND WHAT TO DO W/ IT ==========
+                        break_check = []
+                        gain_check = []
+                        # then, for each of these, we check if that connection exists, and what to do with it
+                        if len(connections) > 0:
+                            for i in connections:
+                                if i[1] not in self.current_partner_list:
+                                    gain_check.append(i[1])
+                                else:
+                                    if i[1] in self.current_partner_list:
+                                        break_check.append(i[1])
+
+                        # TODO: this only happens once, when actually it needs to happen for each connection in the restructuring list.
+                        # TODO: partnerDecision needs to be a decision per partner, returning single removRequest over and over, which are each removed in that moment from the model
+
+                        if self.model.complexRestructuring:
+                            if len(break_check) > 0:
+                                for partnerID in break_check:
+                                    toBreak = True
+                                    #print("5my partners are", self.current_partner_list)
+                                    #print("5my wm is:", self.working_memory)
+                                    request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
+                                                                  self.ID, self.rejected_partner_list,
+                                                                  self.working_memory[partnerID],
+                                                                  self.indivAvPayoff[partnerID],
+                                                                  self.oppAvPayoff[partnerID],
+                                                                  self.model.CC,
+                                                                  self.model.reputationBlackboard[self.ID],
+                                                                  self.mood,
+                                                                  50, self.model.reputationBlackboard[partnerID],
+                                                                  self.normalizedActorDegreeCentrality)
+                                    # check if the request is valid (aka, not Null) - if it is, send it to the model
+                                    #   if it isn't, ignore it
+                                    #print("5request outcome was ", request)
+                                    if request[1] != None:
+                                        self.model.graph_removals.append(request)
+                                        self.rejected_partner_list.append(partnerID)
+                                        self.current_partner_list.remove(partnerID)
+
+                            if len(self.current_partner_list) < self.model.maximumPartners:
+                                if len(gain_check) > 0:
+                                    for partnerID in gain_check:
+                                        toBreak = False
+                                        # then do the partner decision line
+                                        #print("6my partners are", self.current_partner_list)
+                                        #print("6my wm is:", self.working_memory)
+                                        request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
+                                                                      self.ID, self.rejected_partner_list,
+                                                                      [0, 0, 0, 0, 0, 0, 0],
+                                                                      0,
+                                                                      0,
+                                                                      self.model.CC,
+                                                                      self.model.reputationBlackboard[self.ID],
+                                                                      self.mood,
+                                                                      50, self.model.reputationBlackboard[partnerID],
+                                                                      self.normalizedActorDegreeCentrality)
+                                        # check if the request is valid (aka, not Null) - if it is, send it to the model
+                                        #   if it isn't, ignore it
+                                        #print("6request outcome was ", request)
+                                        if request[1] != None:
+                                            self.model.graph_additions.append(request)
+                            # else:
+                            #   todo: some kind of pruning behaviour
+
+                        else:
+                            removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list, self.rejected_partner_list,
+                                                                                                 self.potential_partner_list, self.all_possible_partners,
                                                                                                  0.4, self.ID)
-                        if removRequest:
-                            if removRequest[1] != None:
-                                self.model.graph_removals.append(removRequest)
-                                self.current_partner_list.remove(removals)
-                        if addRequest:
-                            if addRequest[1] != None:
-                                self.model.graph_additions.append(addRequest)
+                            if removRequest:
+                                if removRequest[1] != None:
+                                    self.model.graph_removals.append(removRequest)
+                                    self.current_partner_list.remove(removals)
+                                    self.rejected_partner_list.append(removals)
+                            if addRequest:
+                                if addRequest[1] != None:
+                                    self.model.graph_additions.append(addRequest)
 
                     # if additions not in self.current_partner_list:
                     #     self.current_partner_list.append(additions)
@@ -3532,19 +3702,93 @@ class PDAgent(Agent):
                 # Find a new partner?
                 self.outputData(False)
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                if self.model.checkTurn:
-                    removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(self.current_partner_list,
-                                                                                             self.rejected_partner_list,
-                                                                                             self.potential_partner_list,
-                                                                                             self.all_possible_partners,
-                                                                                             0.4, self.ID)
-                    # if removRequest:
-                    #     if removRequest[1] != None:
-                    #         self.model.graph_removals.append(removRequest)
-                    #         self.current_partner_list.remove(removals)
-                    if addRequest:
-                        if addRequest[1] != None:
-                            self.model.graph_additions.append(addRequest)
+                if self.model.checkTurn:  # todo: this needs to  be repeated on all the other checkturns
+                    # =============== CHECK IF YOU ARE ELIGIBLE FOR RESTRUCTURING =============
+                    connections = []
+                    for i in self.model.agentsToRestructure:
+                        if i[0] == self.ID:
+                            # if we have a connection to evaluate,
+                            connections.append(i)
+                        else:
+                            pass
+
+                    # =============== CHECK IF RESTRUCTURE CONNECTION EXISTS AND WHAT TO DO W/ IT ==========
+                    break_check = []
+                    gain_check = []
+                    # then, for each of these, we check if that connection exists, and what to do with it
+                    if len(connections) > 0:
+                        for i in connections:
+                            if i[1] not in self.current_partner_list:
+                                gain_check.append(i[1])
+                            else:
+                                if i[1] in self.current_partner_list:
+                                    break_check.append(i[1])
+
+                    # TODO: this only happens once, when actually it needs to happen for each connection in the restructuring list.
+                    # TODO: partnerDecision needs to be a decision per partner, returning single removRequest over and over, which are each removed in that moment from the model
+
+                    if self.model.complexRestructuring:
+                        if len(break_check) > 0:
+                            for partnerID in break_check:
+                                toBreak = True
+                                print("7my partners are", self.current_partner_list)
+                                print("7my wm is:", self.working_memory)
+                                request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
+                                                              self.ID, self.rejected_partner_list,
+                                                              self.working_memory[partnerID],
+                                                              statistics.mean(self.working_memory[partnerID]),
+                                                              statistics.mean(self.pp_oppPayoff[partnerID]),
+                                                              self.model.CC,
+                                                              self.model.reputationBlackboard[self.ID],
+                                                              self.mood,
+                                                              50, self.model.reputationBlackboard[partnerID],
+                                                              self.normalizedActorDegreeCentrality)
+                                # check if the request is valid (aka, not Null) - if it is, send it to the model
+                                #   if it isn't, ignore it
+                                print("7request outcome was ", request)
+                                if request[1] != None:
+                                    self.model.graph_removals.append(request)
+                                    self.rejected_partner_list.append(partnerID)
+                                    self.current_partner_list.remove(partnerID)
+
+                        if len(self.current_partner_list) < self.model.maximumPartners:
+                            if len(gain_check) > 0:
+                                for partnerID in gain_check:
+                                    toBreak = False
+                                    # then do the partner decision line
+                                    print("8my partners are", self.current_partner_list)
+                                    print("8my wm is:", self.working_memory)
+                                    request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
+                                                                  self.ID, self.rejected_partner_list,
+                                                                  [0, 0, 0, 0, 0, 0, 0],
+                                                                  0,
+                                                                  0,
+                                                                  self.model.CC,
+                                                                  self.model.reputationBlackboard[self.ID],
+                                                                  self.mood,
+                                                                  50, self.model.reputationBlackboard[partnerID],
+                                                                  self.normalizedActorDegreeCentrality)
+                                    # check if the request is valid (aka, not Null) - if it is, send it to the model
+                                    #   if it isn't, ignore it
+                                    print("8request outcome was ", request)
+                                    if request[1] != None:
+                                        self.model.graph_additions.append(request)
+                        # else:
+                        #   todo: some kind of pruning behaviour
+
+                    else:
+                        removRequest, addRequest, removals, additions = rnf.basicPartnerDecision(
+                            self.current_partner_list, self.rejected_partner_list,
+                            self.potential_partner_list, self.all_possible_partners,
+                            0.4, self.ID)
+                        if removRequest:
+                            if removRequest[1] != None:
+                                self.model.graph_removals.append(removRequest)
+                                self.current_partner_list.remove(removals)
+                                self.rejected_partner_list.append(removals)
+                        if addRequest:
+                            if addRequest[1] != None:
+                                self.model.graph_additions.append(addRequest)
 
                 # if additions not in self.current_partner_list:
                 #     self.current_partner_list.append(additions)
@@ -3555,7 +3799,7 @@ class PDAgent(Agent):
                 return
         else:
             if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
-                print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
+                #print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
                 self.outputData(True)  # TODO: need to find out where to put this so that it doesn't break
                 # TODO: Or, make it output a null/zeroes for this turn because it's a changeover round/can we duplicate the last round's outputs
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
@@ -3564,15 +3808,15 @@ class PDAgent(Agent):
                 # self.check_partner(self.current_partner_list)
                 return
             elif self.partnerSelectionStrat == "REP":  # ===========================================================
-                print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
+                #print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
                 self.outputData(True)
-                #self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
-                #self.partner_IDs = copy.deepcopy(self.current_partner_list)
+                self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
+                self.partner_IDs = copy.deepcopy(self.current_partner_list)
                 self.stepCount += 1
                 # self.check_partner(self.current_partner_list)
                 return
             elif self.partnerSelectionStrat == "SCORE":  # ===========================================================
-                print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
+                #print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
                 self.outputData(True)
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
                 self.partner_IDs = copy.deepcopy(self.current_partner_list)

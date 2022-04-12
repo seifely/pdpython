@@ -451,6 +451,7 @@ class PDModel(Model):
                  forgivenessPeriod=0,
                  maximumPartners=0,
                  rewirePercentage=0.1,
+                 selectionStrategy="DEFAULT",
                  ):
 
         # ---------- Model Parameters --------
@@ -562,6 +563,7 @@ class PDModel(Model):
         self.agentsToRestructure = []
         # how many
         # TODO: Add these as inputs in the batchrunner? Or are we keeping these consistent?
+        self.selectionStrategy = selectionStrategy
 
         self.checkTurn = False
         self.resetTurn = False
@@ -635,7 +637,8 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('swaptest_%s-%s-%s-%s_round%s_mood%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.change_frequency, self.moody_startmood, self.graph_probability, self.width, self.width, self.moody_MA,
+                #todo : this is the most used one, below vvvvv
+                concatenator = ('scoreswaptest_%s-%s-%s-%s_round%s_mood%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.change_frequency, self.moody_startmood, self.graph_probability, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1342,6 +1345,7 @@ br_params = {#"number_of_agents": [64],
              #"sensitivity": [0],
              "sensitive_agents": [(0,), #(0, 13]),
                                   ],  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
+             "selectionStrategy": ["SCORE"]
              }
 
 

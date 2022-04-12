@@ -214,32 +214,34 @@ def partnerDecision(breakCheck, selectionStrategy, partnerID, myID, rejectedPart
     request = []
     #removal = 0
     #addition = 0
+    request.append(myID)
+    request.append(None)
 
     if selectionStrategy == "DEFAULT":
         # the default is to make these decisions at random, so we will gain and lose them randomly
         if breakCheck:
             r = random.random()
             if r > 0.5:
-                request.append(myID)
-                request.append(partnerID)
+                # request.append(myID)
+                request[1] = partnerID
                 #removal = partnerID
         else:
             if partnerID not in rejectedPartners:
                 r = random.random()
                 if r > 0.5:
-                    request.append(myID)
-                    request.append(partnerID)
+                    # request.append(myID)
+                    request[1] = partnerID
                     #addition = partnerID
 
     elif selectionStrategy == "SCORE":
         if breakCheck:
             if scoreCheck(scoreAgainst, partnerScore, scoreThreshold):
-                request.append(myID)
-                request.append(partnerID)
+                # request.append(myID)
+                request[1] = partnerID
         else:
             if partnerID not in rejectedPartners:
-                request.append(myID)
-                request.append(partnerID)
+                # request.append(myID)
+                request[1] = partnerID
 
     elif selectionStrategy == "REP":
         pass
