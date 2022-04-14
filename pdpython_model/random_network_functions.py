@@ -244,9 +244,28 @@ def partnerDecision(breakCheck, selectionStrategy, partnerID, myID, rejectedPart
                 request[1] = partnerID
 
     elif selectionStrategy == "REP":
-        pass
+        if breakCheck:
+            if partnerRep > myRep:
+                request[1] = partnerID
+        else:
+            if partnerID not in rejectedPartners:
+                if partnerRep > myRep:
+                    request[1] = partnerID
     else:
-        pass
+        # this is just the default strategy, as a backup in case something goes wrong
+        if breakCheck:
+            r = random.random()
+            if r > 0.5:
+                # request.append(myID)
+                request[1] = partnerID
+                # removal = partnerID
+        else:
+            if partnerID not in rejectedPartners:
+                r = random.random()
+                if r > 0.5:
+                    # request.append(myID)
+                    request[1] = partnerID
+                    # addition = partnerID
 
     return tuple(request)  # , removal, addition
 

@@ -3011,7 +3011,7 @@ class PDAgent(Agent):
                     print("----------------------------------------------------------")
         else:
             # We need to generate a number of partners that are allowed to switch and w/ whom they form a new connection
-            print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
+            #print("IT'S A RESET TURN! and my selection strat is,", self.partnerSelectionStrat)
             """ If it's a reset round where we just change partners, all we want to do is update our partner list.
                 The method by which I do this is randomly, for this section. """
             self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
@@ -3798,6 +3798,9 @@ class PDAgent(Agent):
                 self.stepCount += 1
                 return
         else:
+            if self.model.forgivenessTurn:
+                self.rejected_partner_list = []
+
             if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
                 #print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
                 self.outputData(True)  # TODO: need to find out where to put this so that it doesn't break
@@ -3812,7 +3815,9 @@ class PDAgent(Agent):
                 self.outputData(True)
                 self.current_partner_list = copy.deepcopy(self.model.updated_graphD[self.ID])
                 self.partner_IDs = copy.deepcopy(self.current_partner_list)
-                self.stepCount += 1
+                self.stepCount += 1   # tekkers
+
+
                 # self.check_partner(self.current_partner_list)
                 return
             elif self.partnerSelectionStrat == "SCORE":  # ===========================================================

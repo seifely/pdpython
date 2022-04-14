@@ -448,7 +448,7 @@ class PDModel(Model):
                  sensitivity=0,
                  graph_probability=0.2,
                  changeFrequency=5,
-                 forgivenessPeriod=0,
+                 forgivenessPeriod=5,
                  maximumPartners=0,
                  rewirePercentage=0.1,
                  selectionStrategy="DEFAULT",
@@ -567,6 +567,8 @@ class PDModel(Model):
 
         self.checkTurn = False
         self.resetTurn = False
+        self.forgivenessTurn = False
+        self.forgivenessCountdown = self.forgivenessPeriod
 
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
@@ -1235,10 +1237,19 @@ class PDModel(Model):
         self.datacollector.collect(self)
         self.get_highest_score()
         self.reset_values()
+        if self.forgivenessTurn:
+            self.forgivenessTurn = False
         if self.checkTurn:
             self.resetTurn = True
+            self.forgivenessCountdown -= 1  # for each reset turn we have, count down once on the forgiveness for partners
         if not self.checkTurn:
             self.resetTurn = False
+        if self.forgivenessCountdown == 0:
+            # todo: this SHOULD allow agents to also reset their rejected partner lists
+            self.forgivenessTurn = True
+            self.forgivenessCountdown = copy.deepcopy(self.forgivenessPeriod)
+            for i in self.agentIDs:
+                self.reputationBlackboard[i] = 0  # reset the agent blackboard
 
         # Update the graph using rnf and the agent's requests for changes
         # print("graph D", self.updated_graphD)
@@ -1356,7 +1367,7 @@ br_params = {#"number_of_agents": [64],
 br = BatchRunner(PDModel,
                  br_params,
                  iterations=5,
-                 max_steps=50,  # This should be 10k, but have set it to 5k because it now takes ages to run
+                 max_steps=100,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
