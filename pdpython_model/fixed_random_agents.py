@@ -1835,7 +1835,7 @@ class PDAgent(Agent):
     def output_data_to_file(self, outcomes):
         """ Outputs the data collected each turn on multiple agent variables to a .csv file"""
 
-        for m in self.per_partner_strategies:
+        for m in self.current_partner_list:
             if self.per_partner_strategies[m] == self.strategy:
                 self.similar_partners += 1
 
@@ -3732,8 +3732,8 @@ class PDAgent(Agent):
                         if len(break_check) > 0:
                             for partnerID in break_check:
                                 toBreak = True
-                                print("7my partners are", self.current_partner_list)
-                                print("7my wm is:", self.working_memory)
+                                # print("7my partners are", self.current_partner_list)
+                                # print("7my wm is:", self.working_memory)
                                 request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
                                                               self.ID, self.rejected_partner_list,
                                                               self.working_memory[partnerID],
@@ -3746,7 +3746,7 @@ class PDAgent(Agent):
                                                               self.normalizedActorDegreeCentrality)
                                 # check if the request is valid (aka, not Null) - if it is, send it to the model
                                 #   if it isn't, ignore it
-                                print("7request outcome was ", request)
+                                # print("7request outcome was ", request)
                                 if request[1] != None:
                                     self.model.graph_removals.append(request)
                                     self.rejected_partner_list.append(partnerID)
@@ -3757,8 +3757,8 @@ class PDAgent(Agent):
                                 for partnerID in gain_check:
                                     toBreak = False
                                     # then do the partner decision line
-                                    print("8my partners are", self.current_partner_list)
-                                    print("8my wm is:", self.working_memory)
+                                    # print("8my partners are", self.current_partner_list)
+                                    # print("8my wm is:", self.working_memory)
                                     request = rnf.partnerDecision(toBreak, self.partnerSelectionStrat, partnerID,
                                                                   self.ID, self.rejected_partner_list,
                                                                   [0, 0, 0, 0, 0, 0, 0],
@@ -3771,7 +3771,7 @@ class PDAgent(Agent):
                                                                   self.normalizedActorDegreeCentrality)
                                     # check if the request is valid (aka, not Null) - if it is, send it to the model
                                     #   if it isn't, ignore it
-                                    print("8request outcome was ", request)
+                                    # print("8request outcome was ", request)
                                     if request[1] != None:
                                         self.model.graph_additions.append(request)
                         # else:
@@ -3801,7 +3801,7 @@ class PDAgent(Agent):
         else:
             if self.model.forgivenessTurn:
                 self.rejected_partner_list = []
-
+            self.similar_partners = 0
             if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
                 #print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
                 self.outputData(True)  # TODO: need to find out where to put this so that it doesn't break

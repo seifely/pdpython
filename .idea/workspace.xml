@@ -39,8 +39,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="474">
-                  <caret line="105" column="44" selection-start-line="105" selection-start-column="44" selection-end-line="105" selection-end-column="44" />
+                <state relative-caret-position="152">
+                  <caret line="1837" column="42" selection-start-line="1837" selection-start-column="42" selection-end-line="1837" selection-end-column="42" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                     <element signature="e#75607#92088#0" />
@@ -149,9 +149,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.working_memory</find>
-      <find>mean</find>
-      <find>average</find>
       <find>removRe</find>
       <find>checkT</find>
       <find>update_gra</find>
@@ -179,6 +176,9 @@
       <find>similar_partn</find>
       <find>self.reset_values(</find>
       <find>reset_values</find>
+      <find>n_part</find>
+      <find>numbPartners</find>
+      <find>self.similar_partners</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -416,7 +416,7 @@
       <window_info id="Favorites" order="2" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32827735" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49947312" weight="0.30985916" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49947312" visible="true" weight="0.30985916" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -720,8 +720,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="474">
-          <caret line="105" column="44" selection-start-line="105" selection-start-column="44" selection-end-line="105" selection-end-column="44" />
+        <state relative-caret-position="152">
+          <caret line="1837" column="42" selection-start-line="1837" selection-start-column="42" selection-end-line="1837" selection-end-column="42" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
             <element signature="e#75607#92088#0" />

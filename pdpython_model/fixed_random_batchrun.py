@@ -1291,7 +1291,7 @@ class PDModel(Model):
         # if self.step_count >= self.rounds:
             # sys.exit()  # Do we need it to kill itself?
 
-    def run_model(self, rounds=50):
+    def run_model(self, rounds=3000):
         for i in range(self.rounds):
             self.step()
 
