@@ -2460,6 +2460,7 @@ class PDAgent(Agent):
         self.number_of_c = 0
         self.update_value = self.init_uv
         self.mutual_c_outcome = 0
+        self.similar_partners = 0
 
     # TODO: Move all the kNN stuff to a separate script that we just reference
 
