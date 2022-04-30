@@ -1891,7 +1891,7 @@ class PDAgent(Agent):
 
         """ When changing over to random network agents, there was some kind of background bug in the data 
         output where each round's number of c/number of d was correct for the round AFTER (some misalignment
-        in the csv) - this below is a temporary fix for that to save time. """
+        in the csv) - this below is a temporary fix for that tso save time. """
         dCount = 0
         cCount = 0
         for n in self.current_partner_list:
@@ -3163,7 +3163,7 @@ class PDAgent(Agent):
                             #     print("It's turn ", self.stepCount)
                             #     print("My mood going into this was ", self.mood)
                             #     print("My values were ", reward, myAv, oppScore, oppAv)
-                            self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+                            self.mood, self.sensitivity_mod = sarsa_moody.update_mood_new(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                             # if self.ID == 9:
                             #     print("My mood coming out of it was ", self.mood)
 
@@ -3412,7 +3412,7 @@ class PDAgent(Agent):
                         #     print("It's turn ", self.stepCount)
                         #     print("My mood going into this was ", self.mood)
                         #     print("My values were ", reward, myAv, oppScore, oppAv)
-                        self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+                        self.mood, self.sensitivity_mod = sarsa_moody.update_mood_new(self.mood, reward, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
                         # if self.ID == 9:
                             # print("My mood coming out of it was ", self.mood)
 
@@ -3451,7 +3451,7 @@ class PDAgent(Agent):
                         # Update how we feel
                         # TODO: update mood earlier, after each Q value update??
                         # myAv, oppAv, oppScore = self.averageScoreComparison(i)
-                        # self.mood = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
+                        # self.mood = sarsa_moody.update_mood_new(self.mood, self.score, myAv, oppScore, oppAv, False, 0)
 
                     if self.model.moody_export_q:
                         if self.stepCount == 1:
@@ -3577,7 +3577,7 @@ class PDAgent(Agent):
                         for i in self.partner_IDs:
                             myAv, oppAv, oppScore = self.averageScoreComparison(i, False, self.current_partner_list)
                             # TODO: ARE THE SCORES BELOW SCORES AGAINST EACH PARTNER, OR ARE THEY TOTAL SCORES?
-                            self.mood, self.sensitivity_mod = sarsa_moody.update_mood_old(self.mood, self.score, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
+                            self.mood, self.sensitivity_mod = sarsa_moody.update_mood_new(self.mood, self.score, myAv, oppScore, oppAv, self.sensitive, self.sensitivity_mod)
 
                     if self.last_round:
                         if self.strategy == 'VPP':
