@@ -1713,7 +1713,9 @@ class PDAgent(Agent):
                                   'groupDegreeCent_%d' % self.ID,
                                   'globav_%d' % self.ID,
                                   'sensitivity_%d' % self.ID,
-                                  'epsilon_%d' % self.ID]
+                                  'epsilon_%d' % self.ID,
+                                  #'rejected_%d' % self.ID
+                                  ]
 
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -1753,7 +1755,9 @@ class PDAgent(Agent):
                                   'groupDegreeCent_%d' % self.ID: IGDC,
                                   'globav_%d' % self.ID: self.globalAvPayoff,
                                   'sensitivity_%d' % self.ID: self.sensitivity_mod,
-                                  'epsilon_%d' % self.ID: self.epsilon,})
+                                  'epsilon_%d' % self.ID: self.epsilon,
+                                  #'rejected_%d' % self.ID: self.rejected_partner_list
+                                   })
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
 
@@ -1788,7 +1792,9 @@ class PDAgent(Agent):
                                   'groupDegreeCent_%d' % self.ID,
                                   'globav_%d' % self.ID,
                                   'sensitivity_%d' % self.ID,
-                                  'epsilon_%d' % self.ID]
+                                  'epsilon_%d' % self.ID,
+                                  #'rejected_%d' % self.ID
+                                  ]
 
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -1828,7 +1834,9 @@ class PDAgent(Agent):
                          'groupDegreeCent_%d' % self.ID: IGDC,
                          'globav_%d' % self.ID: self.globalAvPayoff,
                          'sensitivity_%d' % self.ID: self.sensitivity_mod,
-                         'epsilon_%d' % self.ID: self.epsilon, })
+                         'epsilon_%d' % self.ID: self.epsilon,
+                         #'rejected_%d' % self.ID: self.rejected_partner_list
+                         })
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
 
@@ -2030,7 +2038,9 @@ class PDAgent(Agent):
                                   'groupDegreeCent_%d' % self.ID,
                                   'globav_%d' % self.ID,
                                   'sensitivity_%d' % self.ID,
-                                  'epsilon_%d' % self.ID]
+                                  'epsilon_%d' % self.ID,
+                                  #'rejected_%d' % self.ID
+                                  ]
 
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -2070,7 +2080,9 @@ class PDAgent(Agent):
                                   'groupDegreeCent_%d' % self.ID: IGDC,
                                   'globav_%d' % self.ID: self.globalAvPayoff,
                                   'sensitivity_%d' % self.ID: self.sensitivity_mod,
-                                  'epsilon_%d' % self.ID: self.epsilon,})
+                                  'epsilon_%d' % self.ID: self.epsilon,
+                                  #'rejected_%d' % self.ID: self.rejected_partner_list
+                                   })
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
 
@@ -2105,7 +2117,9 @@ class PDAgent(Agent):
                                   'groupDegreeCent_%d' % self.ID,
                                   'globav_%d' % self.ID,
                                   'sensitivity_%d' % self.ID,
-                                  'epsilon_%d' % self.ID]
+                                  'epsilon_%d' % self.ID,
+                                  #'rejected_%d' % self.ID
+                                  ]
 
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -2145,7 +2159,9 @@ class PDAgent(Agent):
                          'groupDegreeCent_%d' % self.ID: IGDC,
                          'globav_%d' % self.ID: self.globalAvPayoff,
                          'sensitivity_%d' % self.ID: self.sensitivity_mod,
-                         'epsilon_%d' % self.ID: self.epsilon, })
+                         'epsilon_%d' % self.ID: self.epsilon,
+                         #'rejected_%d' % self.ID: self.rejected_partner_list
+                         })
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
 
@@ -3801,6 +3817,7 @@ class PDAgent(Agent):
         else:
             if self.model.forgivenessTurn:
                 self.rejected_partner_list = []
+                self.indivAvPayoff = {}
             self.similar_partners = 0
             if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
                 #print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)

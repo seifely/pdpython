@@ -640,7 +640,7 @@ class PDModel(Model):
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
                 #todo : this is the most used one, below vvvvv
-                concatenator = ('score30Rewire_%s-%s-%s-%s_round%s_mood%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.change_frequency, self.moody_startmood, self.graph_probability, self.width, self.width, self.moody_MA,
+                concatenator = ('restructure%s_%s-%s-%s-%s_round%s_mood%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.change_frequency, self.DC, self.CC, self.DD, self.CD, self.change_frequency, self.moody_startmood, self.graph_probability, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1352,13 +1352,20 @@ br_params = {#"number_of_agents": [64],
              "startingBehav": ['C',
                               #'D',
                               ],
-             "changeFrequency": [5],
+             "changeFrequency": [5,
+                                 10,
+                                 15],
              #"sensitivity": [0],
              "sensitive_agents": [(0,), #(0, 13]),
                                   ],  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
              "selectionStrategy": ["SCORE"],
-             "rewirePercentage": [#0.1,
-                                  0.3],
+             "rewirePercentage": [0.1,
+                                  #0.3
+                                  ],
+             "forgivenessPeriod": [#5,
+                                   #200,
+                                   1000
+                                    ],
              }
 
 
@@ -1369,7 +1376,7 @@ br_params = {#"number_of_agents": [64],
 br = BatchRunner(PDModel,
                  br_params,
                  iterations=5,
-                 max_steps=10000,  # This should be 10k, but have set it to 5k because it now takes ages to run
+                 max_steps=50000,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

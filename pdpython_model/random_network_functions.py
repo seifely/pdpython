@@ -201,6 +201,7 @@ def basicPartnerDecision(current_partners, rejected_partners, untested_partners,
 
 def scoreCheck(my_av, their_av, threshold):
     breakCheck = False
+    # Currently this prioritises getting a score against someone of 3 or higher
     if my_av < threshold:
         breakCheck = True
     return breakCheck
@@ -238,7 +239,7 @@ def partnerDecision(breakCheck, selectionStrategy, partnerID, myID, rejectedPart
             if scoreCheck(scoreAgainst, partnerScore, scoreThreshold):
                 # request.append(myID)
                 request[1] = partnerID
-        else:
+        else:  # if we are gaining them as a partner
             if partnerID not in rejectedPartners:
                 # request.append(myID)
                 request[1] = partnerID
