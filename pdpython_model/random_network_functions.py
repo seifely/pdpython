@@ -250,7 +250,7 @@ def partnerDecision(breakCheck, selectionStrategy, partnerID, myID, rejectedPart
                 request[1] = partnerID
         else:
             if partnerID not in rejectedPartners:
-                if partnerRep > myRep:
+                if partnerRep < myRep:
                     request[1] = partnerID
     else:
         # this is just the default strategy, as a backup in case something goes wrong
