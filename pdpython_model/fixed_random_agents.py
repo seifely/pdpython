@@ -1080,6 +1080,33 @@ class PDAgent(Agent):
         if state_value in bound_f:
             return theta * 6
 
+    def check_item(self, partner_ID, type):
+
+        neighbouring_agents = partner_ID
+        neighbouring_cells = []
+        partner = 0
+
+        # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
+        for partner in neighbouring_agents:
+            neighbouring_cells.append(self.model.agent_positions[partner])
+
+        # print("My ID is", self.ID, "and my current partners are", current_partners)
+        # First, get the neighbours
+        for i in neighbouring_cells:
+            bound_checker = self.model.grid.out_of_bounds(i)
+            if not bound_checker:
+                this_cell = self.model.grid.get_cell_list_contents([i])
+                # print("This cell", this_cell)
+                if self.stepCount == 2:
+                    self.n_partners += 1
+
+                if len(this_cell) > 0:
+                    partner = [obj for obj in this_cell
+                               if isinstance(obj, PDAgent)][0]
+
+        if type == "rep":
+            return partner.betrayals
+
     def check_partner(self, current_partners):
         """ Check Partner looks at all the partner's current move selections and adds them to relevant memory spaces"""
         x, y = self.pos
@@ -1397,7 +1424,8 @@ class PDAgent(Agent):
             outcome = [my_move, this_partner_move]
             if my_move == 'D':
                 if this_partner_move == 'C':
-                    self.model.reputationBlackboard[self.ID] += 1  # Here we increment our model rep each time we betray
+                    #self.model.reputationBlackboard[self.ID] += 1  # Here we increment our model rep each time we betray
+                    self.betrayals += 1
 
             if my_move == 'C':
                 self.per_partner_mcoops[i] += 1
@@ -3265,9 +3293,12 @@ class PDAgent(Agent):
                                                                   self.indivAvPayoff[partnerID],  # using this instead of working memory as sometimes wm breaks
                                                                   self.oppAvPayoff[partnerID],
                                                                   self.model.CC,
-                                                                  self.model.reputationBlackboard[self.ID],
+                                                                  #self.model.reputationBlackboard[self.ID],
+                                                                  self.betrayals,
                                                                   self.mood,
-                                                                  50, self.model.reputationBlackboard[partnerID],
+                                                                  50,
+                                                                  #self.model.reputationBlackboard[partnerID],
+                                                                  self.check_item(partnerID, "rep"),
                                                                   self.normalizedActorDegreeCentrality)
                                     # check if the request is valid (aka, not Null) - if it is, send it to the model
                                     #   if it isn't, ignore it
@@ -3291,9 +3322,12 @@ class PDAgent(Agent):
                                                                       0,
                                                                       0,
                                                                       self.model.CC,
-                                                                      self.model.reputationBlackboard[self.ID],
+                                                                      #self.model.reputationBlackboard[self.ID],
+                                                                      self.betrayals,
                                                                       self.mood,
-                                                                      50, self.model.reputationBlackboard[partnerID],
+                                                                      50,
+                                                                      #self.model.reputationBlackboard[partnerID],
+                                                                      self.check_item(partnerID, "rep"),
                                                                       self.normalizedActorDegreeCentrality)
                                         # check if the request is valid (aka, not Null) - if it is, send it to the model
                                         #   if it isn't, ignore it
@@ -3522,9 +3556,12 @@ class PDAgent(Agent):
                                                                   self.indivAvPayoff[partnerID],  # using this instead of working memory as sometimes wm breaks
                                                                   self.oppAvPayoff[partnerID],
                                                                   self.model.CC,
-                                                                  self.model.reputationBlackboard[self.ID],
+                                                                  #self.model.reputationBlackboard[self.ID],
+                                                                  self.betrayals,
                                                                   self.mood,
-                                                                  50, self.model.reputationBlackboard[partnerID],
+                                                                  50,
+                                                                  #self.model.reputationBlackboard[partnerID],
+                                                                  self.check_item(partnerID, "rep"),
                                                                   self.normalizedActorDegreeCentrality)
                                     # check if the request is valid (aka, not Null) - if it is, send it to the model
                                     #   if it isn't, ignore it
@@ -3548,9 +3585,12 @@ class PDAgent(Agent):
                                                                       0,
                                                                       0,
                                                                       self.model.CC,
-                                                                      self.model.reputationBlackboard[self.ID],
+                                                                      #self.model.reputationBlackboard[self.ID],
+                                                                      self.betrayals,
                                                                       self.mood,
-                                                                      50, self.model.reputationBlackboard[partnerID],
+                                                                      50,
+                                                                      #self.model.reputationBlackboard[partnerID],
+                                                                      self.check_item(partnerID, "rep"),
                                                                       self.normalizedActorDegreeCentrality)
                                         # check if the request is valid (aka, not Null) - if it is, send it to the model
                                         #   if it isn't, ignore it
@@ -3654,9 +3694,12 @@ class PDAgent(Agent):
                                                                   self.indivAvPayoff[partnerID],
                                                                   self.oppAvPayoff[partnerID],
                                                                   self.model.CC,
-                                                                  self.model.reputationBlackboard[self.ID],
+                                                                  self.betrayals,
+                                                                  #self.model.reputationBlackboard[self.ID],
                                                                   self.mood,
-                                                                  50, self.model.reputationBlackboard[partnerID],
+                                                                  50,
+                                                                  #self.model.reputationBlackboard[partnerID],
+                                                                  self.check_item(partnerID, "rep"),
                                                                   self.normalizedActorDegreeCentrality)
                                     # check if the request is valid (aka, not Null) - if it is, send it to the model
                                     #   if it isn't, ignore it
@@ -3679,9 +3722,12 @@ class PDAgent(Agent):
                                                                       0,
                                                                       0,
                                                                       self.model.CC,
-                                                                      self.model.reputationBlackboard[self.ID],
+                                                                      self.betrayals,
+                                                                      #self.model.reputationBlackboard[self.ID],
                                                                       self.mood,
-                                                                      50, self.model.reputationBlackboard[partnerID],
+                                                                      50,
+                                                                      #self.model.reputationBlackboard[partnerID],
+                                                                      self.check_item(partnerID, "rep"),
                                                                       self.normalizedActorDegreeCentrality)
                                         # check if the request is valid (aka, not Null) - if it is, send it to the model
                                         #   if it isn't, ignore it
@@ -3760,9 +3806,12 @@ class PDAgent(Agent):
                                                               statistics.mean(self.working_memory[partnerID]),
                                                               statistics.mean(self.pp_oppPayoff[partnerID]),
                                                               self.model.CC,
-                                                              self.model.reputationBlackboard[self.ID],
+                                                              #self.model.reputationBlackboard[self.ID],
+                                                              self.betrayals,
                                                               self.mood,
-                                                              50, self.model.reputationBlackboard[partnerID],
+                                                              50,
+                                                              #self.model.reputationBlackboard[partnerID],
+                                                              self.check_item(partnerID, "rep"),
                                                               self.normalizedActorDegreeCentrality)
                                 # check if the request is valid (aka, not Null) - if it is, send it to the model
                                 #   if it isn't, ignore it
@@ -3785,9 +3834,12 @@ class PDAgent(Agent):
                                                                   0,
                                                                   0,
                                                                   self.model.CC,
-                                                                  self.model.reputationBlackboard[self.ID],
+                                                                  #self.model.reputationBlackboard[self.ID],
+                                                                  self.betrayals,
                                                                   self.mood,
-                                                                  50, self.model.reputationBlackboard[partnerID],
+                                                                  50,
+                                                                  #self.model.reputationBlackboard[partnerID],
+                                                                  self.check_item(partnerID, "rep"),
                                                                   self.normalizedActorDegreeCentrality)
                                     # check if the request is valid (aka, not Null) - if it is, send it to the model
                                     #   if it isn't, ignore it
@@ -3822,7 +3874,8 @@ class PDAgent(Agent):
             if self.model.forgivenessTurn:
                 self.rejected_partner_list = []
                 self.indivAvPayoff = {}
-            self.similar_partners = 0
+                self.betrayals = 0
+            self.similar_partners = 0   # TODO: DOES THIS NEED TO BE INDENTED?
             if self.partnerSelectionStrat == "DEFAULT":  # ===========================================================
                 #print("This was a reset round, so all I did was update my partners, my selection strat was,", self.partnerSelectionStrat)
                 self.outputData(True)  # TODO: need to find out where to put this so that it doesn't break

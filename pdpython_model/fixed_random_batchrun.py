@@ -1248,8 +1248,8 @@ class PDModel(Model):
             # todo: this SHOULD allow agents to also reset their rejected partner lists
             self.forgivenessTurn = True
             self.forgivenessCountdown = copy.deepcopy(self.forgivenessPeriod)
-            for i in self.agentIDs:
-                self.reputationBlackboard[i] = 0  # reset the agent blackboard
+            #for i in self.agentIDs:
+             #   self.reputationBlackboard[i] = 0  # reset the agent blackboard
 
         # Update the graph using rnf and the agent's requests for changes
         # print("graph D", self.updated_graphD)
