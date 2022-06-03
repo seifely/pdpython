@@ -2040,6 +2040,7 @@ class PDAgent(Agent):
                                   'sensitivity_%d' % self.ID,
                                   'epsilon_%d' % self.ID,
                                   #'rejected_%d' % self.ID
+                                  'blackboard_%d' % self.ID,
                                   ]
 
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -2082,6 +2083,7 @@ class PDAgent(Agent):
                                   'sensitivity_%d' % self.ID: self.sensitivity_mod,
                                   'epsilon_%d' % self.ID: self.epsilon,
                                   #'rejected_%d' % self.ID: self.rejected_partner_list
+                                  'blackboard_%d' % self.ID: self.model.reputationBlackboard,
                                    })
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
@@ -2119,6 +2121,7 @@ class PDAgent(Agent):
                                   'sensitivity_%d' % self.ID,
                                   'epsilon_%d' % self.ID,
                                   #'rejected_%d' % self.ID
+                                  'blackboard_%d' % self.ID,
                                   ]
 
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -2161,6 +2164,7 @@ class PDAgent(Agent):
                          'sensitivity_%d' % self.ID: self.sensitivity_mod,
                          'epsilon_%d' % self.ID: self.epsilon,
                          #'rejected_%d' % self.ID: self.rejected_partner_list
+                         'blackboard_%d' % self.ID: self.model.reputationBlackboard,
                          })
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
