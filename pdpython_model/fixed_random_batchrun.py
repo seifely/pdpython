@@ -1,6 +1,7 @@
 from mesa import Model
 from mesa.space import SingleGrid
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
+import pdpython_model
 from pdpython_model.fixed_random_agents import PDAgent
 
 from mesa.datacollection import DataCollector
@@ -1352,16 +1353,16 @@ br_params = {#"number_of_agents": [64],
              "startingBehav": ['C',
                               #'D',
                               ],
-             "changeFrequency": [#5,
-                                 10,
+             "changeFrequency": [5,
+                                 #10,
                                  #15,
                                  ],
              #"sensitivity": [0],
              "sensitive_agents": [(0,), #(0, 13]),
                                   ],  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
              "selectionStrategy": ["REP"],
-             "rewirePercentage": [0.1,
-                                  #0.3
+             "rewirePercentage": [#0.1,
+                                  0.3
                                   ],
              "forgivenessPeriod": [5,
                                    #200,
@@ -1376,8 +1377,8 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
-                 max_steps=1000,  # This should be 10k, but have set it to 5k because it now takes ages to run
+                 iterations=2,
+                 max_steps=25000,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

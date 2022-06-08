@@ -1080,11 +1080,11 @@ class PDAgent(Agent):
         if state_value in bound_f:
             return theta * 6
 
-    def check_item(self, partner_ID, type):
+    def check_item(self, partnerID, type):
 
-        neighbouring_agents = partner_ID
+        neighbouring_agents = [partnerID]
         neighbouring_cells = []
-        partner = 0
+        # partner = 0
 
         # neighbouring_cells = [(x, y + 1), (x + 1, y), (x, y - 1), (x - 1, y)]  # N, E, S, W
         for partner in neighbouring_agents:
@@ -1787,7 +1787,7 @@ class PDAgent(Agent):
                                   #'rejected_%d' % self.ID: self.rejected_partner_list
                                    })
             except PermissionError:
-                self.output_data_to_file(self.outcome_list)
+                self.fake_data_to_file(self.outcome_list)
 
         else:
             try:
@@ -2111,7 +2111,7 @@ class PDAgent(Agent):
                                   'sensitivity_%d' % self.ID: self.sensitivity_mod,
                                   'epsilon_%d' % self.ID: self.epsilon,
                                   #'rejected_%d' % self.ID: self.rejected_partner_list
-                                  'blackboard_%d' % self.ID: self.model.reputationBlackboard,
+                                  'blackboard_%d' % self.ID: self.betrayals,
                                    })
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
@@ -2192,7 +2192,7 @@ class PDAgent(Agent):
                          'sensitivity_%d' % self.ID: self.sensitivity_mod,
                          'epsilon_%d' % self.ID: self.epsilon,
                          #'rejected_%d' % self.ID: self.rejected_partner_list
-                         'blackboard_%d' % self.ID: self.model.reputationBlackboard,
+                         'blackboard_%d' % self.ID: self.betrayals,
                          })
             except PermissionError:
                 self.output_data_to_file(self.outcome_list)
