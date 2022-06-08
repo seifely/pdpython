@@ -1,7 +1,8 @@
 from mesa import Model
 from mesa.space import SingleGrid
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
-from pdpython_model.fixed_random_agents import PDAgent
+#from pdpython_model.
+from fixed_random_agents import PDAgent
 
 from mesa.datacollection import DataCollector
 from mesa.batchrunner import BatchRunner
