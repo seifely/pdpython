@@ -6,10 +6,13 @@ import statistics
 import pickle
 from scipy.spatial import distance as dst
 import copy
-from pdpython_model import sarsa
-from pdpython_model import sarsa_moody
+#from pdpython_model \
+import sarsa
+#from pdpython_model \
+import sarsa_moody
 import math
-from pdpython_model import random_network_functions as rnf
+#from pdpython_model \
+import random_network_functions as rnf
 
 """Note on Strategies:
     RANDOM - Does what it says on the tin, each turn a random move is selected.
