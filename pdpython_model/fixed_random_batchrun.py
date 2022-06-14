@@ -1,8 +1,8 @@
 from mesa import Model
 from mesa.space import SingleGrid
 from mesa.time import BaseScheduler, RandomActivation, SimultaneousActivation
-from pdpython_model.fixed_random_agents import PDAgent
-# from fixed_random_agents import PDAgent
+# from pdpython_model.fixed_random_agents import PDAgent
+from fixed_random_agents import PDAgent
 
 from mesa.datacollection import DataCollector
 from mesa.batchrunner import BatchRunner
@@ -16,13 +16,13 @@ import sys
 import os
 import pickle
 import copy
-from pdpython_model import statemaker
-# import statemaker
-from pdpython_model import statemaker_moody
-# import statemaker_moody
+# from pdpython_model import statemaker
+import statemaker
+# from pdpython_model import statemaker_moody
+import statemaker_moody
 
-from pdpython_model import random_network_functions as rnf
-# import random_network_functions as rnf
+# from pdpython_model import random_network_functions as rnf
+import random_network_functions as rnf
 import matplotlib.pyplot as plt
 import networkx as nx
 
