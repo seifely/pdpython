@@ -261,26 +261,35 @@ class PDAgent(Agent):
                     # self.ppD_partner[partner_ID] = 0.5
 
     def set_defaults(self, ids):
-        # open the ppD pickle
-        # with open("agent_ppds.p", "rb") as f:
-        #     agent_ppds = pickle.load(f)
-        agent_ppds = copy.deepcopy(self.model.agent_ppds)
-        # print("agent ppds are,", agent_ppds)
-        my_pickle = agent_ppds[self.ID]
-        # print("my defaults are", my_pickle)
-        # j = 0
-        for i in ids:
-            # print("eeyore", i)
-            index = ids.index(i)
-            self.ppD_partner[i] = my_pickle[index]
-
-            # print("this ppd was", self.ppD_partner[i])
-            # print("this partner's pickled ppd is ", my_pickle[index])
-            self.default_ppds[i] = my_pickle[index]
-
-            self.itermove_result[i] = self.model.startingBehav
-            self.pp_aprime[i] = self.model.startingBehav
-            self.moody_pp_aprime[i] = self.model.startingBehav
+        if self.model.dynamic:
+            # I believe we just want a list of a starting value * number_of_agents
+            my_pickle = [0 for i in range(self.model.number_of_agents)]
+            for i in ids:
+                index = ids.index(i)
+                self.ppD_partner[i] = my_pickle[index]
+                self.default_ppds[i] = my_pickle[index]
+                self.itermove_result[i] = self.model.startingBehav
+                self.pp_aprime[i] = self.model.startingBehav
+                self.moody_pp_aprime[i] = self.model.startingBehav
+        else:
+            # open the ppD pickle
+            # with open("agent_ppds.p", "rb") as f:
+            #     agent_ppds = pickle.load(f)
+            agent_ppds = copy.deepcopy(self.model.agent_ppds)
+            # print("agent ppds are,", agent_ppds)
+            my_pickle = agent_ppds[self.ID]
+            # print("my defaults are", my_pickle)
+            # j = 0
+            for i in ids:
+                # print("eeyore", i)
+                index = ids.index(i)
+                self.ppD_partner[i] = my_pickle[index]
+                # print("this ppd was", self.ppD_partner[i])
+                # print("this partner's pickled ppd is ", my_pickle[index])
+                self.default_ppds[i] = my_pickle[index]
+                self.itermove_result[i] = self.model.startingBehav
+                self.pp_aprime[i] = self.model.startingBehav
+                self.moody_pp_aprime[i] = self.model.startingBehav
 
 
     def export_training_data(self):
@@ -386,62 +395,75 @@ class PDAgent(Agent):
                         return str(strat)
 
         elif self.model.moody_sarsa_spawn:
-            choices = ["MOODYLEARN", self.model.moody_sarsa_oppo]
-            if self.model.sarsa_distro > 0:                                                               # THIS SECTION ISN'T SET TO MOODY_ --> might need changing in future
-                weights = [self.model.sarsa_distro, 1-self.model.sarsa_distro]
-                strat = np.random.choice(choices, 1, replace=False, p=weights)
-                self.model.agent_strategies[self.ID] = str(strat[0])
-                return str(strat[0])
+            initChoices = ["MOODYLEARN", self.model.moody_sarsa_oppo]
+            choices = []
+            choices.append("MOODYLEARN")
+            if len(self.model.moody_sarsa_oppo) > 0:
+                for i in self.model.moody_sarsa_oppo:
+                    choices.append(i)
             else:
-                if len(choices) == 2:
-                    if self.model.width == 8:                                                             # THESE COORDINATES SHOULD BE CORRECT, JUST SPAWN NORMAL SARSA IN AS AN OPPONENT TYPE
-                        check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
-                               42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
-                        check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
-                               43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
-                    elif self.model.width == 3:
-                        check_a = [1, 3, 5, 7, 9]
-                        check_b = [2, 4, 6, 8]
-                    elif self.model.width == 4:
-                        check_a = [1, 3, 6, 8, 9, 11, 14, 16]
-                        check_b = [2, 4, 5, 7, 10, 12, 13, 15]
-                    elif self.model.width == 5:
-                        check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
-                        check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
-                    # elif self.model.width == 5:
-                    #     check_a = [1, 5, 21, 25, 9, 7, 17, 19, 6, 16, 20, 10, ]  # These are test-related coordinates used to spawn agents for the Sarsa Vs. Moody Paper Experiments
-                    #     check_b = [13, 8, 12, 14, 18, 22, 24, 2, 4, 15, 23, 3, 11,]
-                    elif self.model.width == 6:
-                        check_a = [1, 3, 5, 8, 10, 12, 13, 15, 17, 20, 22, 24, 25, 27, 29, 32, 34, 36]
-                        check_b = [2, 4, 6, 7, 9, 11, 14, 16, 18, 19, 21, 23, 26, 28, 30, 31, 33, 35]
-                    elif self.model.width == 7:
-                        check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35,
-                                   37, 39, 41, 43, 45, 47, 49]
-                        check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36,
-                                   38, 40, 42, 44, 46, 48]
-                    elif self.model.width == 2:
-                        check_a = [1, 4]
-                        check_b = [2, 3]
+                choices.append(self.model.moody_sarsa_oppo)
+            if self.model.dynamic:
+                weighter = 1 / len(choices)
+                weights = []
+                for n in choices:
+                    weights.append(weighter)
+            else:
+                if self.model.sarsa_distro > 0:                                                               # THIS SECTION ISN'T SET TO MOODY_ --> might need changing in future
+                    weights = [self.model.sarsa_distro, 1-self.model.sarsa_distro]
+                    strat = np.random.choice(choices, 1, replace=False, p=weights)
+                    self.model.agent_strategies[self.ID] = str(strat[0])
+                    return str(strat[0])
+                else:
+                    if len(choices) == 2:
+                        if self.model.width == 8:                                                             # THESE COORDINATES SHOULD BE CORRECT, JUST SPAWN NORMAL SARSA IN AS AN OPPONENT TYPE
+                            check_a = [1, 3, 5, 7, 10, 12, 14, 16, 17, 19, 21, 23, 26, 28, 30, 32, 33, 35, 37, 39,
+                                   42, 44, 46, 48, 49, 51, 53, 55, 58, 60, 62, 64]
+                            check_b = [2, 4, 6, 8, 9, 11, 13, 15, 18, 20, 22, 24, 25, 27, 29, 31, 34, 36, 38, 40, 41,
+                                   43, 45, 47, 50, 52, 54, 56, 57, 59, 61, 63]
+                        elif self.model.width == 3:
+                            check_a = [1, 3, 5, 7, 9]
+                            check_b = [2, 4, 6, 8]
+                        elif self.model.width == 4:
+                            check_a = [1, 3, 6, 8, 9, 11, 14, 16]
+                            check_b = [2, 4, 5, 7, 10, 12, 13, 15]
+                        elif self.model.width == 5:
+                            check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
+                            check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+                        # elif self.model.width == 5:
+                        #     check_a = [1, 5, 21, 25, 9, 7, 17, 19, 6, 16, 20, 10, ]  # These are test-related coordinates used to spawn agents for the Sarsa Vs. Moody Paper Experiments
+                        #     check_b = [13, 8, 12, 14, 18, 22, 24, 2, 4, 15, 23, 3, 11,]
+                        elif self.model.width == 6:
+                            check_a = [1, 3, 5, 8, 10, 12, 13, 15, 17, 20, 22, 24, 25, 27, 29, 32, 34, 36]
+                            check_b = [2, 4, 6, 7, 9, 11, 14, 16, 18, 19, 21, 23, 26, 28, 30, 31, 33, 35]
+                        elif self.model.width == 7:
+                            check_a = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35,
+                                       37, 39, 41, 43, 45, 47, 49]
+                            check_b = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36,
+                                       38, 40, 42, 44, 46, 48]
+                        elif self.model.width == 2:
+                            check_a = [1, 4]
+                            check_b = [2, 3]
 
-                    # print("My ID is:", self.ID, "and my coordinates are", self)
-                    if self.ID in check_a:
-                        strat = choices[0]
-                        # print("I am in check_a and my strategy is now", strat)
-                        self.model.agent_strategies[self.ID] = str(strat)
-                        return str(strat)
-                    elif self.ID in check_b:
-                        strat = choices[1]
-                        if strat == 'MIXED':
-                            # Then we should randomly pick from this list without weighting
-                            strat = random.choice(self.model.oppoList)
+                        # print("My ID is:", self.ID, "and my coordinates are", self)
+                        if self.ID in check_a:
+                            strat = choices[0]
+                            # print("I am in check_a and my strategy is now", strat)
                             self.model.agent_strategies[self.ID] = str(strat)
                             return str(strat)
-                        # if type(strat) == list:
-                        #     # Then we should randomly pick from this list without weighting
-                        #     strat = random.choice(strat)
-                        #     return str(strat)
-                        self.model.agent_strategies[self.ID] = str(strat)
-                        return str(strat)
+                        elif self.ID in check_b:
+                            strat = choices[1]
+                            if strat == 'MIXED':
+                                # Then we should randomly pick from this list without weighting
+                                strat = random.choice(self.model.oppoList)
+                                self.model.agent_strategies[self.ID] = str(strat)
+                                return str(strat)
+                            # if type(strat) == list:
+                            #     # Then we should randomly pick from this list without weighting
+                            #     strat = random.choice(strat)
+                            #     return str(strat)
+                            self.model.agent_strategies[self.ID] = str(strat)
+                            return str(strat)
 
         else:
             if self.pickstrat == "RANDOM":
@@ -548,10 +570,12 @@ class PDAgent(Agent):
 
                     if partner_ID not in new_partners:
                         # pick a move
-                        if strategy is not "MOODYLEARN":
-                            move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
-                        else:
+                        if strategy == "MOODYLEARN":
                             move = self.pick_move(strategy, payoffs, partner_ID, self.partner_states)
+                            # move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
+                        else:
+                            move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
+                            # move = self.pick_move(strategy, payoffs, partner_ID, self.partner_states)
                         # add that move, with partner ID, to the versus choice dictionary
                         versus_moves[partner_ID] = move
                     else:

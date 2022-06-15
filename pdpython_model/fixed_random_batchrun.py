@@ -383,8 +383,8 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=5, width=5,    # even numbers are checkerboard fair
-                 number_of_agents=25,
+    def __init__(self, height=11, width=11,    # even numbers are checkerboard fair
+                 number_of_agents=40,
                  schedule_type="Simultaneous",
                  rounds=50,
                  collect_data=True,
@@ -453,6 +453,7 @@ class PDModel(Model):
                  maximumPartners=0,
                  rewirePercentage=0.1,
                  selectionStrategy="DEFAULT",
+                 dynamic=True,
                  ):
 
         # ---------- Model Parameters --------
@@ -527,6 +528,7 @@ class PDModel(Model):
 
         # ========================== RANDOM GRAPH VARIABLES =============================
 
+        self.dynamic = dynamic
         self.complexRestructuring = True
 
         self.initial_graphG = 0
@@ -635,14 +637,20 @@ class PDModel(Model):
         if self.sarsa_spawn:
             concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         elif self.moody_sarsa_spawn:
+            opponent = ""
             if type(self.moody_sarsa_oppo) == list:
-                concatenator = ('csvfix_mood%s_DC_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (
-                self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
-                self.moody_statemode, "mixedOppo", self.iteration_n), "a")
+                if len(self.moody_sarsa_oppo) > 1:
+                    opponent = "mixedOppo"
+                else:
+                    opponent = self.moody_sarsa_oppo[0]
             else:
-                #todo : this is the most used one, below vvvvv
-                concatenator = ('repTest_%s-%s-%s-%s_restruct%s_forgive%s_rewire%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.change_frequency, self.forgivenessPeriod, self.rewirePercentage, self.graph_probability, self.width, self.width, self.moody_MA,
-                                                                                          self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
+                opponent = self.moody_sarsa_oppo
+            # TODO: THIS IS THE MOST USED CONCATENATOR VVVVVVVVVVVVVVVVVVVVVVVV
+            concatenator = ('restructure%s_%s-%s-%s-%s_round%s_mood%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (
+                self.change_frequency, self.DC, self.CC, self.DD, self.CD, self.change_frequency, self.moody_startmood,
+                self.graph_probability, self.width, self.width, self.moody_MA,
+                self.moody_statemode, opponent, self.iteration_n), "a")
+
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
@@ -1325,7 +1333,7 @@ br_params = {#"number_of_agents": [64],
                                #0.9
                                ],
              "moody_sarsa_oppo": [#"TFT",
-                                  "LEARN",
+                                  ["LEARN"],
                                   #"MOODYLEARN",
                                 #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                 #'MIXED',
