@@ -16,13 +16,13 @@ import sys
 import os
 import pickle
 import copy
-from pdpython_model import statemaker
-# import statemaker
-from pdpython_model import statemaker_moody
-# import statemaker_moody
+# from pdpython_model import statemaker
+import statemaker
+# from pdpython_model import statemaker_moody
+import statemaker_moody
 
-from pdpython_model import random_network_functions as rnf
-# import random_network_functions as rnf
+# from pdpython_model import random_network_functions as rnf
+import random_network_functions as rnf
 import matplotlib.pyplot as plt
 import networkx as nx
 
