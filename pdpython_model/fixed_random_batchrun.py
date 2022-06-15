@@ -642,7 +642,10 @@ class PDModel(Model):
         elif self.moody_sarsa_spawn:
             opponent = ""
             if type(self.moody_sarsa_oppo) == list:
-                opponent = "mixedOppo"
+                if len(self.moody_sarsa_oppo) > 1:
+                    opponent = "mixedOppo"
+                else:
+                    opponent = self.moody_sarsa_oppo[0]
             else:
                 opponent = self.moody_sarsa_oppo
             # TODO: THIS IS THE MOST USED CONCATENATOR VVVVVVVVVVVVVVVVVVVVVVVV
