@@ -580,10 +580,12 @@ class PDAgent(Agent):
 
                     if partner_ID not in new_partners:
                         # pick a move
-                        if strategy is not "MOODYLEARN":
-                            move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
-                        else:
+                        if strategy == "MOODYLEARN":
                             move = self.pick_move(strategy, payoffs, partner_ID, self.partner_states)
+                            # move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
+                        else:
+                            move = self.pick_move(strategy, payoffs, partner_ID, self.working_memory)
+                            # move = self.pick_move(strategy, payoffs, partner_ID, self.partner_states)
                         # add that move, with partner ID, to the versus choice dictionary
                         versus_moves[partner_ID] = move
                     else:
@@ -977,7 +979,6 @@ class PDAgent(Agent):
                     # moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_alt(self.mood, learning_state[id],
                     #                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA,
                     #                                                               self.stepCount, self.model.startingBehav)
-
                     moodyBehav = sarsa_moody.moody_action_three(self.mood, learning_state[id],
                                                                                   self.moody_qtable, moodAffectMode,
                                                                                   self.moody_epsilon,
@@ -991,11 +992,11 @@ class PDAgent(Agent):
                     # moodyBehav, self.moody_epsilon = sarsa_moody.moody_action_alt(self.mood, learning_state[id],
                     #                                       self.moody_qtable, moodAffectMode, self.moody_epsilon, self.model.moody_MA,
                     #                                                               self.stepCount, self.model.startingBehav)
-
                     moodyBehav = sarsa_moody.moody_action_three(self.mood, learning_state[id],
                                                                                   self.moody_qtable, moodAffectMode,
                                                                                   self.moody_epsilon,
-                                                                                  self.model.moody_MA,)
+                                                                                  self.model.moody_MA,
+                                                                                  )
                     # print('mbehav B', moodyBehav)
 
             self.moody_epsilon = self.model.moody_epsilon

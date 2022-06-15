@@ -157,7 +157,6 @@ def decay_value(initial, current, max_round, linear, floor):
 
 def moody_action_three(mood, state, qtable, moodAffectMode, epsilon, moodAffect):
     """ IF USING THIS FUNCTION, USE A SMALL STARTING EPSILON AS IT USES A LARGER EPSILON VALUE SELECTIVELY """
-    # print(mood, state, qtable, epsilon, moodAffect, turn, startingBehav)
     change = epsilon
     epsChange = 0  # this should stay at no change if mood isn't high or low
     current = qtable[tuple(state)]
