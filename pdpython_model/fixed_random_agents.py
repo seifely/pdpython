@@ -408,6 +408,9 @@ class PDAgent(Agent):
                 weights = []
                 for n in choices:
                     weights.append(weighter)
+                strat = np.random.choice(choices, 1, replace=False, p=weights)
+                self.model.agent_strategies[self.ID] = str(strat[0])
+                return str(strat[0])
             else:
                 if self.model.sarsa_distro > 0:                                                               # THIS SECTION ISN'T SET TO MOODY_ --> might need changing in future
                     weights = [self.model.sarsa_distro, 1-self.model.sarsa_distro]
@@ -3330,6 +3333,7 @@ class PDAgent(Agent):
                                     if request[1] != None:
                                         self.model.graph_removals.append(request)
                                         self.rejected_partner_list.append(partnerID)
+                                        print("My strat is", self.strategy, "and I just rejected", partnerID)
                                         self.current_partner_list.remove(partnerID)
 
                             if len(self.current_partner_list) < self.model.maximumPartners:
