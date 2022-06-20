@@ -753,6 +753,10 @@ class PDAgent(Agent):
                 self.number_of_c += 1
                 return "C"
             else:
+                if self.partner_latest_move.get(id) is None:
+                    self.number_of_c += 1
+                    return "C"
+
                 if self.partner_latest_move[id] == 'C':
                     self.number_of_c += 1
                 elif self.partner_latest_move[id] == 'D':
@@ -767,6 +771,10 @@ class PDAgent(Agent):
             # same move again, if not, play the opposite move.
 
             if self.stepCount == 1:
+                self.number_of_c += 1
+                return "C"
+
+            if self.partner_latest_move.get(id) is None:
                 self.number_of_c += 1
                 return "C"
 
@@ -816,6 +824,10 @@ class PDAgent(Agent):
                              check if it was performing as the lit suggests."""
 
             if self.stepCount == 1:
+                self.number_of_c += 1
+                return "C"
+
+            if self.partner_latest_move.get(id) is None:
                 self.number_of_c += 1
                 return "C"
 
