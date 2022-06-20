@@ -746,6 +746,10 @@ class PDAgent(Agent):
                 self.number_of_c += 1
                 return "C"
             else:
+                if self.partner_latest_move.get(id) is None:
+                    self.number_of_c += 1
+                    return "C"
+
                 if self.partner_latest_move[id] == 'C':
                     self.number_of_c += 1
                 elif self.partner_latest_move[id] == 'D':
@@ -760,6 +764,10 @@ class PDAgent(Agent):
             # same move again, if not, play the opposite move.
 
             if self.stepCount == 1:
+                self.number_of_c += 1
+                return "C"
+
+            if self.partner_latest_move.get(id) is None:
                 self.number_of_c += 1
                 return "C"
 
@@ -809,6 +817,10 @@ class PDAgent(Agent):
                              check if it was performing as the lit suggests."""
 
             if self.stepCount == 1:
+                self.number_of_c += 1
+                return "C"
+
+            if self.partner_latest_move.get(id) is None:
                 self.number_of_c += 1
                 return "C"
 
@@ -3333,7 +3345,7 @@ class PDAgent(Agent):
                                     if request[1] != None:
                                         self.model.graph_removals.append(request)
                                         self.rejected_partner_list.append(partnerID)
-                                        print("My strat is", self.strategy, "and I just rejected", partnerID)
+                                        #print("My strat is", self.strategy, "and I just rejected", partnerID)
                                         self.current_partner_list.remove(partnerID)
 
                             if len(self.current_partner_list) < self.model.maximumPartners:
@@ -3374,6 +3386,7 @@ class PDAgent(Agent):
                                     self.model.graph_removals.append(removRequest)
                                     self.current_partner_list.remove(removals)
                                     self.rejected_partner_list.append(removals)
+                                    #print("My strat is", self.strategy, "and I just rejected", partnerID)
                             if addRequest:
                                 if addRequest[1] != None:
                                     self.model.graph_additions.append(addRequest)
@@ -3597,6 +3610,7 @@ class PDAgent(Agent):
                                     if request[1] != None:
                                         self.model.graph_removals.append(request)
                                         self.rejected_partner_list.append(partnerID)
+                                        #print("My strat is", self.strategy, "and I just rejected", partnerID)
                                         self.current_partner_list.remove(partnerID)
 
                             if len(self.current_partner_list) < self.model.maximumPartners:
@@ -3637,6 +3651,7 @@ class PDAgent(Agent):
                                     self.model.graph_removals.append(removRequest)
                                     self.current_partner_list.remove(removals)
                                     self.rejected_partner_list.append(removals)
+                                    #print("My strat is", self.strategy, "and I just rejected", partnerID)
                             if addRequest:
                                 if addRequest[1] != None:
                                     self.model.graph_additions.append(addRequest)
@@ -3735,6 +3750,7 @@ class PDAgent(Agent):
                                     if request[1] != None:
                                         self.model.graph_removals.append(request)
                                         self.rejected_partner_list.append(partnerID)
+                                        #print("My strat is", self.strategy, "and I just rejected", partnerID)
                                         self.current_partner_list.remove(partnerID)
 
                             if len(self.current_partner_list) < self.model.maximumPartners:
@@ -3774,6 +3790,7 @@ class PDAgent(Agent):
                                     self.model.graph_removals.append(removRequest)
                                     self.current_partner_list.remove(removals)
                                     self.rejected_partner_list.append(removals)
+                                    #print("My strat is", self.strategy, "and I just rejected", partnerID)
                             if addRequest:
                                 if addRequest[1] != None:
                                     self.model.graph_additions.append(addRequest)
@@ -3847,6 +3864,7 @@ class PDAgent(Agent):
                                 if request[1] != None:
                                     self.model.graph_removals.append(request)
                                     self.rejected_partner_list.append(partnerID)
+                                    #print("My strat is", self.strategy, "and I just rejected", partnerID)
                                     self.current_partner_list.remove(partnerID)
 
                         if len(self.current_partner_list) < self.model.maximumPartners:
@@ -3887,6 +3905,7 @@ class PDAgent(Agent):
                                 self.model.graph_removals.append(removRequest)
                                 self.current_partner_list.remove(removals)
                                 self.rejected_partner_list.append(removals)
+                                #print("My strat is", self.strategy, "and I just rejected", partnerID)
                         if addRequest:
                             if addRequest[1] != None:
                                 self.model.graph_additions.append(addRequest)
