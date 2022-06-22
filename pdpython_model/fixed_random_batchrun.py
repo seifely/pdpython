@@ -559,7 +559,8 @@ class PDModel(Model):
             self.reputationBlackboard[i] = 0
         self.forgivenessPeriod = forgivenessPeriod
         # how often we forgive previously bad agents (in number of play segments)
-        self.maximumPartners = self.number_of_agents // 2
+        # self.maximumPartners = self.number_of_agents // 2
+        self.maximumPartners = self.number_of_agents
         # how many partners an agent is allowed to have (i.e. up to a half of the network, etc.)
         self.rewirePercentage = rewirePercentage
         # a random number between x and number_of_agents. we then select this number of switchers
@@ -1333,7 +1334,7 @@ br_params = {#"number_of_agents": [64],
                                #0.9
                                ],
              "moody_sarsa_oppo": [#"TFT",
-                                  ["LEARN", "WSLS", "TFT"],
+                                  ("LEARN", "WSLS", "TFT"),
                                   #"MOODYLEARN",
                                 #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                 #'MIXED',
@@ -1386,8 +1387,8 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
-                 max_steps=5000,  # This should be 10k, but have set it to 5k because it now takes ages to run
+                 iterations=1,
+                 max_steps=25000,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
