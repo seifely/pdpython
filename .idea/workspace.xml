@@ -18,8 +18,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="247">
-                  <caret line="408" column="33" selection-start-line="408" selection-start-column="33" selection-end-line="408" selection-end-column="33" />
+                <state relative-caret-position="-8">
+                  <caret line="421" column="55" selection-start-line="421" selection-start-column="55" selection-end-line="421" selection-end-column="55" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                   </folding>
@@ -47,7 +47,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="637">
+                <state relative-caret-position="1207">
                   <caret line="170" column="24" selection-start-line="170" selection-start-column="24" selection-end-line="170" selection-end-column="24" />
                   <folding>
                     <element signature="e#1650#2226#0" />
@@ -60,8 +60,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="352">
-                  <caret line="1343" column="35" selection-start-line="1343" selection-start-column="35" selection-end-line="1343" selection-end-column="35" />
+                <state relative-caret-position="383">
+                  <caret line="1390" column="32" selection-start-line="1390" selection-start-column="32" selection-end-line="1390" selection-end-column="32" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                   </folding>
@@ -72,7 +72,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/pdproject/Lib/site-packages/mesa/batchrunner.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="275">
+                <state relative-caret-position="2669">
                   <caret line="160" column="32" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
                 </state>
               </provider>
@@ -90,11 +90,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="9775">
-                  <caret line="575" column="38" selection-start-line="575" selection-start-column="38" selection-end-line="575" selection-end-column="38" />
-                  <folding>
-                    <element signature="e#0#22#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="-46513">
+                  <caret line="936" column="51" selection-start-line="936" selection-start-column="42" selection-end-line="936" selection-end-column="51" />
                 </state>
               </provider>
             </entry>
@@ -112,8 +109,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>update_mood_old</find>
-      <find>update_mood</find>
       <find>scoreCh</find>
       <find>self.rejected_partner_list</find>
       <find>self.indivAvPayoff</find>
@@ -142,6 +137,8 @@
       <find>epsi</find>
       <find>== list</find>
       <find>choices</find>
+      <find>restructure</find>
+      <find>moodsta</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -379,7 +376,7 @@
       <window_info id="Favorites" order="2" sideWeight="0.5008026" side_tool="true" weight="0.15226555" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32827735" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49841937" weight="0.32936078" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49841937" visible="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3997833" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -387,7 +384,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32936078" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32827735" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5015806" side_tool="true" weight="0.29685807" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" visible="true" weight="0.22101842" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.22101842" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -650,14 +647,14 @@
     </entry>
     <entry file="file://$USER_HOME$/AppData/Local/conda/conda/envs/pdproject/Lib/site-packages/mesa/batchrunner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
+        <state relative-caret-position="2669">
           <caret line="160" column="32" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_moody.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="637">
+        <state relative-caret-position="1207">
           <caret line="170" column="24" selection-start-line="170" selection-start-column="24" selection-end-line="170" selection-end-column="24" />
           <folding>
             <element signature="e#1650#2226#0" />
@@ -668,18 +665,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9775">
-          <caret line="575" column="38" selection-start-line="575" selection-start-column="38" selection-end-line="575" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-46513">
+          <caret line="936" column="51" selection-start-line="936" selection-start-column="42" selection-end-line="936" selection-end-column="51" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_batchrun.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="1343" column="35" selection-start-line="1343" selection-start-column="35" selection-end-line="1343" selection-end-column="35" />
+        <state relative-caret-position="383">
+          <caret line="1390" column="32" selection-start-line="1390" selection-start-column="32" selection-end-line="1390" selection-end-column="32" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>

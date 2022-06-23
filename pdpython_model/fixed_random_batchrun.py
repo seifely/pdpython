@@ -639,7 +639,7 @@ class PDModel(Model):
             concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         elif self.moody_sarsa_spawn:
             opponent = ""
-            if type(self.moody_sarsa_oppo) == list:
+            if type(self.moody_sarsa_oppo) == tuple:
                 if len(self.moody_sarsa_oppo) > 1:
                     opponent = "mixedOppo"
                 else:
