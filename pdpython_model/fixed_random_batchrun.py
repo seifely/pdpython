@@ -1336,7 +1336,7 @@ br_params = {#"number_of_agents": [64],
                                #0.9
                                ],
              "moody_sarsa_oppo": [#"TFT",
-                                  ["LEARN"],
+                                  ("LEARN"),
                                   #"MOODYLEARN",
                                 #"ANGEL", "DEVIL", "VPP", "RANDOM", "WSLS", "iWSLS",
                                 #'MIXED',
