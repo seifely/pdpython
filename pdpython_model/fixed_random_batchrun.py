@@ -569,6 +569,8 @@ class PDModel(Model):
         # TODO: Add these as inputs in the batchrunner? Or are we keeping these consistent?
         self.selectionStrategy = selectionStrategy
 
+        self.averageBetrayals = 0
+
         self.checkTurn = False
         self.resetTurn = False
         self.forgivenessTurn = False
@@ -1008,6 +1010,10 @@ class PDModel(Model):
         scores = [a.score for a in self.schedule.agents]
         self.highest_score = max(scores)
 
+    def get_average_betrayals(self):
+        betrays = [a.betrayals for a in self.schedule.agents]
+        self.averageBetrayals = statistics.mean(betrays)
+
     def reset_values(self):
         # self.agents_defecting = 0
         # self.agents_cooperating = 0
@@ -1246,6 +1252,7 @@ class PDModel(Model):
             self.output_data(steptime)
         self.datacollector.collect(self)
         self.get_highest_score()
+        self.get_average_betrayals()
         self.reset_values()
         if self.forgivenessTurn:
             self.forgivenessTurn = False
@@ -1387,8 +1394,8 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
-                 max_steps=15000,  # This should be 10k, but have set it to 5k because it now takes ages to run
+                 iterations=1,
+                 max_steps=10000,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':

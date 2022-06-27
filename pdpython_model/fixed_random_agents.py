@@ -3333,7 +3333,7 @@ class PDAgent(Agent):
                                                                   self.oppAvPayoff[partnerID],
                                                                   self.model.CC,
                                                                   #self.model.reputationBlackboard[self.ID],
-                                                                  self.betrayals,
+                                                                  self.model.averageBetrayals,  # this is the target reputation
                                                                   self.mood,
                                                                   50,
                                                                   #self.model.reputationBlackboard[partnerID],
@@ -3363,7 +3363,8 @@ class PDAgent(Agent):
                                                                       0,
                                                                       self.model.CC,
                                                                       #self.model.reputationBlackboard[self.ID],
-                                                                      self.betrayals,
+                                                                      self.model.averageBetrayals,
+                                                                      # this is the target reputation
                                                                       self.mood,
                                                                       50,
                                                                       #self.model.reputationBlackboard[partnerID],
@@ -3598,7 +3599,8 @@ class PDAgent(Agent):
                                                                   self.oppAvPayoff[partnerID],
                                                                   self.model.CC,
                                                                   #self.model.reputationBlackboard[self.ID],
-                                                                  self.betrayals,
+                                                                  self.model.averageBetrayals,
+                                                                  # this is the target reputation
                                                                   self.mood,
                                                                   50,
                                                                   #self.model.reputationBlackboard[partnerID],
@@ -3628,7 +3630,8 @@ class PDAgent(Agent):
                                                                       0,
                                                                       self.model.CC,
                                                                       #self.model.reputationBlackboard[self.ID],
-                                                                      self.betrayals,
+                                                                      self.model.averageBetrayals,
+                                                                      # this is the target reputation
                                                                       self.mood,
                                                                       50,
                                                                       #self.model.reputationBlackboard[partnerID],
@@ -3737,7 +3740,8 @@ class PDAgent(Agent):
                                                                   self.indivAvPayoff[partnerID],
                                                                   self.oppAvPayoff[partnerID],
                                                                   self.model.CC,
-                                                                  self.betrayals,
+                                                                  self.model.averageBetrayals,
+                                                                  # this is the target reputation
                                                                   #self.model.reputationBlackboard[self.ID],
                                                                   self.mood,
                                                                   50,
@@ -3766,7 +3770,8 @@ class PDAgent(Agent):
                                                                       0,
                                                                       0,
                                                                       self.model.CC,
-                                                                      self.betrayals,
+                                                                      self.model.averageBetrayals,
+                                                                      # this is the target reputation
                                                                       #self.model.reputationBlackboard[self.ID],
                                                                       self.mood,
                                                                       50,
@@ -3852,7 +3857,8 @@ class PDAgent(Agent):
                                                               statistics.mean(self.pp_oppPayoff[partnerID]),
                                                               self.model.CC,
                                                               #self.model.reputationBlackboard[self.ID],
-                                                              self.betrayals,
+                                                              self.model.averageBetrayals,
+                                                              # this is the target reputation
                                                               self.mood,
                                                               50,
                                                               #self.model.reputationBlackboard[partnerID],
@@ -3881,7 +3887,8 @@ class PDAgent(Agent):
                                                                   0,
                                                                   self.model.CC,
                                                                   #self.model.reputationBlackboard[self.ID],
-                                                                  self.betrayals,
+                                                                  self.model.averageBetrayals,
+                                                                  # this is the target reputation
                                                                   self.mood,
                                                                   50,
                                                                   #self.model.reputationBlackboard[partnerID],

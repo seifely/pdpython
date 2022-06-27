@@ -207,7 +207,7 @@ def scoreCheck(my_av, their_av, threshold):
     return breakCheck
 
 def partnerDecision(breakCheck, selectionStrategy, partnerID, myID, rejectedPartners, partnerHistory,
-                    scoreAgainst, partnerScore, scoreThreshold, myRep, mood, moodThreshold,
+                    scoreAgainst, partnerScore, scoreThreshold, targetRep, mood, moodThreshold,
                     partnerRep, myConnectedness):
     # May want things like partner mood, current_mood,
     """ Initially this function will , but later will be designed to make decisions based on information and rules as to
@@ -246,11 +246,11 @@ def partnerDecision(breakCheck, selectionStrategy, partnerID, myID, rejectedPart
 
     elif selectionStrategy == "REP":
         if breakCheck:
-            if partnerRep > myRep:
+            if partnerRep >= targetRep:
                 request[1] = partnerID
         else:
             if partnerID not in rejectedPartners:
-                if partnerRep < myRep:
+                if partnerRep < targetRep:
                     request[1] = partnerID
     else:
         # this is just the default strategy, as a backup in case something goes wrong
