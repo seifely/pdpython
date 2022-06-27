@@ -582,7 +582,7 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('allsens_smallmood_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                concatenator = ('all_smallmood-max4k-sens100_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
