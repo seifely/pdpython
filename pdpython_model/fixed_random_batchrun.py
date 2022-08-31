@@ -22,6 +22,8 @@ from pdpython_model import statemaker_moody
 from pdpython_model import random_network_functions as rnf
 import matplotlib.pyplot as plt
 import networkx as nx
+from pyvis.network import Network
+import pyvis
 
 
 def get_num_coop_agents(model):
@@ -880,6 +882,15 @@ class PDModel(Model):
         plt.figure()
         nx.draw_networkx(self.initial_graphG, ax=None)
         plt.savefig(self.exp_n + "-initGraph.png")
+        nt = Network('800px', '800px')
+        nt.from_nx(self.initial_graphG)
+        if self.number_of_agents > 30:
+            nt.toggle_physics(False)
+            nt.show('initialisation_batch.html')
+        else:
+            nt.toggle_physics(True)
+            nt.show('initialisation_batch.html')
+
         self.max_edges = rnf.maxEdgesPossible(self.number_of_agents, self.agentIDs)
         self.graph_connectedness = (nx.number_of_edges(self.initial_graphG)) / self.max_edges
         return
@@ -1202,6 +1213,28 @@ class PDModel(Model):
         elif strategy == "MOODYLEARN":
             return ('darkorange')
 
+    def colorPicker2(self, strategy):
+        if strategy == 'RANDOM':
+            return ('#C3C3C3')
+        elif strategy == 'ANGEL':
+            return ('#FFDB34')
+        elif strategy == 'DEVIL':
+            return ('#FF4534')
+        elif strategy == 'EV':
+            return ('#880052')
+        elif strategy == 'VEV':
+            return ('#400088')
+        elif strategy == 'TFT':
+            return ('#31A9FF')
+        elif strategy == 'VPP':
+            return ('#CD00DA')
+        elif strategy == 'WSLS':
+            return ('#00C71C')
+        elif strategy == "LEARN":
+            return ('#7F8AFF')
+        elif strategy == "MOODYLEARN":
+            return ('#F67300')
+
     def getColorMap(self, strategies, graph):
         color_map = []
         for node in graph:
@@ -1209,6 +1242,41 @@ class PDModel(Model):
             color = self.colorPicker(strategies[node])
             color_map.append(color)
         return color_map
+
+    def getColorSingle(self, strategies, id):
+        color = self.colorPicker2(strategies[id])
+        return color
+
+    def recolorGraph(self,):
+        # We wanna pull in the PyVis graph that we've converted from the nx graph, and relabel/recolour it
+        # Each node's natural number should be its ID number, since they are just added sequentially
+        nt = Network('800px', '800px')
+        nt.from_nx(self.updated_graphG)
+
+        edges = nt.get_edges()
+        nodes = nt.get_nodes()
+
+        nnt_batch = Network('800px', '800px')
+
+        # Then we can recreate the network for visualisation from these
+        for i in nodes:
+            col = (self.getColorSingle(self.agent_strategies, i))
+            nnt_batch.add_node(i, label=str(i), color=col)
+        # print("edg", edges)
+        # nnt.add_edges(edges)
+
+        for j in edges:
+            frm = j['from']
+            to = j['to']
+            nnt_batch.add_edge(frm, to)
+
+        if self.number_of_agents > 30:
+            nnt_batch.toggle_physics(False)
+            nnt_batch.show('nnx_batch.html')
+        else:
+            nnt_batch.toggle_physics(True)
+            nnt_batch.show('nnx_batch.html')
+        return
 
     def step(self):
 
@@ -1240,6 +1308,17 @@ class PDModel(Model):
             # print(rnf.analysis(self.updated_graphD, self.updated_graphG))
             nx.draw_networkx(self.updated_graphG, node_color=color_map)
             plt.savefig(self.exp_n + "-finalGraph.png")
+
+            nt = Network('800px', '800px')
+            nt.from_nx(self.updated_graphG)
+            if self.number_of_agents > 30:
+                nt.toggle_physics(False)
+                nt.show('nx_batch.html')
+            else:
+                nt.toggle_physics(True)
+                nt.show('nx_batch.html')
+
+            self.recolorGraph()
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
 
