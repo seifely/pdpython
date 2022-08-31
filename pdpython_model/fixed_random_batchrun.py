@@ -576,6 +576,7 @@ class PDModel(Model):
         self.forgivenessTurn = False
         self.forgivenessCountdown = self.forgivenessPeriod
 
+
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
                          "TFT",

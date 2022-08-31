@@ -207,7 +207,60 @@ def gen_Model_Portrayal(agent):
 class StepCountDisplay(TextElement):
 
     def render(self, model):
-        return "Step Count: " + str(model.step_count), "  --- K: " + str(model.coop_index)
+        return "Step Count: " + str(model.step_count),
+
+
+class KDisplay(TextElement):
+
+    def render(self, model):
+        return "K: " + str(model.coop_index),
+
+
+class NodeDisplay(TextElement):
+
+    def render(self, model):
+        return "Nodes: " + str(model.networkNodes),
+
+
+class EdgeDisplay(TextElement):
+
+    def render(self, model):
+        return "Edges: " + str(model.networkEdges),
+
+class IsolatesDisplay(TextElement):
+
+    def render(self, model):
+        return "Isolates: " + str(model.networkIsolates)
+
+
+class GDCDisplay(TextElement):
+
+    def render(self, model):
+        return "Group Degree Centralization: " + str(model.group_degree_centralization)
+
+
+class MeanScoreDisplay(TextElement):
+
+    def render(self, model):
+        return "Mean Agent Cumulative Score: " + str(model.averageScore)
+
+
+class MeanPayoffDisplay(TextElement):
+
+    def render(self, model):
+        return "Mean Agent Payoff: " + str(model.averagePayoff)
+
+
+class MeanPartnersDisplay(TextElement):
+
+    def render(self, model):
+        return "Mean Agent Partner Count: " + str(model.averagePartners)
+
+
+class MeanBetrayDisplay(TextElement):
+
+    def render(self, model):
+        return "Mean Network Betrayals: " + str(model.averageBetrayals)
 
 
 # class CoopIndexDisplay(TextElement):
@@ -216,22 +269,31 @@ class StepCountDisplay(TextElement):
 #         return "K: " + str(model.coop_index)
 
 
-canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
+#canvas_element = CanvasGrid(gen_Model_Portrayal, 8, 8, 500, 500)
 step_element = StepCountDisplay()
+k_element = KDisplay()
+node_element = NodeDisplay()
+edge_element = EdgeDisplay()
+isolate_element = IsolatesDisplay()
+gdc_element = GDCDisplay()
+meanscore_element = MeanScoreDisplay()
+meanpayoff_element = MeanPayoffDisplay()
+meanpartner_element = MeanPartnersDisplay()
+meanbetray_element = MeanBetrayDisplay()
 
 # chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 #                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
-model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 25, 2, 64, 1),
-                "number_of_agents": UserSettableParameter('choice', 'Number of Agents', value=25,
-                                          choices=[2, 4, 9, 16, 25, 36, 49, 64]),
-                "moody_sarsa_oppo": UserSettableParameter('choice', 'Opponent Type', value='TFT',
-                                          choices=['MOODYLEARN', 'LEARN', 'TFT', 'VPP', 'ANGEL', 'DEVIL', 'RANDOM', 'WSLS', 'MIXED']),
+model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of Agents', 25, 2, 100, 1),
+                #"number_of_agents": UserSettableParameter('choice', 'Number of Agents', value=25,
+                #                          choices=[2, 4, 9, 16, 25, 36, 49, 64]),
+                "moody_sarsa_oppo": UserSettableParameter('choice', 'Opponent Type', value=['MIXED'],
+                                          choices=[['MOODYLEARN'], ['LEARN'], ['TFT'], ['VPP'], ['ANGEL'], ['DEVIL'], ['RANDOM'], ['WSLS'], ['MIXED']]),
                 "startingBehav": UserSettableParameter('choice', 'First Round Move', value='C',
                                           choices=['C', 'D']),
-                "moody_statemode": UserSettableParameter('choice', 'State Information', value='stateless',
-                                          choices=['stateless', 'agentstate', 'moodstate']),
-                "rounds": UserSettableParameter('slider', 'Number of Rounds', 5000,1,100000,10),
+                #"moody_statemode": UserSettableParameter('choice', 'State Information', value='stateless',
+                                          #choices=['stateless', 'agentstate', 'moodstate']),
+                "rounds": UserSettableParameter('slider', 'Number of Rounds', 5000,1,10000,10),
                 "collect_data": UserSettableParameter('checkbox', 'Collect Data', False),
                 #"init_ppD": UserSettableParameter('slider', 'Initial Probability VPP Agents Defect', 0.50,0.01,1,0.01),
                 # "agent_printing": UserSettableParameter('checkbox', 'Agent Printouts', False),
@@ -239,10 +301,15 @@ model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of 
                 "CD": UserSettableParameter('number', 'Payoff for CD (Default: 0)', value=0),
                 "DC": UserSettableParameter('number', 'Payoff for DC (Default: 5)', value=5),
                 "DD": UserSettableParameter('number', 'Payoff for DD (Default: 2)', value=2),
-                "moody_epsilon": UserSettableParameter('number', 'Starting Epsilon (Default: 0.9)', value=0.9),
+                #"moody_epsilon": UserSettableParameter('number', 'Starting Epsilon (Default: 0.9)', value=0.9),
                 "moody_startmood": UserSettableParameter('slider', 'Starting Mood (Default: 50)', 50,1,100,1),
-                "moody_MA": UserSettableParameter('slider', 'Value of mA', 0.5,0,1,0.001),
-                "sensitivity": UserSettableParameter('slider', 'Emotional Sensitivity', 0, 0, 100, 5)
+                #"moody_MA": UserSettableParameter('slider', 'Value of mA', 0.5,0,1,0.001),
+                #"sensitivity": UserSettableParameter('slider', 'Emotional Sensitivity', 0, 0, 100, 5),
+                "selectionStrategy": UserSettableParameter('choice', 'Partner Termination Strategy', value='DEFAULT',
+                                                           choices=['DEFAULT', 'REP', 'SCORE']),
+                "rewirePercentage": UserSettableParameter('slider', 'Rewiring Percentage', 0.3, 0, 1, 0.1),
+                "forgivenessPeriod": UserSettableParameter('slider', 'Forgiveness Frequency (Lower = More Frequent)', 5, 0, 1000, 5),
+                "changeFrequency": UserSettableParameter('slider', 'Restructuring Frequency (Lower = More Frequent', 5, 1, 100, 1)
 
 
                 # "simplified_payoffs": UserSettableParameter('checkbox', 'Simplified Payoffs', False),
@@ -256,12 +323,16 @@ model_params = {#"number_of_agents": UserSettableParameter('slider', 'Number of 
 
 chart_element = ChartModule([{"Label": "Percentage Cooperations", "Color": C_COLOR},
                              {"Label": "Percentage Defections", "Color": D_COLOR},
-                             {"Label": "Average Mood", "Color": "#ffc0cb"}])
+                             {"Label": "Average Mood", "Color": "#ffc0cb"},
+                             ])
 
 # k_element = CoopIndexDisplay()
 #chart_element_2 = ChartModule([{"Label": "Average Mood", "Color": "#ffc0cb"}], canvas_height=200, canvas_width=300)
 # TODO: Kind of want to add in mutual cooperations tracking, but that's extraneous right now
 
-server = ModularServer(PDModel, [canvas_element, step_element, chart_element, #k_element
+server = ModularServer(PDModel, [#canvas_element,
+                                 step_element, k_element, node_element, edge_element, isolate_element,
+                                 meanscore_element, meanbetray_element, meanpayoff_element,
+                                 meanpartner_element, chart_element,
                                  ], "Prisoner's Dilemma Simulation", model_params)
 server.port = 8521

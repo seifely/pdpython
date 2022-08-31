@@ -10,10 +10,17 @@ import csv
 import numpy as np
 import pandas as pd
 import sys
-import os.path
+import os
 import pickle
 import statistics
 import math
+import copy
+
+from pdpython_model import random_network_functions as rnf
+import matplotlib.pyplot as plt
+import networkx as nx
+from pyvis.network import Network
+import pyvis
 
 from pdpython_model import statemaker
 from pdpython_model import statemaker_moody
@@ -429,7 +436,7 @@ class PDModel(Model):
                      "Random": RandomActivation,
                      "Simultaneous": SimultaneousActivation}
 
-    def __init__(self, height=5, width=5,    # even numbers are checkerboard fair
+    def __init__(self, height=10, width=10,    # even numbers are checkerboard fair
                  number_of_agents=25,
                  schedule_type="Simultaneous",
                  rounds=2500,
@@ -459,7 +466,7 @@ class PDModel(Model):
 
                  sarsa_spawn=False,  # should mean checkerboard
                  sarsa_training=False,          #TODO: THESE VARIABLES HAVE BEEN TURNED OFF FOR MOODY SARSA TESTING
-                 sarsa_testing=False,
+                 sarsa_testing=True,
                  sarsa_distro=0,
                  sarsa_oppo="LEARN",
                  epsilon=0.99,
@@ -470,10 +477,11 @@ class PDModel(Model):
                  epsilon_floor=0.05,
 
                  moody_sarsa_spawn=True,  # should mean checkerboard
+                 sensitive_agents=[],
                  moody_sarsa_training=True,
                  moody_sarsa_testing=True,
                  moody_sarsa_distro=0,
-                 moody_sarsa_oppo="TFT",
+                 moody_sarsa_oppo=["TFT"],
                  moody_epsilon=0.9,
                  moody_alpha=0.1,
                  moody_gamma=0.95,
@@ -491,13 +499,20 @@ class PDModel(Model):
                  startingBehav='C',
 
                  sensitivity=0,
-                 sensitive_agents=[],
+                 graph_probability=0.2,
+                 changeFrequency=5,
+                 forgivenessPeriod=5,
+                 maximumPartners=0,
+                 rewirePercentage=0.1,
+                 selectionStrategy="DEFAULT",
+                 dynamic=True,
                  ):
 
         # ---------- Model Parameters --------
         self.height = height
         self.width = width
         self.number_of_agents = number_of_agents
+        self.agentIDs = list(range(1, (number_of_agents + 1)))
         self.step_count = 0
         self.DD = DD
         self.CC = CC
@@ -566,31 +581,78 @@ class PDModel(Model):
 
         self.n_interactions = calcInteractions(self.height)
 
-        """ This section here changes the spawn locations if the number of agents is changed"""
-        if self.number_of_agents == 2:
-            self.height = 2
-            self.width = 2
-        if self.number_of_agents == 4:
-            self.height = 2
-            self.width = 2
-        if self.number_of_agents == 9:
-            self.height = 3
-            self.width = 3
-        if self.number_of_agents == 16:
-            self.height = 4
-            self.width = 4
-        if self.number_of_agents == 25:
-            self.height = 5
-            self.height = 5
-        if self.number_of_agents == 36:
-            self.height = 6
-            self.width = 6
-        if self.number_of_agents == 49:
-            self.height = 7
-            self.width = 7
-        if self.number_of_agents == 64:
-            self.height = 8
-            self.width = 8
+        # ========================== RANDOM GRAPH VARIABLES =============================
+        self.dynamic = dynamic
+        self.complexRestructuring = True
+        self.initial_graphG = 0
+        self.initial_graphD = {}
+        self.updated_graphD = {}
+        self.updated_graphG = 0
+        self.end_graphG = 0
+        self.end_graphD = {}
+        self.graph_additions = []
+        self.graph_removals = []
+        self.agent_positions = {}
+        self.agent_strategies = {}
+        self.graph_probability = graph_probability
+        self.graph_connectedness = []
+        self.max_edges = 0
+        self.groupDegreeCentralities = {}
+        # if len(self.groupDegreeCentralities) == 0:  # Initialise the centralities in case any agent doesn't get partners initially
+        for j in self.agentIDs:
+            self.groupDegreeCentralities[j] = 0
+        self.group_degree_centralization = 0
+        self.change_frequency = changeFrequency  # this is how often there will be a restructuring of edges
+        self.reputationBlackboard = {}
+        # this is the reputation of every agent, aka the sum count of each agent's betrayals against a partner
+        # ======= this should be initialised with zeroes =======
+        for i in self.agentIDs:
+            self.reputationBlackboard[i] = 0
+        self.forgivenessPeriod = forgivenessPeriod
+        # how often we forgive previously bad agents (in number of play segments)
+        # self.maximumPartners = self.number_of_agents // 2
+        self.maximumPartners = self.number_of_agents
+        # how many partners an agent is allowed to have (i.e. up to a half of the network, etc.)
+        self.rewirePercentage = rewirePercentage
+        # a random number between x and number_of_agents. we then select this number of switchers
+        self.agentsToRestructure = []
+        # how many
+        # TODO: Add these as inputs in the batchrunner? Or are we keeping these consistent?
+        self.selectionStrategy = selectionStrategy
+        self.averageBetrayals = 0
+        self.checkTurn = False
+        self.resetTurn = False
+        self.forgivenessTurn = False
+        self.forgivenessCountdown = self.forgivenessPeriod
+        self.networkEdges = 0
+        self.networkNodes = self.number_of_agents
+        self.networkIsolates = 0
+
+        # """ This section here changes the spawn locations if the number of agents is changed"""
+        # if self.number_of_agents == 2:
+        #     self.height = 2
+        #     self.width = 2
+        # if self.number_of_agents == 4:
+        #     self.height = 2
+        #     self.width = 2
+        # if self.number_of_agents == 9:
+        #     self.height = 3
+        #     self.width = 3
+        # if self.number_of_agents == 16:
+        #     self.height = 4
+        #     self.width = 4
+        # if self.number_of_agents == 25:
+        #     self.height = 5
+        #     self.height = 5
+        # if self.number_of_agents == 36:
+        #     self.height = 6
+        #     self.width = 6
+        # if self.number_of_agents == 49:
+        #     self.height = 7
+        #     self.width = 7
+        # if self.number_of_agents == 64:
+        #     self.height = 8
+        #     self.width = 8
 
         # TODO: Add opponents to the oppoList for if opponent 'MIXED' is used
         self.oppoList = [
@@ -647,13 +709,19 @@ class PDModel(Model):
         if self.sarsa_spawn:
             concatenator = ('wave3_neutralpayoff_%s_%s_%s_sarsa_no_%s' % (self.msize, self.learnFrom, self.sarsa_oppo, self.iteration_n), "a")
         elif self.moody_sarsa_spawn:
-            if type(self.moody_sarsa_oppo) == list:
-                concatenator = ('csvfix_mood%s_DC_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (
-                self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
-                self.moody_statemode, "mixedOppo", self.iteration_n), "a")
+            opponent = ""
+            if type(self.moody_sarsa_oppo) == tuple:
+                if len(self.moody_sarsa_oppo) > 1:
+                    opponent = "mixedOppo"
+                else:
+                    opponent = self.moody_sarsa_oppo[0]
             else:
-                concatenator = ('startwith%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
-                                                                                          self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
+                opponent = self.moody_sarsa_oppo
+            # TODO: THIS IS THE MOST USED CONCATENATOR VVVVVVVVVVVVVVVVVVVVVVVV
+            concatenator = ('restructure%s_%s-%s-%s-%s_round%s_mood%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (
+                self.change_frequency, self.DC, self.CC, self.DD, self.CD, self.change_frequency, self.moody_startmood,
+                self.graph_probability, self.width, self.width, self.moody_MA,
+                self.moody_statemode, opponent, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
         self.exp_n = concatenator[0]
@@ -703,6 +771,9 @@ class PDModel(Model):
         self.coops_utility = 0
         self.defects_utility = 0
         self.highest_score = 0
+        self.averageScore = 0
+        self.averagePayoff = 0
+        self.averagePartners = 0
 
         self.datacollector = DataCollector(model_reporters={
             "Cooperations": get_num_coop_agents,
@@ -747,6 +818,9 @@ class PDModel(Model):
         self.training_data = []
         self.training_data = pickle.load(open("training_data_50.p",
                                               "rb"))  # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        self.init_graph()
+        self.updated_graphD = copy.deepcopy(self.initial_graphD)  # Put the first update as the initial graph
+
 
         if not kNN_spawn:
             self.make_agents()
@@ -781,7 +855,7 @@ class PDModel(Model):
                              })
         if self.kNN_testing:
             with open('{}_kNN.csv'.format(self.filename), 'a', newline='') as csvfile:
-                fieldnames = ['k', 'accuracy',]
+                fieldnames = ['k', 'accuracy', 'accuracy_p',]
 
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -789,7 +863,7 @@ class PDModel(Model):
 
                 if self.step_count == 1:
                     writer.writeheader()
-                writer.writerow({'k': self.k, 'accuracy': kNN_accuracy_percent,
+                writer.writerow({'k': self.k, 'accuracy': self.kNN_accuracy, 'accuracy_p': kNN_accuracy_percent,
                                  })
 
                 self.kNN_accuracy = 0  # Hopefully resetting this value here is fine
@@ -861,6 +935,53 @@ class PDModel(Model):
     #                             permutations.append(new)
     #     return permutations
 
+    def plotGraph(self, G, rnd, color):
+        if color:
+            color_map = self.getColorMap(self.agent_strategies, G)
+            plt.figure()
+            nx.draw_networkx(G, node_color=color_map)
+            plt.savefig(self.exp_n + "-round-" + str(rnd))
+        elif not color:
+            plt.figure()
+            nx.draw_networkx(G, ax=None)
+            plt.savefig(self.exp_n + "-round-" + str(rnd))
+
+    def init_graph(self):
+        self.initial_graphD, self.initial_graphG = rnf.initRandomGraph(self.number_of_agents, self.graph_probability,
+                                                                       self.agentIDs)
+        print("I've made a graph!")
+        plt.figure()
+        nx.draw_networkx(self.initial_graphG, ax=None)
+        plt.savefig(self.exp_n + "-initGraph.png")
+
+        nt = Network('800px', '800px')
+        nt.from_nx(self.initial_graphG)
+        if self.number_of_agents > 30:
+            nt.toggle_physics(False)
+            nt.show('initialisation.html')
+        else:
+            nt.toggle_physics(True)
+            nt.show('initialisation.html')
+
+
+        self.max_edges = rnf.maxEdgesPossible(self.number_of_agents, self.agentIDs)
+        self.graph_connectedness = (nx.number_of_edges(self.initial_graphG)) / self.max_edges
+        return
+
+    def change_graph(self, additions, removals, old_graph):
+        # Previous Graph Stata
+        print("OLD Density:", nx.density(self.updated_graphG), " Nodes:", nx.number_of_nodes(self.updated_graphG),
+              " Edges:", nx.number_of_edges(self.updated_graphG))
+        updated_graph, updated_graphG = rnf.update_graph(self.updated_graphD, self.graph_additions, self.graph_removals,
+                                                         True, self.agentIDs)
+        # Reset the additions and removal request lists
+        self.graph_additions = []
+        self.graph_removals = []
+        # New Graph Stats
+        print("OLD Density:", nx.density(updated_graphG), " Nodes:", nx.number_of_nodes(updated_graphG), " Edges:",
+              nx.number_of_edges(updated_graphG))
+        return updated_graph, updated_graphG
+
     def set_ppds(self):
         """ Below: need to remove this part of the function as it will reset ppds to be whatever the br_params specifies,
                     when actually we want it to start at 0.5 and then go unaltered by this method for the subsequent games"""
@@ -874,7 +995,12 @@ class PDModel(Model):
         if self.firstgame:
             for i in range(n_of_a):
                 # print("n of a", i)
-                initialised[i + 1] = [self.init_ppD, self.init_ppD, self.init_ppD, self.init_ppD]
+                # TODO: THIS IS A TEMPORARY FIX FOR THE PPD SITUATION, BASICALLY PPDS WERE INITIALLY SET FOR 4 PARTNERS FIXED - NOW THERE WILL BE ONE FOR ALL 25 PARTNERS - NOT SURE HOW TO HANDLE THIS IF PARTNERS CHANGE THO BUT THIS IS LEGACY CODE
+                inits = []
+                for n in range(n_of_a + 1):
+                    inits.append(self.init_ppD)
+                print("inits", inits)
+                initialised[i + 1] = inits
                 with open("agent_ppds.p", "wb") as f:
                     pickle.dump(initialised, f)
 
@@ -968,6 +1094,23 @@ class PDModel(Model):
     def get_highest_score(self):
         scores = [a.score for a in self.schedule.agents]
         self.highest_score = max(scores)
+        self.averageScore = statistics.mean(scores)
+
+        payoffRatios = [a.avPayoff for a in self.schedule.agents]
+        # print("pr", payoffRatios)
+        self.averagePayoff = statistics.mean(payoffRatios)
+
+        # partners = [a.n_partners for a in self.schedule.agents]
+        # print("parts", partners)
+        # self.averagePartners = statistics.mean(partners)
+        if self.step_count > 1:
+            self.averagePartners = (nx.number_of_edges(self.updated_graphG)/self.number_of_agents)
+        else:
+            self.averagePartners = 0
+
+    def get_average_betrayals(self):
+        betrays = [a.betrayals for a in self.schedule.agents]
+        self.averageBetrayals = statistics.mean(betrays)
 
     def reset_values(self):
         # self.agents_defecting = 0
@@ -1050,6 +1193,7 @@ class PDModel(Model):
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
+                self.agent_positions[i + 1] = (x, y)  # Add in a storage of where each agent is, by ID no.
                 self.schedule.add(pdagent)
 
         elif self.randspawn:
@@ -1060,13 +1204,14 @@ class PDModel(Model):
                 # x, y = self.grid.find_empty()
                 pdagent = PDAgent((x, y), self, True)
                 self.grid.place_agent(pdagent, (x, y))
+                self.agent_positions[i + 1] = (x, y)  # Add in a storage of where each agent is, by ID no.
                 self.schedule.add(pdagent)
 
     def export_q_tables(self, init):      # TODO: Does this need a moody counterpart? =============================
         qs = [a.qtable for a in self.schedule.agents]
         # we need to print/save a list of the keys
         # then print/save each
-        print('qs', qs)
+        # print('qs', qs)
         qvals = []
         for i in qs:
             if i is not []:
@@ -1082,7 +1227,7 @@ class PDModel(Model):
                         # append all the qvalues into one big list
                     qvals.append(temp_qs)
 
-        print('qvals', qvals)
+        # print('qvals', qvals)
         if init:
             with open('{} qinit.csv'.format(self.filename), 'a', newline='') as csvfile:
                 fieldnames = ['q']
@@ -1119,12 +1264,171 @@ class PDModel(Model):
             self.grid.place_agent(pdagent, (x, y))
             self.schedule.add(pdagent)
 
+        #  ===== This was me trying to calculate GDC by myself, when in fact network x has a function for it
+
+    def calculate_GDC(self, centralities, IDs, nAgents):
+        # print("THE CENTRALITIES ARE", centralities, "and the connections are", self.updated_graphD)
+        # print("centrals", centralities)
+        highest = -1
+        highest_id = 0
+        if not IDs:
+            IDs = list(range(1, (nAgents + 1)))
+        # print("model centralities", centralities)
+        for i in IDs:
+            if centralities[i] > highest:
+                # print(centralities[i], "is higher than", highest, "so I'll replace it")
+                highest = centralities[i]
+                highest_id = i
+        # sum the observed differences between the highest and all the others
+        summedDiff = 0
+        othersList = copy.deepcopy(centralities)
+        othersIDs = copy.deepcopy(IDs)
+        # print("I'm gonna remove", highest_id, "from the lists")
+        othersIDs.remove(highest_id)
+        othersList.pop(highest_id)
+        # othersList = othersList.remove(highest_id)
+        for i in othersIDs:
+            # print("highest is", highest, "other is ", othersList[i])
+            # print("diff was", summedDiff)
+            diff = (highest - othersList[i])
+            # print("the difference was", diff)
+            # print("diff is now", summedDiff + diff)
+            summedDiff = summedDiff + diff
+        denom = (nAgents - 1) * (nAgents - 2)
+        # print("the denom is ", denom)
+        return summedDiff / denom
+
+    def roundCheck(self, n, frequency):
+        if n > 1:
+            if n % frequency == 0:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def colorPicker(self, strategy):
+        if strategy == 'RANDOM':
+            return ('gray')
+        elif strategy == 'ANGEL':
+            return ('yellow')
+        elif strategy == 'DEVIL':
+            return ('red')
+        elif strategy == 'EV':
+            return ('plum')
+        elif strategy == 'VEV':
+            return ('violet')
+        elif strategy == 'TFT':
+            return ('deepskyblue')
+        elif strategy == 'VPP':
+            return ('magenta')
+        elif strategy == 'WSLS':
+            return ('lime')
+        elif strategy == "LEARN":
+            return ('blue')
+        elif strategy == "MOODYLEARN":
+            return ('darkorange')
+
+    def colorPicker2(self, strategy):
+        if strategy == 'RANDOM':
+            return ('#C3C3C3')
+        elif strategy == 'ANGEL':
+            return ('#FFDB34')
+        elif strategy == 'DEVIL':
+            return ('#FF4534')
+        elif strategy == 'EV':
+            return ('#880052')
+        elif strategy == 'VEV':
+            return ('#400088')
+        elif strategy == 'TFT':
+            return ('#31A9FF')
+        elif strategy == 'VPP':
+            return ('#CD00DA')
+        elif strategy == 'WSLS':
+            return ('#00C71C')
+        elif strategy == "LEARN":
+            return ('#7F8AFF')
+        elif strategy == "MOODYLEARN":
+            return ('#F67300')
+
+    def getColorMap(self, strategies, graph):
+        color_map = []
+        for node in graph:
+            # if the node number is in strategies
+            color = self.colorPicker(strategies[node])
+            color_map.append(color)
+        return color_map
+
+    def getColorSingle(self, strategies, id):
+        color = self.colorPicker2(strategies[id])
+        return color
+
+    def recolorGraph(self,):
+        # We wanna pull in the PyVis graph that we've converted from the nx graph, and relabel/recolour it
+        # Each node's natural number should be its ID number, since they are just added sequentially
+        nt = Network('800px', '800px')
+        nt.from_nx(self.updated_graphG)
+
+        edges = nt.get_edges()
+        nodes = nt.get_nodes()
+
+        nnt = Network('800px', '800px')
+
+        # Then we can recreate the network for visualisation from these
+        for i in nodes:
+            col = (self.getColorSingle(self.agent_strategies, i))
+            nnt.add_node(i, label=str(i), color=col)
+        # print("edg", edges)
+        # nnt.add_edges(edges)
+
+        for j in edges:
+            frm = j['from']
+            to = j['to']
+            nnt.add_edge(frm, to)
+
+        if self.number_of_agents > 30:
+            nnt.toggle_physics(False)
+            nnt.show('nnx.html')
+        else:
+            nnt.toggle_physics(True)
+            nnt.show('nnx.html')
+        return
+
     def step(self):
         start = time.time()
+        self.checkTurn = self.roundCheck(self.step_count, self.change_frequency)
+        if self.checkTurn:
+            # if it's a reset round, we should generate a list of agents to rewite
+            self.agentsToRestructure = rnf.generateRewireList(self.number_of_agents, self.rewirePercentage)
+            # now we have the list of agents who need to rewire, each of these needs to check on a
+            # reset round and take this data in
         self.schedule.step()
+        if self.updated_graphG == 0:
+            graph_connect = self.initial_graphG
+        else:
+            graph_connect = self.updated_graphG
+        self.graph_connectedness = (nx.number_of_edges(graph_connect)) / self.max_edges
+        self.group_degree_centralization = self.calculate_GDC(self.groupDegreeCentralities, self.agentIDs,
+                                                              self.number_of_agents)
+
+        # if self.step_count !=0:
+        #     with open('latest_sim_output.csv', 'a') as ff:
+        #         # Overwrite the old file with the modified rows
+        #         writer = csv.writer(ff)
+        #         writer.writerow(rnf.analysis(self.updated_graphD, self.updated_graphG))
+
         if self.step_count == self.rounds - 1:
+            color_map = self.getColorMap(self.agent_strategies, self.updated_graphG)
+            plt.figure()
+            # print("gonna make an output graph")
+            # print(rnf.analysis(self.updated_graphD, self.updated_graphG))
+            nx.draw_networkx(self.updated_graphG, node_color=color_map)
+            plt.savefig(self.exp_n + "-finalGraph.png")
             self.update_agent_ppds(self.agent_ppds)
             self.training_data_collector()
+
+        # if self.step_count == 2:
+        #     self.plotGraph(self.updated_graphG, self.step_count, True)
         self.step_count += 1
         # print("Step:", self.step_count)
         end = time.time()
@@ -1133,7 +1437,36 @@ class PDModel(Model):
             self.output_data(steptime)
         self.datacollector.collect(self)
         self.get_highest_score()
+        self.get_average_betrayals()
         self.reset_values()
+        if self.forgivenessTurn:
+            self.forgivenessTurn = False
+        if self.checkTurn:
+            self.resetTurn = True
+            self.forgivenessCountdown -= 1  # for each reset turn we have, count down once on the forgiveness for partners
+        if not self.checkTurn:
+            self.resetTurn = False
+        if self.forgivenessCountdown == 0:
+            # todo: this SHOULD allow agents to also reset their rejected partner lists
+            self.forgivenessTurn = True
+            self.forgivenessCountdown = copy.deepcopy(self.forgivenessPeriod)
+            # for i in self.agentIDs:
+            #   self.reputationBlackboard[i] = 0  # reset the agent blackboard
+
+        # Update the graph using rnf and the agent's requests for changes
+        # print("graph D", self.updated_graphD)
+        # print("adds", self.graph_additions)
+        # print("removes", self.graph_removals)
+        self.updated_graphD, self.updated_graphG = rnf.update_graph(self.updated_graphD, self.graph_additions,
+                                                                    self.graph_removals, True,
+                                                                    list(range(1, (self.number_of_agents + 1))))
+        # The reset those lists to empty
+        self.graph_additions = []
+        self.graph_removals = []
+
+        # Update the Graph that Agents will Read From
+        # self.updated_graphD, self.updated_graphG = self.change_graph(self.graph_additions, self.graph_removals,
+        #                                                            self.updated_graphD)
 
         # if self.export_q:
         #     if self.step_count == 1:
@@ -1157,6 +1490,21 @@ class PDModel(Model):
                             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                             # writer.writeheader()
                             writer.writerow({'state': j})
+        self.networkEdges = nx.number_of_edges(self.updated_graphG)
+        self.networkNodes = nx.number_of_nodes(self.updated_graphG)
+        self.networkIsolates = nx.number_of_isolates(self.updated_graphG)
+        if self.resetTurn:
+            nt = Network('800px', '800px')
+            nt.from_nx(self.updated_graphG)
+            if self.number_of_agents > 30:
+                nt.toggle_physics(False)
+                nt.show('nx.html')
+            else:
+                nt.toggle_physics(True)
+                nt.show('nx.html')
+
+            self.recolorGraph()
+
 
     def run_model(self, rounds=1000):
         for i in range(self.rounds):

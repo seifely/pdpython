@@ -194,6 +194,7 @@ class PDAgent(Agent):
         self.normalizedActorDegreeCentrality = 0
         self.utilityRatio = 0  # ratio of utility earned to number of partners
         self.payoffRatio = 0   # average payoff that round
+        self.avPayoff = 0
         self.pp_UR = {}  # Each of my Partner's Utility Ratios (utility / n_partners)
         self.pp_PR = {}  # Each of my Partner's Payoff Ratios (payoff / n partners)
         self.pp_CON = {} # Each of my Partner's connectednesses
@@ -400,7 +401,12 @@ class PDAgent(Agent):
             choices.append("MOODYLEARN")
             if len(self.model.moody_sarsa_oppo) > 0:
                 for i in self.model.moody_sarsa_oppo:
-                    choices.append(i)
+                    if i == "MIXED":
+                        strat = random.choice(self.model.oppoList)
+                        # self.model.agent_strategies[self.ID] = str(strat)
+                        choices.append(strat)
+                    else:
+                        choices.append(i)
             else:
                 choices.append(self.model.moody_sarsa_oppo)
             if self.model.dynamic:
@@ -456,7 +462,7 @@ class PDAgent(Agent):
                             return str(strat)
                         elif self.ID in check_b:
                             strat = choices[1]
-                            if strat == 'MIXED':
+                            if strat == ['MIXED']:
                                 # Then we should randomly pick from this list without weighting
                                 strat = random.choice(self.model.oppoList)
                                 self.model.agent_strategies[self.ID] = str(strat)
@@ -1944,6 +1950,7 @@ class PDAgent(Agent):
             pays = [0]
         # print("My per partner payoff is: ", pays)
         avPayoff = sum(pays)/len(pays)
+        self.avPayoff = avPayoff
         self.payoffRatio = sum(pays)/len(pays)
         medianPayoff = statistics.median(pays)
 
@@ -2862,6 +2869,22 @@ class PDAgent(Agent):
                 # print("Agent", self.ID, "on step", self.stepCount, "took", self.attempts_taken, "attempt/s to export.")
                 self.attempts_taken = 0
 
+    def avScore(self):
+        pays = []
+        for i in self.current_partner_list:
+            if i in self.per_partner_payoffs:
+                end = len(self.per_partner_payoffs[i]) - 1
+                item = self.per_partner_payoffs[i]
+                pays.append(item[end])
+            else:
+                pass
+        if len(pays) == 0:
+            pays = [0]
+        # print("My per partner payoff is: ", pays)
+        avPayoff = sum(pays) / len(pays)
+        return avPayoff
+
+
     def set_starting_oldstates(self, strategy, learning_from, size):
         if strategy is not 'MOODYLEARN':
             if learning_from == "me":
@@ -2942,6 +2965,7 @@ class PDAgent(Agent):
             return my_average, averages[oppID], self.pp_oppPayoff[partner_ID]
 
     def step(self):
+
         if not self.model.resetTurn:
             self.compare_score()
             self.reset_values()
@@ -2995,6 +3019,8 @@ class PDAgent(Agent):
                         self.itermove_result[n] = new_moves[n]
                     # self.itermove_result =
                     self.find_average_move()
+                    if self.stepCount > 1:
+                        self.avPayoff = self.avScore()
 
                     if self.model.schedule_type != "Simultaneous":
                         self.advance()
@@ -3026,6 +3052,8 @@ class PDAgent(Agent):
                     # self.itermove_result =
                     self.previous_moves.append(self.move)
                     self.find_average_move()
+                    if self.stepCount > 1:
+                        self.avPayoff = self.avScore()
 
                     if self.model.schedule_type != "Simultaneous":
                         self.advance()
@@ -3060,6 +3088,8 @@ class PDAgent(Agent):
                         # self.itermove_result =
 
                     self.find_average_move()
+                    if self.stepCount > 1:
+                        self.avPayoff = self.avScore()
 
                     if self.model.schedule_type != "Simultaneous":
                         self.advance()
@@ -3085,6 +3115,8 @@ class PDAgent(Agent):
 
                     self.previous_moves.append(self.move)  # Does this need to be here? Why is it nowhere else?
                     self.find_average_move()
+                    if self.stepCount > 1:
+                        self.avPayoff = self.avScore()
 
                     if self.model.schedule_type != "Simultaneous":
                         self.advance()
@@ -3142,6 +3174,8 @@ class PDAgent(Agent):
                     self.itermove_result[n] = moves[n]  # We now try and find our partners from here
 
                 self.find_average_move()
+                if self.stepCount > 1:
+                    self.avPayoff = self.avScore()
 
             for i in self.current_partner_list:
                 if i not in self.partner_IDs:
@@ -3152,6 +3186,8 @@ class PDAgent(Agent):
             if self.stepCount == (self.model.rounds - 1):
                 self.last_round = True
             self.find_average_move()
+            if self.stepCount > 1:
+                self.avPayoff = self.avScore()
             if self.model.schedule_type != "Simultaneous":
                 self.advance()
 
