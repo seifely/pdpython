@@ -3367,7 +3367,8 @@ class PDAgent(Agent):
                                                                   self.working_memory[partnerID],
                                                                   self.indivAvPayoff[partnerID],  # using this instead of working memory as sometimes wm breaks
                                                                   self.oppAvPayoff[partnerID],
-                                                                  self.model.CC,
+                                                                  #self.model.CC,
+                                                                  2,
                                                                   #self.model.reputationBlackboard[self.ID],
                                                                   self.model.averageBetrayals,  # this is the target reputation
                                                                   self.mood,
@@ -3397,7 +3398,8 @@ class PDAgent(Agent):
                                                                       [0, 0, 0, 0, 0, 0, 0],
                                                                       0,
                                                                       0,
-                                                                      self.model.CC,
+                                                                      #self.model.CC,
+                                                                      2,
                                                                       #self.model.reputationBlackboard[self.ID],
                                                                       self.model.averageBetrayals,
                                                                       # this is the target reputation
@@ -3633,7 +3635,8 @@ class PDAgent(Agent):
                                                                   self.working_memory[partnerID],
                                                                   self.indivAvPayoff[partnerID],  # using this instead of working memory as sometimes wm breaks
                                                                   self.oppAvPayoff[partnerID],
-                                                                  self.model.CC,
+                                                                  #self.model.CC,
+                                                                  2,
                                                                   #self.model.reputationBlackboard[self.ID],
                                                                   self.model.averageBetrayals,
                                                                   # this is the target reputation
@@ -3664,7 +3667,8 @@ class PDAgent(Agent):
                                                                       [0,0,0,0,0,0,0],
                                                                       0,
                                                                       0,
-                                                                      self.model.CC,
+                                                                      #self.model.CC,
+                                                                      2,
                                                                       #self.model.reputationBlackboard[self.ID],
                                                                       self.model.averageBetrayals,
                                                                       # this is the target reputation
@@ -3775,7 +3779,8 @@ class PDAgent(Agent):
                                                                   self.working_memory[partnerID],
                                                                   self.indivAvPayoff[partnerID],
                                                                   self.oppAvPayoff[partnerID],
-                                                                  self.model.CC,
+                                                                  #self.model.CC,
+                                                                  2,
                                                                   self.model.averageBetrayals,
                                                                   # this is the target reputation
                                                                   #self.model.reputationBlackboard[self.ID],
@@ -3805,7 +3810,8 @@ class PDAgent(Agent):
                                                                       [0, 0, 0, 0, 0, 0, 0],
                                                                       0,
                                                                       0,
-                                                                      self.model.CC,
+                                                                      #self.model.CC,
+                                                                      2,
                                                                       self.model.averageBetrayals,
                                                                       # this is the target reputation
                                                                       #self.model.reputationBlackboard[self.ID],
@@ -3891,7 +3897,8 @@ class PDAgent(Agent):
                                                               self.working_memory[partnerID],
                                                               statistics.mean(self.working_memory[partnerID]),
                                                               statistics.mean(self.pp_oppPayoff[partnerID]),
-                                                              self.model.CC,
+                                                              #self.model.CC,
+                                                              2,
                                                               #self.model.reputationBlackboard[self.ID],
                                                               self.model.averageBetrayals,
                                                               # this is the target reputation
@@ -3921,7 +3928,8 @@ class PDAgent(Agent):
                                                                   [0, 0, 0, 0, 0, 0, 0],
                                                                   0,
                                                                   0,
-                                                                  self.model.CC,
+                                                                  #self.model.CC,
+                                                                  2,
                                                                   #self.model.reputationBlackboard[self.ID],
                                                                   self.model.averageBetrayals,
                                                                   # this is the target reputation

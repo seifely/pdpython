@@ -386,7 +386,7 @@ class PDModel(Model):
                      "Simultaneous": SimultaneousActivation}
 
     def __init__(self, height=11, width=11,    # even numbers are checkerboard fair
-                 number_of_agents=40,
+                 number_of_agents=12,
                  schedule_type="Simultaneous",
                  rounds=50,
                  collect_data=True,
@@ -886,10 +886,10 @@ class PDModel(Model):
         nt.from_nx(self.initial_graphG)
         if self.number_of_agents > 30:
             nt.toggle_physics(False)
-            nt.show('initialisation_batch.html')
+            nt.show(self.exp_n + '-initialisation_batch.html')
         else:
             nt.toggle_physics(True)
-            nt.show('initialisation_batch.html')
+            nt.show(self.exp_n + '-initialisation_batch.html')
 
         self.max_edges = rnf.maxEdgesPossible(self.number_of_agents, self.agentIDs)
         self.graph_connectedness = (nx.number_of_edges(self.initial_graphG)) / self.max_edges
@@ -897,7 +897,7 @@ class PDModel(Model):
 
     def change_graph(self, additions, removals, old_graph):
         #Previous Graph Stata
-        print("OLD Density:", nx.density(self.updated_graphG), " Nodes:", nx.number_of_nodes(self.updated_graphG), " Edges:", nx.number_of_edges(self.updated_graphG))
+        # print("OLD Density:", nx.density(self.updated_graphG), " Nodes:", nx.number_of_nodes(self.updated_graphG), " Edges:", nx.number_of_edges(self.updated_graphG))
 
         updated_graph, updated_graphG = rnf.update_graph(self.updated_graphD, self.graph_additions, self.graph_removals,
                                                          True, self.agentIDs)
@@ -906,7 +906,7 @@ class PDModel(Model):
         self.graph_removals = []
 
         #New Graph Stats
-        print("OLD Density:", nx.density(updated_graphG), " Nodes:", nx.number_of_nodes(updated_graphG), " Edges:", nx.number_of_edges(updated_graphG))
+        # print("OLD Density:", nx.density(updated_graphG), " Nodes:", nx.number_of_nodes(updated_graphG), " Edges:", nx.number_of_edges(updated_graphG))
         return updated_graph, updated_graphG
 
     def set_ppds(self):
@@ -1227,11 +1227,11 @@ class PDModel(Model):
         elif strategy == 'TFT':
             return ('#31A9FF')
         elif strategy == 'VPP':
-            return ('#CD00DA')
+            return ('#7F8AFF')
         elif strategy == 'WSLS':
             return ('#00C71C')
         elif strategy == "LEARN":
-            return ('#7F8AFF')
+            return ('#CD00DA')
         elif strategy == "MOODYLEARN":
             return ('#F67300')
 
@@ -1272,10 +1272,10 @@ class PDModel(Model):
 
         if self.number_of_agents > 30:
             nnt_batch.toggle_physics(False)
-            nnt_batch.show('nnx_batch.html')
+            nnt_batch.show(self.exp_n + '-nnx_batch.html')
         else:
             nnt_batch.toggle_physics(True)
-            nnt_batch.show('nnx_batch.html')
+            nnt_batch.show(self.exp_n + '-nnx_batch.html')
         return
 
     def step(self):
@@ -1313,10 +1313,12 @@ class PDModel(Model):
             nt.from_nx(self.updated_graphG)
             if self.number_of_agents > 30:
                 nt.toggle_physics(False)
-                nt.show('nx_batch.html')
+                # nt.inherit_edge_colors(False)
+                nt.show(self.exp_n + '-nx_batch.html')
             else:
                 nt.toggle_physics(True)
-                nt.show('nx_batch.html')
+                # nt.inherit_edge_colors(False)
+                nt.show(self.exp_n + '-nx_batch.html')
 
             self.recolorGraph()
             self.update_agent_ppds(self.agent_ppds)
@@ -1457,9 +1459,10 @@ br_params = {#"number_of_agents": [64],
              #"sensitivity": [0],
              "sensitive_agents": [(0,), #(0, 13]),
                                   ],  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
-             "selectionStrategy": ["REP"],
+             "selectionStrategy": ["SCORE"],
              "rewirePercentage": [#0.1,
-                                  0.3
+                                  0.3,
+                                  #0.5,
                                   ],
              "forgivenessPeriod": [5,
                                    #200,
@@ -1474,7 +1477,7 @@ br_params = {#"number_of_agents": [64],
 
 br = BatchRunner(PDModel,
                  br_params,
-                 iterations=3,
+                 iterations=1,
                  max_steps=25000,  # This should be 10k, but have set it to 5k because it now takes ages to run
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 

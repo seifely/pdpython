@@ -661,7 +661,7 @@ class PDModel(Model):
                          "MOODYLEARN",
                           "ANGEL",
                          "DEVIL",
-                         "VPP",
+                         #"VPP",
                          "RANDOM",
                          "WSLS",
                          # "iWSLS",
@@ -958,10 +958,10 @@ class PDModel(Model):
         nt.from_nx(self.initial_graphG)
         if self.number_of_agents > 30:
             nt.toggle_physics(False)
-            nt.show('initialisation.html')
+            nt.show(self.exp_n + '-initialisation.html')
         else:
             nt.toggle_physics(True)
-            nt.show('initialisation.html')
+            nt.show(self.exp_n + '-initialisation.html')
 
 
         self.max_edges = rnf.maxEdgesPossible(self.number_of_agents, self.agentIDs)
@@ -1343,11 +1343,11 @@ class PDModel(Model):
         elif strategy == 'TFT':
             return ('#31A9FF')
         elif strategy == 'VPP':
-            return ('#CD00DA')
+            return ('#7F8AFF')
         elif strategy == 'WSLS':
             return ('#00C71C')
         elif strategy == "LEARN":
-            return ('#7F8AFF')
+            return ('#CD00DA')
         elif strategy == "MOODYLEARN":
             return ('#F67300')
 
@@ -1388,10 +1388,10 @@ class PDModel(Model):
 
         if self.number_of_agents > 30:
             nnt.toggle_physics(False)
-            nnt.show('nnx.html')
+            nnt.show(self.exp_n + '-nnx.html')
         else:
             nnt.toggle_physics(True)
-            nnt.show('nnx.html')
+            nnt.show(self.exp_n + '-nnx.html')
         return
 
     def step(self):
@@ -1498,10 +1498,10 @@ class PDModel(Model):
             nt.from_nx(self.updated_graphG)
             if self.number_of_agents > 30:
                 nt.toggle_physics(False)
-                nt.show('nx.html')
+                nt.show(self.exp_n + '-nx.html')
             else:
                 nt.toggle_physics(True)
-                nt.show('nx.html')
+                nt.show(self.exp_n + '-nx.html')
 
             self.recolorGraph()
 
