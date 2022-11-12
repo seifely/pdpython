@@ -31,7 +31,7 @@
             <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="220">
-                  <caret line="266" column="12" lean-forward="true" selection-start-line="266" selection-start-column="12" selection-end-line="266" selection-end-column="71" />
+                  <caret line="266" column="12" selection-start-line="266" selection-start-column="12" selection-end-line="266" selection-end-column="71" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
                   </folding>
@@ -46,10 +46,22 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pdpython_model/moody_model.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="189">
-                  <caret line="437" column="33" selection-start-line="437" selection-start-column="33" selection-end-line="437" selection-end-column="33" />
+                <state relative-caret-position="408">
+                  <caret line="1135" column="27" selection-start-line="1135" selection-start-column="27" selection-end-line="1135" selection-end-column="27" />
                   <folding>
                     <element signature="e#0#22#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/pdpython_model/moody_server.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="595">
+                  <caret line="240" column="91" selection-start-line="240" selection-start-column="91" selection-end-line="240" selection-end-column="91" />
+                  <folding>
+                    <element signature="e#0#65#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -80,9 +92,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.avPayoff = self.avScore()</find>
-      <find>averageScoreComparison</find>
-      <find>if not</find>
       <find>avpayoff</find>
       <find>avscore</find>
       <find>averageScore</find>
@@ -110,6 +119,9 @@
       <find>len(choices</find>
       <find>agent_strategies</find>
       <find>pickle</find>
+      <find>k_inde</find>
+      <find>coop_inde</find>
+      <find>self.DD</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -127,7 +139,6 @@
         <option value="$PROJECT_DIR$/pdpython_model/sarsa_moody.py" />
         <option value="$PROJECT_DIR$/pdpython_model/sarsa_model.py" />
         <option value="$PROJECT_DIR$/pdpython_model/batch_run.py" />
-        <option value="$PROJECT_DIR$/pdpython_model/moody_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/sarsa_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/random_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/random_run.py" />
@@ -143,6 +154,7 @@
         <option value="$PROJECT_DIR$/pdpython_model/fixed_random_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/example_test.py" />
         <option value="$PROJECT_DIR$/pdpython_model/agents.py" />
+        <option value="$PROJECT_DIR$/pdpython_model/moody_server.py" />
         <option value="$PROJECT_DIR$/pdpython_model/moody_model.py" />
       </list>
     </option>
@@ -403,16 +415,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pdpython_model/moody_server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3468">
-          <caret line="209" column="59" selection-start-line="209" selection-start-column="59" selection-end-line="209" selection-end-column="59" />
-          <folding>
-            <element signature="e#0#65#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/sarsa_server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -468,33 +470,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1385">
           <caret line="446" column="47" selection-start-line="446" selection-start-column="47" selection-end-line="446" selection-end-column="47" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#776#1059#0" />
-            <element signature="e#1100#1369#0" />
-            <element signature="e#1407#1931#0" />
-            <element signature="e#1972#2475#0" />
-            <element signature="e#2510#2732#0" />
-            <element signature="e#2765#2986#0" />
-            <element signature="e#3016#3253#0" />
-            <element signature="e#3292#3926#0" />
-            <element signature="e#3966#4600#0" />
-            <element signature="e#4639#5273#0" />
-            <element signature="e#5313#5947#0" />
-            <element signature="e#5987#6623#0" />
-            <element signature="e#6664#7302#0" />
-            <element signature="e#7343#7979#0" />
-            <element signature="e#8021#8659#0" />
-            <element signature="e#8700#9336#0" />
-            <element signature="e#9370#10007#0" />
-            <element signature="e#10049#10685#0" />
-            <element signature="e#10731#11372#0" />
-            <element signature="e#11411#12053#0" />
-            <element signature="e#12100#12741#0" />
-            <element signature="e#12773#13027#0" />
-            <element signature="e#13065#13304#0" />
-            <element signature="e#13340#13485#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -503,33 +478,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
           <caret line="1007" column="31" selection-start-line="1007" selection-start-column="31" selection-end-line="1007" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#630#913#0" />
-            <element signature="e#954#1223#0" />
-            <element signature="e#1258#1480#0" />
-            <element signature="e#1513#1734#0" />
-            <element signature="e#1773#2407#0" />
-            <element signature="e#2447#3081#0" />
-            <element signature="e#3120#3754#0" />
-            <element signature="e#3794#4428#0" />
-            <element signature="e#4468#5104#0" />
-            <element signature="e#5145#5783#0" />
-            <element signature="e#5824#6460#0" />
-            <element signature="e#6502#7140#0" />
-            <element signature="e#7181#7817#0" />
-            <element signature="e#7851#8488#0" />
-            <element signature="e#8530#9166#0" />
-            <element signature="e#9212#9853#0" />
-            <element signature="e#9892#10534#0" />
-            <element signature="e#10581#11222#0" />
-            <element signature="e#11254#11508#0" />
-            <element signature="e#11546#11785#0" />
-            <element signature="e#11821#11966#0" />
-            <element signature="e#33091#34719#0" />
-            <element signature="e#34779#36419#0" />
-            <element signature="e#40807#41616#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -537,9 +485,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="945" column="30" selection-start-line="945" selection-start-column="26" selection-end-line="945" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -641,7 +586,7 @@
     <entry file="file://$PROJECT_DIR$/pdpython_model/fixed_random_agents.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
-          <caret line="266" column="12" lean-forward="true" selection-start-line="266" selection-start-column="12" selection-end-line="266" selection-end-column="71" />
+          <caret line="266" column="12" selection-start-line="266" selection-start-column="12" selection-end-line="266" selection-end-column="71" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
@@ -658,10 +603,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pdpython_model/moody_server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="595">
+          <caret line="240" column="91" selection-start-line="240" selection-start-column="91" selection-end-line="240" selection-end-column="91" />
+          <folding>
+            <element signature="e#0#65#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pdpython_model/moody_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="437" column="33" selection-start-line="437" selection-start-column="33" selection-end-line="437" selection-end-column="33" />
+        <state relative-caret-position="408">
+          <caret line="1135" column="27" selection-start-line="1135" selection-start-column="27" selection-end-line="1135" selection-end-column="27" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
