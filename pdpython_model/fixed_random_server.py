@@ -321,8 +321,8 @@ model_params = {"number_of_agents": UserSettableParameter('slider', 'Number of A
 #chart_element = ChartModule([{"Label": "Cooperations", "Color": C_COLOR},
  #                            {"Label": "Defections", "Color": D_COLOR}], canvas_height=200, canvas_width=200)
 
-chart_element = ChartModule([{"Label": "Percentage Cooperations", "Color": C_COLOR},
-                             {"Label": "Percentage Defections", "Color": D_COLOR},
+chart_element = ChartModule([{"Label": "Cooperations", "Color": C_COLOR},
+                             {"Label": "Defections", "Color": D_COLOR},
                              {"Label": "Average Mood", "Color": "#ffc0cb"},
                              ])
 
