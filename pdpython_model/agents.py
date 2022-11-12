@@ -212,7 +212,8 @@ class PDAgent(Agent):
         #     agent_ppds = pickle.load(f)
         agent_ppds = copy.deepcopy(self.model.agent_ppds)
         # print("agent ppds are,", agent_ppds)
-        my_pickle = agent_ppds[self.ID]
+        # my_pickle = agent_ppds[self.ID]
+        my_pickle = [0 for i in range(self.model.number_of_agents)]
         # print("my defaults are", my_pickle)
         # j = 0
         for i in ids:
