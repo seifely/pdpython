@@ -1397,11 +1397,6 @@ class PDModel(Model):
 
 # parameter lists for each parameter to be tested in batch run
 br_params = {#"number_of_agents": [64],
-             #"theta": [0.015, #0.01, 0.015, 0.02],
-             #model.learning_rate
-             #"alpha": [0.1],
-             #"gamma": [0.95],
-             #"epsilon": [0.99],
              "DC": [5],
              "CC": [3],
              "DD": [1],
