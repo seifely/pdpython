@@ -583,7 +583,8 @@ class PDModel(Model):
                 self.moody_startmood, self.DC, self.width, self.width, self.moody_MA,
                 self.moody_statemode, "mixedOppo", self.iteration_n), "a")
             else:
-                concatenator = ('payoffredo_%s-%s-%s-%s_start%s_mood%s_eps_%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.startingBehav, self.moody_startmood, self.moody_epsilon, self.width, self.width, self.moody_MA,
+                # TODO: THIS IS THE MOST USED CONCATENATOR VVVVVVVVV
+                concatenator = ('moodygrid_%s-%s-%s-%s_start%s_mood%s_eps_%s_%s_mA_%s_%s_%s_msarsa_no_%s' % (self.DC, self.CC, self.DD, self.CD, self.startingBehav, self.moody_startmood, self.moody_epsilon, self.number_of_agents, self.moody_MA,
                                                                                           self.moody_statemode, self.moody_sarsa_oppo, self.iteration_n), "a")
         else:
             concatenator = ('xxx_nosarsa_no_%s' % (self.iteration_n), "a")
@@ -1068,23 +1069,13 @@ class PDModel(Model):
 br_params = {#"number_of_agents": [64],
              #"theta": [0.015, #0.01, 0.015, 0.02],
              #model.learning_rate
-             #"init_ppD": [0.5],
-             #"k": [35],
              #"alpha": [0.1],
              #"gamma": [0.95],
              #"epsilon": [0.99],
-             #"sarsa_distro": [0.25, 0.50, 0.75],
              "DC": [5],
              "CC": [3],
              "DD": [1],
              "CD": [0],
-             #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
-                            #"MOODYLEARN"],
-
-             # "learnFrom": ["them"],
-             # "memoryPaired": [False],
-             #"msize": [1,4,7],
-
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
              "moody_epsilon": [0.1,

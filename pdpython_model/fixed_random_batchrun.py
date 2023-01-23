@@ -652,9 +652,9 @@ class PDModel(Model):
             else:
                 opponent = self.moody_sarsa_oppo
             # TODO: THIS IS THE MOST USED CONCATENATOR VVVVVVVVVVVVVVVVVVVVVVVV
-            concatenator = ('restructure%s_%s-%s-%s-%s_round%s_mood%s_graphprob%s_%sx%s_mA_%s_%s_%s_msarsa_no_%s' % (
+            concatenator = ('restructure%s_%s-%s-%s-%s_round%s_mood%s_graphprob%s_%s_mA_%s_%s_%s_msarsa_no_%s' % (
                 self.change_frequency, self.DC, self.CC, self.DD, self.CD, self.change_frequency, self.moody_startmood,
-                self.graph_probability, self.width, self.width, self.moody_MA,
+                self.graph_probability, self.number_of_agents, self.moody_MA,
                 self.moody_statemode, opponent, self.iteration_n), "a")
 
         else:
@@ -1399,23 +1399,13 @@ class PDModel(Model):
 br_params = {#"number_of_agents": [64],
              #"theta": [0.015, #0.01, 0.015, 0.02],
              #model.learning_rate
-             #"init_ppD": [0.5],
-             #"k": [35],
              #"alpha": [0.1],
              #"gamma": [0.95],
              #"epsilon": [0.99],
-             #"sarsa_distro": [0.25, 0.50, 0.75],
              "DC": [5],
              "CC": [3],
              "DD": [1],
              "CD": [0],
-             #"sarsa_oppo": [#"TFT", "ANGEL", "DEVIL", "LEARN", "VPP", "RANDOM", "WSLS", "iWSLS",
-                            #"MOODYLEARN"],
-
-             # "learnFrom": ["them"],
-             # "memoryPaired": [False],
-             #"msize": [1,4,7],
-
              "moody_alpha": [0.1],
              "moody_gamma": [0.95],
              "moody_epsilon": [0.1,
@@ -1478,7 +1468,7 @@ br_params = {#"number_of_agents": [64],
 br = BatchRunner(PDModel,
                  br_params,
                  iterations=1,
-                 max_steps=25000,  # This should be 10k, but have set it to 5k because it now takes ages to run
+                 max_steps=25000,
                  model_reporters={"Data Collector": lambda m: m.datacollector})
 
 if __name__ == '__main__':
