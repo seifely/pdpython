@@ -3512,7 +3512,7 @@ class PDAgent(Agent):
 
                         # updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward, self.working_memory[i], self.mood)
                         updatedQone, updatedQtwo = sarsa_moody.update_q(self.stepCount, a, s, self.moody_qtable, reward,
-                                                                        stateActionMem, self.mood)
+                                                                        stateActionMem, self.mood, self.moody_alpha, self.moody_gamma)
 
                         # if self.moody_delta == 1:
                         #     if self.model.moody_memoryPaired:

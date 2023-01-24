@@ -510,6 +510,7 @@ class PDModel(Model):
 
         self.sensitivity = sensitivity
         self.sensitive_agents = sensitive_agents
+        self.sensitive_agents = (0,)
         self.coop_index = (self.CC - self.DD) / (self.DC - self.CD)
 
         self.startingBehav = startingBehav
@@ -1106,9 +1107,6 @@ br_params = {#"number_of_agents": [64],
              "startingBehav": ['C',
                               #'D',
                               ],
-             #"sensitivity": [0],
-             "sensitive_agents": [(0,), #(0, 13]),
-                                  ],  # This will get clunky if we want to randomly distribute them every time, or if we want to include all agents
              }
 
 

@@ -376,7 +376,7 @@ def decay_value(initial, current, max_round, linear, floor):
         else:
             return new_value
 
-def update_q(step_number, actionTaken, state, qtable, payoff, memory, currMood):
+def update_q(step_number, actionTaken, state, qtable, payoff, memory, currMood, alpha, gamma):
     # TODO: Need to manage memory outside of this function, as we do with working memory /
     # TODO: Needs to be a NEW memory of payoffs gained instead of moves observed
     """THIS RETURNS UPDATED Q VALUES FROM OLD Q VALUES"""
@@ -384,10 +384,10 @@ def update_q(step_number, actionTaken, state, qtable, payoff, memory, currMood):
     if step_number is not None:
         if step_number is not 0:
             if actionTaken == 'C':
-                current[0] = learn(current[0], payoff, memory, currMood)
+                current[0] = learn(current[0], payoff, memory, currMood, alpha, gamma)
                 return current[0], current[1]
             else:
-                current[1] = learn(current[1], payoff, memory, currMood)
+                current[1] = learn(current[1], payoff, memory, currMood, alpha, gamma)
                 return current[0], current[1]
         else:
             if actionTaken == 'C':
@@ -416,8 +416,8 @@ def update_q(step_number, actionTaken, state, qtable, payoff, memory, currMood):
 #     return newQ
 #
 
-def learn(oldQ, reward, memory, mood):
-    newQ = oldQ + 0.1 * (reward + (0.95*estimateFutureRewards(mood, memory)) - oldQ)
+def learn(oldQ, reward, memory, mood, alpha, gamma):
+    newQ = oldQ + alpha * (reward + (gamma*estimateFutureRewards(mood, memory)) - oldQ)
     return newQ
 
 def estimateFutureRewards(mood, memory):
